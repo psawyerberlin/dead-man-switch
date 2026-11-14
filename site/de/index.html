@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dead man's switch — ein Brief, der sich nur öffnet, wenn Sie sich nicht mehr melden</title>
+<meta name="description" content="Schreiben Sie einen Brief, hängen Sie Dateien an. Im Browser verschlüsselt, öffnet er sich für die Menschen Ihrer Wahl nur, wenn Sie sich nicht mehr melden. Ohne Server, ohne Konto. Auf Nervos CKB.">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" hreflang="en" href="https://dead-man-switch.chainsolution.net/en/">
+<link rel="alternate" hreflang="fr" href="https://dead-man-switch.chainsolution.net/fr/">
+<link rel="alternate" hreflang="de" href="https://dead-man-switch.chainsolution.net/de/">
+<link rel="alternate" hreflang="x-default" href="https://dead-man-switch.chainsolution.net/">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/de/">Dead man's switch</a>
+  <nav>
+    <a href="#how">So funktioniert es</a>
+    <a href="#need">Was Sie brauchen</a>
+    <a href="#cost">Was es kostet</a>
+    <a href="#questions">Fragen</a>
+    <a href="/app/?lang=de">App öffnen</a>
+  </nav>
+  <div class="lang" aria-label="Sprache"><a href="/en/" lang="en">EN</a><a href="/fr/" lang="fr">FR</a><a href="/de/" aria-current="page" lang="de">DE</a></div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h1>Ein Brief, der sich nur öffnet, wenn Sie sich nicht mehr melden.</h1>
+      <p class="lede">Schreiben Sie auf, was sie wissen sollen. Hängen Sie die Unterlagen an. Versiegeln Sie alles in Ihrem Browser und geben Sie die versiegelte Datei noch heute den Menschen, denen Sie vertrauen. Solange Sie sich melden — jeden Monat, jedes Jahr, in Ihrem Rhythmus — bleibt der Brief verschlossen. Versäumen Sie Ihre Meldung um einen Tag, öffnet er sich von selbst. Überlegen Sie es sich anders, widerrufen Sie ihn, und er kann sich nie mehr öffnen.</p>
+      <div class="cta">
+        <a class="btn primary" href="/app/?lang=de">Brief schreiben (Testnet)</a>
+        <a class="btn" href="#how">So funktioniert es</a>
+      </div>
+      <p class="small">Kein Konto, kein Server: Nichts wird irgendwo gespeichert außer in der Datei, die Sie halten, und auf einer öffentlichen Kette, die keine Geheimnisse enthält.</p>
+    </div>
+    <div class="letter" aria-hidden="true">
+      <div class="addr">Für Léa und Jonas — nur zu öffnen, wenn ich mich nicht mehr melde</div>
+      <div class="line"></div>
+      <div class="body"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="stamp">Versiegelt · öffnet sich am 14. Mai 2027, sofern ich mich nicht melde</div>
+      <svg class="seal-mark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#7a1f2b"/><circle cx="50" cy="50" r="36" fill="none" stroke="#f0dfe1" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M34 50h22M56 50l-8-8M56 50l-8 8" stroke="#f0dfe1" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </section>
+
+  <h2 id="how">So funktioniert es</h2>
+  <ol class="steps">
+    <li><b>Schreiben und anhängen</b><p>Ein Text und Dateien jeder Art — ein Testament, Passwörter, Fotos, Anweisungen. Bis zu 25 MB. Nichts verlässt Ihren Browser.</p></li>
+    <li><b>Rhythmus wählen</b><p>Wie oft Sie sich melden werden: jeden Monat, alle drei, sechs oder zwölf. Die App sagt Ihnen in einem Satz, was geschieht, wenn Sie es nicht tun.</p></li>
+    <li><b>Wächter wählen</b><p>Unabhängige Betreiber von Nervos-CKB-Knoten bewahren je ein Schlüsselstück auf. Fünf von acht öffnen den Brief nach der Frist; weniger können nichts ausrichten, weder vorher noch nachher. Ihren eigenen Knoten können Sie als Wächter hinzufügen, der immer zustimmen muss.</p></li>
+    <li><b>Versiegeln und übergeben</b><p>Der Brief wird verschlüsselt und mit allem, was zum Öffnen nötig ist, in eine einzige Datei gepackt: den Tresor. Geben Sie ihn jetzt den Empfängern. Bis der Tag kommt, nützt er ihnen nichts.</p></li>
+    <li><b>Sich melden</b><p>Eine Signatur mit Ihrer Wallet verschiebt die Frist. Eine Kalendererinnerung ist dabei. Versäumen Sie sie um einen Tag, veröffentlichen die Wächter ihre Stücke; der Tresor öffnet sich von selbst.</p></li>
+    <li><b>Oder widerrufen</b><p>Eine Signatur zerstört den Schalter. Die Schlüsselstücke der Wächter werden gelöscht, der Tresor wird nutzlos, die hinterlegten CKB kommen zurück. Widerrufen ist kostenlos.</p></li>
+  </ol>
+
+  <div class="two">
+    <div>
+      <h3>Was die Empfänger tun</h3>
+      <p class="sans">Sie klicken doppelt auf die Tresordatei, in jedem Browser, online oder offline. Sie prüft sich selbst, sagt ihnen, ob der Brief schon offen ist, und zeigt dann den Text und lässt die Dateien herunterladen. Keine App, kein Konto, nichts zu installieren — auch in zwanzig Jahren nicht.</p>
+    </div>
+    <div>
+      <h3>Was niemand kann</h3>
+      <p class="sans">Den Brief vor der Frist lesen — nicht die Wächter, nicht der Betreiber dieser Seite, nicht die Menschen, die den Tresor halten. Ihn öffnen, nachdem Sie widerrufen haben. Ihn am Öffnen hindern, wenn Sie sich nicht mehr gemeldet haben — solange genug Wächter da sind.</p>
+    </div>
+  </div>
+  <div class="note">Die Tresordatei ist das einzige Geheimnis. Wer sie hält, kann den Brief nach der Frist lesen. Behandeln Sie sie wie den Brief, der sie ist.</div>
+
+  <h2 id="need">Was Sie brauchen</h2>
+  <ul>
+    <li>Eine <b>CKB-Wallet</b> — <a href="https://joy.id">JoyID</a> läuft im Browser mit einem Passkey, ohne Erweiterung. Anlegen, Melden und Widerrufen sind je eine Signatur.</li>
+    <li>Etwas <b>CKB</b> für die Trinkgelder der Wächter und die Zellen auf der Kette (siehe unten). Die App läuft vorerst im Testnetz, mit kostenlosen Test-CKB vom Faucet.</li>
+    <li>Menschen, denen Sie den Tresor geben, und einen Ort für Ihre eigene Kopie.</li>
+  </ul>
+
+  <h2 id="cost">Was es kostet</h2>
+  <table>
+    <thead><tr><th>Acht Wächter, ein Jahr</th><th class="num">CKB</th><th>Kommt zurück?</th></tr></thead>
+    <tbody>
+      <tr><td>Trinkgelder an die Wächter, je eines pro Tag</td><td class="num">≈ 1 470</td><td>nein</td></tr>
+      <tr><td>Servicegebühr dieser App (auf null stellbar)</td><td class="num">50</td><td>nein</td></tr>
+      <tr><td>Zellen, die auf der Kette hinterlegt bleiben, solange der Schalter besteht</td><td class="num">≈ 4 440</td><td>ja, am Ende</td></tr>
+    </tbody>
+  </table>
+  <p class="small">Etwa 15 $ ausgegeben und 44 $ hinterlegt, bei einem Cent pro CKB. Ein kürzerer Rhythmus kostet pro Jahr nicht mehr; Widerrufen ist kostenlos und gibt den hinterlegten Betrag zurück.</p>
+
+  <h2 id="questions">Fragen</h2>
+  <details open><summary>Was, wenn ich vergesse, mich zu melden?</summary><p>Der Brief öffnet sich 24 Stunden nach der Frist. Genau das ist der Zweck. Wählen Sie einen Rhythmus, den Sie einhalten, nehmen Sie die Kalenderdatei der App, und bedenken Sie: Sich früher zu melden kostet nur ein paar Tage doppelter Trinkgelder.</p></details>
+  <details><summary>Was, wenn ich meine Wallet verliere?</summary><p>Dann können Sie sich weder melden noch widerrufen, und der Brief öffnet sich zur nächsten Frist. Wenn Sie das nicht wollen, nutzen Sie eine Wallet mit Wiederherstellung; dem Schalter ist gleich, welche Wallet ihn besitzt.</p></details>
+  <details><summary>Wer sind die Wächter? Warum ihnen vertrauen?</summary><p>Betreiber von CKB-Vollknoten, die <a href="https://github.com/ckb-service-runner/ckb-service-runner">CKB Service Runner</a> einsetzen, auf der Kette mit einer Einlage von 10.000 CKB registriert und von einem unabhängigen Monitor öffentlich gereiht. Sie vertrauen keinem einzelnen: Fünf von acht braucht es, um den Brief zu öffnen, und die App zeigt, wie breit Ihre Auswahl gestreut ist. Sie können selbst einen Knoten betreiben und ihn zum Wächter machen, der immer zustimmen muss.</p></details>
+  <details><summary>Können die Wächter ihn früher öffnen?</summary><p>Nicht auf der Kette: Die Regeln lehnen ihre Veröffentlichung ab, bis die Frist verstrichen ist. Außerhalb der Kette müssten sich fünf von ihnen verschwören. Das ist das eine, was kein Entwurf ausschließen kann — und der Grund, sie an verschiedenen Orten zu wählen.</p></details>
+  <details><summary>Wo wird mein Brief gespeichert?</summary><p>Nur in der Tresordatei, verschlüsselt. Nicht auf dieser Seite, nicht auf der Kette, nicht bei den Wächtern. Die Kette hält nur die Schlüsselstücke der Wächter, die ohne den Tresor nutzlos sind.</p></details>
+  <details><summary>Kann ich den Brief ändern?</summary><p>Nicht an Ort und Stelle: Ein geänderter Brief ist ein neuer Tresor. Am einfachsten widerrufen Sie den Schalter (kostenlos) und legen einen neuen an. Auch ein Wächterwechsel erzeugt einen neuen Tresor; der alte funktioniert nicht mehr.</p></details>
+  <details><summary>Ist das Rechtsberatung? Ein Testament?</summary><p>Nein. Es ist ein Weg, bereits vorbereitete Unterlagen zu übergeben. Ein Testament braucht weiterhin die Form, die Ihr Land verlangt. Viele schreiben in den Brief, wo das Original liegt — und die Passwörter.</p></details>
+  <details><summary>Warum eine Blockchain?</summary><p>Weil ein solcher Schalter eine Uhr braucht, die niemand kontrolliert, einen Widerruf, den niemand übergehen kann, und einen Ort, an dem die Stücke der Wächter erscheinen, ohne dass man sie entfernen könnte. Nervos CKB bietet alle drei in seiner Basisschicht. Das Protokoll darunter ist offen: <a href="https://crt.chainsolution.net">CRT, das CKB Revocable Timelock</a>.</p></details>
+  <details><summary>Wann im Mainnet?</summary><p>Sobald das Netz der Wächter seine Dienstausführung im Mainnet öffnet. Bis dahin läuft alles im Testnetz mit kostenlosen Test-CKB — auch der richtige Ort, um es auszuprobieren.</p></details>
+
+  <p class="cta"><a class="btn primary" href="/app/?lang=de">Brief schreiben</a> <a class="btn" href="/app/?lang=de#/open">Tresor öffnen</a></p>
+</main>
+
+<footer>
+  <span>dead-man-switch — eine Anwendung auf <a href="https://crt.chainsolution.net">CRT</a>, dem CKB Revocable Timelock.</span>
+  <a href="https://github.com/psawyerberlin/dead-man-switch">Quellcode</a>
+  <a href="https://github.com/psawyerberlin/ckb-revocable-timelock/blob/main/SPEC.md">Protokoll</a>
+  <a href="https://t.me/ckbrunner">Fragen auf Telegram</a>
+</footer>
+<script>try{localStorage.setItem('dms-lang','de')}catch(e){}</script>
+</body>
+</html>

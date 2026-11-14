@@ -1,0 +1,6 @@
+node_modules/
+dist/
+.devnet/
+*.log
+.DS_Store
+site/app/assets/

@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://dead-man-switch.chainsolution.net/sitemap.xml

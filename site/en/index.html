@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dead man's switch — a letter that opens only if you stop checking in</title>
+<meta name="description" content="Write a letter and attach files. It is encrypted in your browser and opens for the people you choose only if you stop checking in. No server, no account. Built on Nervos CKB.">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" hreflang="en" href="https://dead-man-switch.chainsolution.net/en/">
+<link rel="alternate" hreflang="fr" href="https://dead-man-switch.chainsolution.net/fr/">
+<link rel="alternate" hreflang="de" href="https://dead-man-switch.chainsolution.net/de/">
+<link rel="alternate" hreflang="x-default" href="https://dead-man-switch.chainsolution.net/">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/en/">Dead man's switch</a>
+  <nav>
+    <a href="#how">How it works</a>
+    <a href="#need">What you need</a>
+    <a href="#cost">What it costs</a>
+    <a href="#questions">Questions</a>
+    <a href="/app/?lang=en">Open the app</a>
+  </nav>
+  <div class="lang" aria-label="Language"><a href="/en/" aria-current="page" lang="en">EN</a><a href="/fr/" lang="fr">FR</a><a href="/de/" lang="de">DE</a></div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h1>A letter that opens only if you stop checking in.</h1>
+      <p class="lede">Write what they should know. Attach the documents. Seal it in your browser and give the sealed file to the people you trust, today. As long as you check in — once a month, once a year, your choice — it stays shut. If you miss your check-in by a day, it opens by itself. If you change your mind, you cancel it, and it can never open.</p>
+      <div class="cta">
+        <a class="btn primary" href="/app/?lang=en">Write a letter (testnet)</a>
+        <a class="btn" href="#how">See how it works</a>
+      </div>
+      <p class="small">No account, no server, nothing stored anywhere but in the file you hold and on a public blockchain that holds no secrets.</p>
+    </div>
+    <div class="letter" aria-hidden="true">
+      <div class="addr">For Léa and Jonas — to be opened only if I stop checking in</div>
+      <div class="line"></div>
+      <div class="body"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="stamp">Sealed · opens 14 May 2027 unless I check in</div>
+      <svg class="seal-mark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#7a1f2b"/><circle cx="50" cy="50" r="36" fill="none" stroke="#f0dfe1" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M34 50h22M56 50l-8-8M56 50l-8 8" stroke="#f0dfe1" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </section>
+
+  <h2 id="how">How it works</h2>
+  <ol class="steps">
+    <li><b>Write and attach</b><p>A text, and files of any kind — a will, passwords, photographs, instructions. Up to 25 MB. Nothing leaves your browser.</p></li>
+    <li><b>Choose your rhythm</b><p>How often you will check in: every month, three, six or twelve. The app tells you in one sentence what happens if you don't.</p></li>
+    <li><b>Choose the guardians</b><p>Independent operators of Nervos CKB nodes each keep one piece of the key. Any five of eight open the letter after the deadline; fewer can do nothing, before or after. You can add your own node as one that must always agree.</p></li>
+    <li><b>Seal and hand over</b><p>The letter is encrypted and packed with everything needed to open it into one file, the vault. Give it to the recipients now. It is useless to them until the day comes.</p></li>
+    <li><b>Check in</b><p>One signature with your wallet moves the deadline. A calendar reminder is included. Miss it by a day and the guardians publish their pieces; the vault opens itself.</p></li>
+    <li><b>Or cancel</b><p>One signature destroys the switch. The guardians' key pieces are deleted, the vault becomes useless, the parked CKB comes back. Cancelling is free.</p></li>
+  </ol>
+
+  <div class="two">
+    <div>
+      <h3>What the recipients do</h3>
+      <p class="sans">They double-click the vault file, in any browser, online or offline. It checks itself, tells them whether the letter is open yet, and if it is, shows the text and lets them download the files. No app, no account, nothing to install, even twenty years from now.</p>
+    </div>
+    <div>
+      <h3>What nobody can do</h3>
+      <p class="sans">Read the letter before the deadline — not the guardians, not the operator of this site, not the people holding the vault. Open it after you cancelled. Stop it from opening once you have stopped checking in, as long as enough guardians are still there.</p>
+    </div>
+  </div>
+  <div class="note">The vault file is the only secret. Whoever holds it can read the letter after the deadline. Treat it like the letter it is.</div>
+
+  <h2 id="need">What you need</h2>
+  <ul>
+    <li>A <b>CKB wallet</b> — <a href="https://joy.id">JoyID</a> works in the browser with a passkey, no extension. Creating, checking in and cancelling are each one signature.</li>
+    <li>Some <b>CKB</b> for the guardians' tips and the on-chain cells (see below). The app runs on the test network for now, with free test CKB from the faucet.</li>
+    <li>People to give the vault to, and a place to keep your own copy.</li>
+  </ul>
+
+  <h2 id="cost">What it costs</h2>
+  <table>
+    <thead><tr><th>Eight guardians, one year</th><th class="num">CKB</th><th>Comes back?</th></tr></thead>
+    <tbody>
+      <tr><td>Tips to the guardians, one per day each</td><td class="num">≈ 1 470</td><td>no</td></tr>
+      <tr><td>Service fee of this app (you can set it to zero)</td><td class="num">50</td><td>no</td></tr>
+      <tr><td>Cells parked on the chain while the switch exists</td><td class="num">≈ 4 440</td><td>yes, when it ends</td></tr>
+    </tbody>
+  </table>
+  <p class="small">About $15 spent and $44 parked at one cent per CKB. A shorter rhythm does not cost more per year; cancelling is free and returns the parked amount.</p>
+
+  <h2 id="questions">Questions</h2>
+  <details open><summary>What if I forget to check in?</summary><p>The letter opens 24 hours after the deadline. That is the point of the device. Choose a rhythm you will keep, add the calendar file the app gives you, and remember that checking in early costs nothing but a few days of overlapping tips.</p></details>
+  <details><summary>What if I lose my wallet?</summary><p>You can no longer check in or cancel, so the letter will open at the next deadline. If that is not what you want, the app lets you use a wallet with recovery options; the switch does not care which wallet owns it.</p></details>
+  <details><summary>Who are the guardians? Why trust them?</summary><p>Operators of CKB full nodes who run <a href="https://github.com/ckb-service-runner/ckb-service-runner">CKB Service Runner</a>, registered on chain with a 10,000 CKB deposit and ranked publicly by an independent monitor. You do not trust any one of them: it takes five of your eight to open the letter, and the app shows you how spread out your choice is. You can run a node yourself and make it one that must always agree.</p></details>
+  <details><summary>Can the guardians open it early?</summary><p>Not on the chain: the rules refuse their publication until the deadline has passed. Off the chain, five of them would have to conspire. That is the one thing no design can rule out, and it is why you choose them from different places.</p></details>
+  <details><summary>Where is my letter stored?</summary><p>Only inside the vault file, encrypted. Not on this site, not on the chain, not with the guardians. The chain holds only the guardians' key pieces, which are useless without the vault.</p></details>
+  <details><summary>Can I change the letter?</summary><p>Not in place: changing the letter means a new vault. The cheapest way is to cancel the switch (free) and create a new one. Changing the guardians also produces a new vault; the old one stops working.</p></details>
+  <details><summary>Is this legal advice? A will?</summary><p>No. It is a way to deliver documents you have already prepared. A will still needs whatever form your jurisdiction requires. Many people put the location of the original, and the passwords, in the letter.</p></details>
+  <details><summary>Why a blockchain?</summary><p>Because a dead man's switch needs a clock nobody controls, a cancel button nobody can override, and a place where the guardians' pieces appear that cannot be taken down. Nervos CKB offers all three in its base layer. The protocol underneath is open: <a href="https://crt.chainsolution.net">CRT, the CKB Revocable Timelock</a>.</p></details>
+  <details><summary>When will it run on mainnet?</summary><p>When the guardians' network opens its service runtime on mainnet. Until then everything here runs on testnet with free test CKB — which is also the right place to try it.</p></details>
+
+  <p class="cta"><a class="btn primary" href="/app/?lang=en">Write a letter</a> <a class="btn" href="/app/?lang=en#/open">Open a vault</a></p>
+</main>
+
+<footer>
+  <span>dead-man-switch — an application on <a href="https://crt.chainsolution.net">CRT</a>, the CKB Revocable Timelock.</span>
+  <a href="https://github.com/psawyerberlin/dead-man-switch">Source</a>
+  <a href="https://github.com/psawyerberlin/ckb-revocable-timelock/blob/main/SPEC.md">Protocol</a>
+  <a href="https://t.me/ckbrunner">Questions on Telegram</a>
+</footer>
+<script>try{localStorage.setItem('dms-lang','en')}catch(e){}</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dead man's switch — une lettre qui ne s'ouvre que si vous cessez de donner signe de vie</title>
+<meta name="description" content="Écrivez une lettre, joignez des fichiers. Chiffrée dans votre navigateur, elle ne s'ouvre pour les personnes de votre choix que si vous cessez de signaler votre présence. Sans serveur, sans compte. Sur Nervos CKB.">
+<link rel="stylesheet" href="/assets/site.css">
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="alternate" hreflang="en" href="https://dead-man-switch.chainsolution.net/en/">
+<link rel="alternate" hreflang="fr" href="https://dead-man-switch.chainsolution.net/fr/">
+<link rel="alternate" hreflang="de" href="https://dead-man-switch.chainsolution.net/de/">
+<link rel="alternate" hreflang="x-default" href="https://dead-man-switch.chainsolution.net/">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="/fr/">Dead man's switch</a>
+  <nav>
+    <a href="#how">Comment ça marche</a>
+    <a href="#need">Ce qu'il vous faut</a>
+    <a href="#cost">Ce que ça coûte</a>
+    <a href="#questions">Questions</a>
+    <a href="/app/?lang=fr">Ouvrir l'application</a>
+  </nav>
+  <div class="lang" aria-label="Langue"><a href="/en/" lang="en">EN</a><a href="/fr/" aria-current="page" lang="fr">FR</a><a href="/de/" lang="de">DE</a></div>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <div>
+      <h1>Une lettre qui ne s'ouvre que si vous cessez de donner signe de vie.</h1>
+      <p class="lede">Écrivez ce qu'ils doivent savoir. Joignez les documents. Scellez le tout dans votre navigateur et remettez dès aujourd'hui le fichier scellé aux personnes de confiance. Tant que vous signalez votre présence — chaque mois, chaque année, à votre rythme — la lettre reste fermée. Si vous manquez votre rendez-vous d'un jour, elle s'ouvre d'elle-même. Si vous changez d'avis, vous l'annulez, et elle ne pourra plus jamais s'ouvrir.</p>
+      <div class="cta">
+        <a class="btn primary" href="/app/?lang=fr">Écrire une lettre (testnet)</a>
+        <a class="btn" href="#how">Voir comment ça marche</a>
+      </div>
+      <p class="small">Sans compte, sans serveur : rien n'est conservé ailleurs que dans le fichier que vous détenez et sur une chaîne publique qui ne contient aucun secret.</p>
+    </div>
+    <div class="letter" aria-hidden="true">
+      <div class="addr">Pour Léa et Jonas — à n'ouvrir que si je cesse de donner signe de vie</div>
+      <div class="line"></div>
+      <div class="body"><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="stamp">Scellée · s'ouvre le 14 mai 2027 sauf si je me signale</div>
+      <svg class="seal-mark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="44" fill="#7a1f2b"/><circle cx="50" cy="50" r="36" fill="none" stroke="#f0dfe1" stroke-width="1.5" stroke-dasharray="3 3"/><path d="M34 50h22M56 50l-8-8M56 50l-8 8" stroke="#f0dfe1" stroke-width="4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </section>
+
+  <h2 id="how">Comment ça marche</h2>
+  <ol class="steps">
+    <li><b>Écrire et joindre</b><p>Un texte, et des fichiers de toute nature — un testament, des mots de passe, des photos, des consignes. Jusqu'à 25 Mo. Rien ne quitte votre navigateur.</p></li>
+    <li><b>Choisir votre rythme</b><p>La fréquence à laquelle vous signalerez votre présence : chaque mois, tous les trois, six ou douze mois. L'application vous dit en une phrase ce qui se passe si vous ne le faites pas.</p></li>
+    <li><b>Choisir les gardiens</b><p>Des opérateurs indépendants de nœuds Nervos CKB conservent chacun un fragment de la clé. Cinq sur huit suffisent à ouvrir la lettre après l'échéance ; moins ne peuvent rien, ni avant ni après. Vous pouvez ajouter votre propre nœud comme gardien dont l'accord est toujours requis.</p></li>
+    <li><b>Sceller et remettre</b><p>La lettre est chiffrée et rangée, avec tout ce qu'il faut pour l'ouvrir, dans un seul fichier : le coffre. Remettez-le dès maintenant aux destinataires. Il ne leur sert à rien avant le jour venu.</p></li>
+    <li><b>Signaler votre présence</b><p>Une signature avec votre portefeuille reporte l'échéance. Un rappel pour votre agenda est fourni. Manquez-la d'un jour et les gardiens publient leurs fragments ; le coffre s'ouvre de lui-même.</p></li>
+    <li><b>Ou annuler</b><p>Une signature détruit le dispositif. Les fragments de clé des gardiens sont supprimés, le coffre devient inutile, les CKB immobilisés reviennent. Annuler est gratuit.</p></li>
+  </ol>
+
+  <div class="two">
+    <div>
+      <h3>Ce que font les destinataires</h3>
+      <p class="sans">Ils double-cliquent sur le fichier du coffre, dans n'importe quel navigateur, en ligne ou hors ligne. Il se vérifie lui-même, leur dit si la lettre est déjà ouverte et, si c'est le cas, affiche le texte et permet de télécharger les fichiers. Sans application, sans compte, sans rien installer — même dans vingt ans.</p>
+    </div>
+    <div>
+      <h3>Ce que personne ne peut faire</h3>
+      <p class="sans">Lire la lettre avant l'échéance — ni les gardiens, ni l'opérateur de ce site, ni ceux qui détiennent le coffre. L'ouvrir après que vous l'avez annulée. L'empêcher de s'ouvrir une fois que vous avez cessé de vous signaler, tant qu'il reste assez de gardiens.</p>
+    </div>
+  </div>
+  <div class="note">Le fichier du coffre est le seul secret. Quiconque le détient pourra lire la lettre après l'échéance. Traitez-le comme la lettre qu'il est.</div>
+
+  <h2 id="need">Ce qu'il vous faut</h2>
+  <ul>
+    <li>Un <b>portefeuille CKB</b> — <a href="https://joy.id">JoyID</a> fonctionne dans le navigateur avec une clé d'accès, sans extension. Créer, se signaler et annuler : une signature chacun.</li>
+    <li>Des <b>CKB</b> pour les pourboires des gardiens et les cellules sur la chaîne (voir ci-dessous). L'application tourne pour l'instant sur le réseau de test, avec des CKB de test gratuits.</li>
+    <li>Des personnes à qui remettre le coffre, et un endroit où garder votre propre copie.</li>
+  </ul>
+
+  <h2 id="cost">Ce que ça coûte</h2>
+  <table>
+    <thead><tr><th>Huit gardiens, un an</th><th class="num">CKB</th><th>Restitué ?</th></tr></thead>
+    <tbody>
+      <tr><td>Pourboires aux gardiens, un par jour chacun</td><td class="num">≈ 1 470</td><td>non</td></tr>
+      <tr><td>Frais de service de cette application (réglables à zéro)</td><td class="num">50</td><td>non</td></tr>
+      <tr><td>Cellules immobilisées sur la chaîne tant que le dispositif existe</td><td class="num">≈ 4 440</td><td>oui, à la fin</td></tr>
+    </tbody>
+  </table>
+  <p class="small">Environ 15 $ dépensés et 44 $ immobilisés, à un cent le CKB. Un rythme plus court ne coûte pas plus cher par an ; annuler est gratuit et restitue le montant immobilisé.</p>
+
+  <h2 id="questions">Questions</h2>
+  <details open><summary>Et si j'oublie de me signaler ?</summary><p>La lettre s'ouvre 24 heures après l'échéance. C'est précisément le rôle du dispositif. Choisissez un rythme que vous tiendrez, ajoutez le rappel d'agenda fourni par l'application, et souvenez-vous que se signaler en avance ne coûte que quelques jours de pourboires en double.</p></details>
+  <details><summary>Et si je perds mon portefeuille ?</summary><p>Vous ne pouvez plus ni vous signaler ni annuler : la lettre s'ouvrira à la prochaine échéance. Si ce n'est pas ce que vous voulez, utilisez un portefeuille avec des options de récupération ; le dispositif ne se soucie pas de quel portefeuille le possède.</p></details>
+  <details><summary>Qui sont les gardiens ? Pourquoi leur faire confiance ?</summary><p>Des opérateurs de nœuds complets CKB qui font tourner <a href="https://github.com/ckb-service-runner/ckb-service-runner">CKB Service Runner</a>, enregistrés sur la chaîne avec une caution de 10 000 CKB et classés publiquement par un moniteur indépendant. Vous ne faites confiance à aucun d'eux en particulier : il en faut cinq sur huit pour ouvrir la lettre, et l'application vous montre à quel point votre choix est dispersé. Vous pouvez faire tourner un nœud vous-même et en faire un gardien dont l'accord est toujours requis.</p></details>
+  <details><summary>Les gardiens peuvent-ils l'ouvrir en avance ?</summary><p>Pas sur la chaîne : les règles refusent leur publication tant que l'échéance n'est pas passée. En dehors de la chaîne, il faudrait que cinq d'entre eux s'entendent. C'est la seule chose qu'aucune conception ne peut exclure, et c'est pourquoi vous les choisissez en des lieux différents.</p></details>
+  <details><summary>Où ma lettre est-elle stockée ?</summary><p>Uniquement dans le fichier du coffre, chiffrée. Ni sur ce site, ni sur la chaîne, ni chez les gardiens. La chaîne ne contient que les fragments de clé des gardiens, inutiles sans le coffre.</p></details>
+  <details><summary>Puis-je modifier la lettre ?</summary><p>Pas sur place : modifier la lettre, c'est un nouveau coffre. Le plus simple est d'annuler le dispositif (gratuit) et d'en créer un nouveau. Changer de gardiens produit aussi un nouveau coffre ; l'ancien cesse de fonctionner.</p></details>
+  <details><summary>Est-ce un conseil juridique ? Un testament ?</summary><p>Non. C'est un moyen de remettre des documents que vous avez déjà préparés. Un testament reste soumis à la forme exigée là où vous vivez. Beaucoup indiquent dans la lettre où se trouve l'original, et les mots de passe.</p></details>
+  <details><summary>Pourquoi une blockchain ?</summary><p>Parce qu'un tel dispositif a besoin d'une horloge que personne ne contrôle, d'un bouton d'annulation que personne ne peut outrepasser, et d'un lieu où les fragments des gardiens apparaissent sans qu'on puisse les retirer. Nervos CKB offre les trois dans sa couche de base. Le protocole sous-jacent est ouvert : <a href="https://crt.chainsolution.net">CRT, le CKB Revocable Timelock</a>.</p></details>
+  <details><summary>Quand sur le mainnet ?</summary><p>Quand le réseau des gardiens ouvrira son exécution de services sur le mainnet. D'ici là, tout fonctionne sur le testnet avec des CKB de test gratuits — ce qui est aussi le bon endroit pour essayer.</p></details>
+
+  <p class="cta"><a class="btn primary" href="/app/?lang=fr">Écrire une lettre</a> <a class="btn" href="/app/?lang=fr#/open">Ouvrir un coffre</a></p>
+</main>
+
+<footer>
+  <span>dead-man-switch — une application sur <a href="https://crt.chainsolution.net">CRT</a>, le CKB Revocable Timelock.</span>
+  <a href="https://github.com/psawyerberlin/dead-man-switch">Code source</a>
+  <a href="https://github.com/psawyerberlin/ckb-revocable-timelock/blob/main/SPEC.md">Protocole</a>
+  <a href="https://t.me/ckbrunner">Questions sur Telegram</a>
+</footer>
+<script>try{localStorage.setItem('dms-lang','fr')}catch(e){}</script>
+</body>
+</html>
