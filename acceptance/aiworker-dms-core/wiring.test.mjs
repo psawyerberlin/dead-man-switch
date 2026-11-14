@@ -21,7 +21,7 @@ test('project and dependencies', () => {
   assert.ok(exists('config', 'testnet.json'));
   assert.ok(exists('config', 'mainnet.json'));
   const t = JSON.parse(read('config', 'testnet.json'));
-  for (const k of ['organiser_fee_ckb', 'organiser_address', 'default_t', 'default_n', 'rhythms_months', 'max_vault_bytes', 'faucet_url']) assert.ok(k in t, `config key ${k}`);
+  for (const k of ['organiser_fee_ckb', 'organiser_address', 'default_t', 'default_n', 'rhythms_months', 'max_vault_bytes', 'faucet_url', 'heartbeat_presets_blocks', 'default_heartbeat_blocks', 'default_heartbeat_tip_ckb']) assert.ok(k in t, `config key ${k}`);
   assert.equal(JSON.parse(read('config', 'mainnet.json')).enabled, false);
 });
 
@@ -33,6 +33,7 @@ test('core modules and constants', () => {
   assert.match(src, /generateKit/);
   assert.match(src, /VALARM/);
   assert.match(src, /dead-man-switch/);
+  assert.match(src, /estimateCost/);
   assert.doesNotMatch(src, /skipVerif|insecure|allowUnverified|noVerify/i);
 });
 
@@ -44,7 +45,7 @@ test('i18n files: three languages, identical key sets, fixed vocabulary', () => 
   const [en, fr, de] = langs.map(([, j]) => j);
   assert.equal(en['word.vault'], 'vault'); assert.equal(fr['word.vault'], 'coffre'); assert.equal(de['word.vault'], 'Tresor');
   assert.equal(en['word.guardians'], 'guardians'); assert.equal(fr['word.guardians'], 'gardiens'); assert.equal(de['word.guardians'], 'Wächter');
-  for (const j of [en, fr, de]) for (const k of ['rhythm.consequence', 'guardians.mandatory_trade', 'guardians.ack_phrase', 'mine.headroom_sentence', 'seal.saved_checkbox', 'cancel.consequence']) assert.ok(j[k], `key ${k}`);
+  for (const j of [en, fr, de]) for (const k of ['rhythm.consequence', 'guardians.mandatory_trade', 'guardians.ack_phrase', 'mine.headroom_sentence', 'seal.saved_checkbox', 'cancel.consequence', 'heartbeat.title', 'heartbeat.tradeoff', 'price.monthly']) assert.ok(j[k], `key ${k}`);
 });
 
 test('opener is built as a single self-contained bundle', () => {

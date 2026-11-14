@@ -7,7 +7,6 @@
   "app.loading": "Loading…",
   "app.chain_time": "chain time",
   "app.chain_time_note": "Dates follow the chain's clock, which can differ from yours by a few minutes.",
-
   "word.letter": "letter",
   "word.vault": "vault",
   "word.checkin": "check in",
@@ -16,12 +15,10 @@
   "word.guardian": "guardian",
   "word.open": "open",
   "word.cancel": "cancel",
-
   "nav.write": "Write a letter",
   "nav.mine": "My switches",
   "nav.open": "Open a vault",
   "nav.about": "How it works",
-
   "wallet.connect": "Connect a wallet",
   "wallet.disconnect": "Disconnect",
   "wallet.balance": "Balance: {amount} CKB",
@@ -29,7 +26,6 @@
   "wallet.needed": "Creating, checking in and cancelling are signed with your wallet. Nothing else is.",
   "wallet.sign_prompt": "Sign in your wallet to continue.",
   "wallet.insufficient": "This needs about {amount} CKB. Your wallet holds {balance} CKB.",
-
   "letter.title": "Your letter",
   "letter.memory_note": "The letter stays in this browser tab until you have saved the vault. Reloading the page before that loses it.",
   "letter.text_label": "Text",
@@ -42,7 +38,6 @@
   "letter.remove_file": "Remove",
   "letter.sender_label": "Your name, as the recipients should see it",
   "letter.next": "Choose the rhythm",
-
   "rhythm.title": "How often will you check in?",
   "rhythm.option": "{months, plural, one {Every month} other {Every # months}}",
   "rhythm.custom": "Other: every {months} months",
@@ -50,7 +45,6 @@
   "rhythm.grace_note": "The 24 hours after the deadline are a fixed grace period, not a reminder.",
   "rhythm.long_warning": "Terms over 5 years are not offered: the keys use today's cryptography, and short rhythms keep your letter under your control.",
   "rhythm.next": "Choose the guardians",
-
   "guardians.title": "Who holds the keys?",
   "guardians.intro": "Independent operators of CKB nodes each keep one piece of the key. Any {t} of {n} pieces open the letter after the deadline; fewer than {t} can do nothing, before or after.",
   "guardians.table.rank": "Rank",
@@ -69,7 +63,6 @@
   "guardians.own_node": "Run your own node and add it here",
   "guardians.limits": "What this cannot protect against: {t} of your guardians agreeing to open early, or a guardian who copies its piece on the first day. Choose them from different places.",
   "guardians.next": "See the price",
-
   "price.title": "What it costs",
   "price.spent": "Spent",
   "price.parked": "Parked, comes back",
@@ -82,7 +75,6 @@
   "price.total_parked": "{amount} CKB parked",
   "price.cancel_free": "Cancelling is free and returns the parked CKB.",
   "price.next": "Create the switch",
-
   "create.title": "Creating the switch",
   "create.step.sign": "Sign the creation in your wallet",
   "create.step.wait": "Waiting for the guardians ({done} of {n} ready)",
@@ -91,7 +83,6 @@
   "create.waiting_note": "Guardians usually answer within minutes. You can leave this tab open.",
   "create.verify_failed": "Verification failed (rule {rule}). The switch was not armed. Nothing can override this check; cancel and start again.",
   "create.done": "The switch is live. Now seal the letter.",
-
   "seal.title": "Seal the letter",
   "seal.intro": "The letter is encrypted in your browser and packed, with everything needed to open it later, into one file: the vault.",
   "seal.download": "Download the vault",
@@ -102,13 +93,11 @@
   "seal.certificate": "Print the certificate",
   "seal.calendar": "Add the deadline to your calendar",
   "seal.next": "Hand over the vault",
-
   "handover.title": "Give the vault to the recipients now",
   "handover.p1": "Send the file to the people who should read the letter, today. It is useless to them until the deadline has passed without you checking in.",
   "handover.p2": "Keep a copy yourself, somewhere they could also find it: a USB stick, a shared drive, a notary.",
   "handover.p3": "If you change the guardians later, a new vault replaces this one. Send it again.",
   "handover.done": "Go to my switches",
-
   "mine.title": "My switches",
   "mine.empty": "No switches on this device. Create one, or add one by its identifier.",
   "mine.add_by_id": "Add by identifier",
@@ -131,13 +120,11 @@
   "mine.download_vault": "Download the vault again",
   "mine.download_unavailable": "The vault cannot be rebuilt without the letter, which only existed in the tab where you wrote it. Change the guardians to produce a new one.",
   "mine.details": "Technical details",
-
   "cancel.title": "Cancel this switch?",
   "cancel.consequence": "The letter can never be opened. The vault becomes useless. The parked CKB comes back to your wallet.",
   "cancel.confirm": "Cancel the switch",
   "cancel.keep": "Keep it",
   "cancel.done": "Cancelled. The guardians' key pieces are being deleted.",
-
   "open.title": "Open a vault",
   "open.drop": "Drop the vault file here, or choose it",
   "open.or_status": "Or check the status of a switch by its identifier",
@@ -161,10 +148,8 @@
   "open.paste_hint": "One per line, as published on the chain.",
   "open.error.decrypt": "The letter could not be opened with the recovered key. The vault may have been altered.",
   "open.error.version": "This vault was made with a newer version of the app.",
-
   "about.title": "How it works",
   "about.site": "Read the full explanation on the website",
-
   "error.generic": "Something went wrong: {message}",
   "error.rpc": "The chain could not be reached. Try again in a moment.",
   "error.rejected": "You declined the signature in your wallet.",
@@ -176,9 +161,23 @@
   "unit.ckb": "CKB",
   "unit.months": "{count, plural, one {# month} other {# months}}",
   "unit.days": "{count, plural, one {# day} other {# days}}",
-
   "ics.summary": "Check in: dead man's switch",
   "ics.description": "Check in at {url} before {deadline}, or the letter opens.",
   "ics.alarm_14": "Two weeks before the deadline",
-  "ics.alarm_2": "Two days before the deadline"
+  "ics.alarm_2": "Two days before the deadline",
+  "heartbeat.title": "How often do the guardians check?",
+  "heartbeat.option_3h": "Every 3 hours",
+  "heartbeat.option_12h": "Every 12 hours",
+  "heartbeat.option_daily": "Every day",
+  "heartbeat.option_weekly": "Every week",
+  "heartbeat.option_custom": "Other: every {blocks} blocks (about {duration})",
+  "heartbeat.tradeoff": "A guardian that disappears is noticed within {delay}. Checking more often costs more.",
+  "heartbeat.tip_label": "Tip per check, per guardian",
+  "heartbeat.tip_note": "Guardians earn this each time they check. Below their minimum they will not take your letter.",
+  "price.monthly": "{amount} CKB per month while the switch runs",
+  "price.spent_now": "Paid now",
+  "price.spent_term": "Paid to the guardians over {months} months",
+  "price.assumptions": "How this is estimated",
+  "price.assumptions_text": "Based on a block every {seconds} seconds, {runs} checks per guardian over the term, and the cell sizes of the current deployment. Tips are prepaid and paid out check by check; what is not used comes back if you cancel early.",
+  "price.detection": "A missing guardian is noticed within {delay}."
 }

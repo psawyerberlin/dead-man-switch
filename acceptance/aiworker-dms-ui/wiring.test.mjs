@@ -13,7 +13,7 @@ const walk = (dir) => fs.readdirSync(path.join(ROOT, dir), { withFileTypes: true
 test('routes and screens', () => {
   const src = walk('app/src/ui').filter((f) => /\.(ts|html)$/.test(f)).map((f) => read(f)).join('\n');
   for (const r of ['#/write', '#/mine', '#/open', '#/about']) assert.ok(src.includes(r), `route ${r}`);
-  for (const k of ['rhythm.consequence', 'guardians.mandatory_trade', 'guardians.ack_phrase', 'mine.headroom_sentence', 'seal.saved_checkbox', 'cancel.consequence']) assert.ok(src.includes(k), `i18n key ${k} used`);
+  for (const k of ['rhythm.consequence', 'guardians.mandatory_trade', 'guardians.ack_phrase', 'mine.headroom_sentence', 'seal.saved_checkbox', 'cancel.consequence', 'heartbeat.title', 'heartbeat.tradeoff', 'price.monthly']) assert.ok(src.includes(k), `i18n key ${k} used`);
   assert.match(src, /prefers-reduced-motion|reduced-motion|matchMedia/);
 });
 

@@ -19,7 +19,7 @@ vendored CRT deployment (`app/public/deployments/<network>.json`, copied by a sc
 | `vault.ts` | `buildVault({descriptor, envelopes, letterCipher, meta, language}) → string` using `@crt/client` `generateKit` with the application payload of `SPEC.md` §4.2 and the opener script of phase 3 appended; `vaultFileName(senderLabel, T)`; `parseVault(html) → {descriptor, envelopes, application}` (reads the kit's JSON blocks) | `vault_deterministic`, `vault_self_contained`, `vault_roundtrip_parse`, `vault_filename` |
 | `calendar.ts` | `icsForDeadline({T, deadline, language}) → string` with two VALARMs (−14 d, −2 d), summary in the language | `ics_has_two_alarms` |
 | `i18n.ts` | `t(key, params)`, `setLanguage`, `detectLanguage(query, storage, navigatorLanguages)`, `formatCkb`, `formatDate`; loads the three JSON files statically | `i18n_same_keys_in_all_languages`, `i18n_detect_order`, `i18n_plural_forms` |
-| `price.ts` | `quote(config, crtDeployment, {n, t, rhythmMonths, heartbeatBlocks}) → {spent, parked, lines[]}` from CRT §11 (uses `@crt/client` defaults) | `quote_matches_crt_defaults` (8 runners / 12 months → 1 530 ± 2 % spent, 4 440 ± 2 % parked) |
+| `price.ts` | `quote(config, crtDeployment, {n, t, rhythmMonths, heartbeatBlocks, heartbeatTip}) → {spentNow, spentOverTerm, monthly, parked, lines[], detectionDelay}` — a thin wrapper over `@crt/client`'s `estimateCost` (CRT §11.1) plus the organiser fee from `config` and fiat formatting; `HEARTBEAT_PRESETS` from `config` | `quote_matches_crt_defaults` (8 / 12 months / daily → 1 530 ± 2 % spent, 4 440 ± 2 % parked), `quote_heartbeat_presets` (presets give strictly decreasing tip lines) |
 
 ## Phase 3 — the opener (`app/src/opener/`)
 

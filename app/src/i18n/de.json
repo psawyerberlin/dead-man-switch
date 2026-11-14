@@ -7,7 +7,6 @@
   "app.loading": "Wird geladen…",
   "app.chain_time": "Kettenzeit",
   "app.chain_time_note": "Die Daten folgen der Uhr der Kette, die um einige Minuten von Ihrer abweichen kann.",
-
   "word.letter": "Brief",
   "word.vault": "Tresor",
   "word.checkin": "sich melden",
@@ -16,12 +15,10 @@
   "word.guardian": "Wächter",
   "word.open": "öffnen",
   "word.cancel": "widerrufen",
-
   "nav.write": "Brief schreiben",
   "nav.mine": "Meine Schalter",
   "nav.open": "Tresor öffnen",
   "nav.about": "So funktioniert es",
-
   "wallet.connect": "Wallet verbinden",
   "wallet.disconnect": "Trennen",
   "wallet.balance": "Guthaben: {amount} CKB",
@@ -29,7 +26,6 @@
   "wallet.needed": "Anlegen, Melden und Widerrufen werden mit Ihrer Wallet signiert. Sonst nichts.",
   "wallet.sign_prompt": "Signieren Sie in Ihrer Wallet, um fortzufahren.",
   "wallet.insufficient": "Dafür werden etwa {amount} CKB benötigt. Ihre Wallet enthält {balance} CKB.",
-
   "letter.title": "Ihr Brief",
   "letter.memory_note": "Der Brief bleibt in diesem Browser-Tab, bis Sie den Tresor gespeichert haben. Ein Neuladen der Seite vorher löscht ihn.",
   "letter.text_label": "Text",
@@ -42,7 +38,6 @@
   "letter.remove_file": "Entfernen",
   "letter.sender_label": "Ihr Name, wie die Empfänger ihn sehen sollen",
   "letter.next": "Rhythmus wählen",
-
   "rhythm.title": "Wie oft werden Sie sich melden?",
   "rhythm.option": "{months, plural, one {Jeden Monat} other {Alle # Monate}}",
   "rhythm.custom": "Anders: alle {months} Monate",
@@ -50,7 +45,6 @@
   "rhythm.grace_note": "Die 24 Stunden nach der Frist sind eine feste Schonfrist, keine Erinnerung.",
   "rhythm.long_warning": "Laufzeiten über 5 Jahre werden nicht angeboten: Die Schlüssel beruhen auf heutiger Kryptographie, und kurze Rhythmen halten Ihren Brief unter Ihrer Kontrolle.",
   "rhythm.next": "Wächter wählen",
-
   "guardians.title": "Wer hält die Schlüssel?",
   "guardians.intro": "Unabhängige Betreiber von CKB-Knoten bewahren je ein Schlüsselstück auf. Beliebige {t} von {n} Stücken öffnen den Brief nach der Frist; weniger als {t} können nichts ausrichten, weder vorher noch nachher.",
   "guardians.table.rank": "Rang",
@@ -69,7 +63,6 @@
   "guardians.own_node": "Eigenen Knoten betreiben und hier hinzufügen",
   "guardians.limits": "Wovor das nicht schützt: {t} Ihrer Wächter, die sich auf ein vorzeitiges Öffnen einigen, oder ein Wächter, der sein Stück schon am ersten Tag kopiert. Wählen Sie sie an verschiedenen Orten.",
   "guardians.next": "Preis ansehen",
-
   "price.title": "Was es kostet",
   "price.spent": "Ausgegeben",
   "price.parked": "Hinterlegt, kommt zurück",
@@ -82,7 +75,6 @@
   "price.total_parked": "{amount} CKB hinterlegt",
   "price.cancel_free": "Widerrufen ist kostenlos und gibt die hinterlegten CKB zurück.",
   "price.next": "Schalter anlegen",
-
   "create.title": "Schalter wird angelegt",
   "create.step.sign": "Signieren Sie das Anlegen in Ihrer Wallet",
   "create.step.wait": "Warten auf die Wächter ({done} von {n} bereit)",
@@ -91,7 +83,6 @@
   "create.waiting_note": "Wächter antworten meist innerhalb von Minuten. Sie können diesen Tab offen lassen.",
   "create.verify_failed": "Die Prüfung ist fehlgeschlagen (Regel {rule}). Der Schalter wurde nicht scharf geschaltet. Diese Prüfung lässt sich nicht umgehen; widerrufen Sie und beginnen Sie von vorn.",
   "create.done": "Der Schalter ist aktiv. Versiegeln Sie jetzt den Brief.",
-
   "seal.title": "Brief versiegeln",
   "seal.intro": "Der Brief wird in Ihrem Browser verschlüsselt und zusammen mit allem, was zum späteren Öffnen nötig ist, in eine einzige Datei gepackt: den Tresor.",
   "seal.download": "Tresor herunterladen",
@@ -102,13 +93,11 @@
   "seal.certificate": "Zertifikat drucken",
   "seal.calendar": "Frist in den Kalender eintragen",
   "seal.next": "Tresor übergeben",
-
   "handover.title": "Geben Sie den Tresor jetzt an die Empfänger",
   "handover.p1": "Senden Sie die Datei heute an die Menschen, die den Brief lesen sollen. Sie nützt ihnen nichts, solange die Frist nicht verstrichen ist, ohne dass Sie sich gemeldet haben.",
   "handover.p2": "Behalten Sie selbst eine Kopie, an einem Ort, den auch sie finden könnten: ein USB-Stick, ein gemeinsames Laufwerk, ein Notar.",
   "handover.p3": "Wenn Sie später die Wächter wechseln, ersetzt ein neuer Tresor diesen. Senden Sie ihn erneut.",
   "handover.done": "Zu meinen Schaltern",
-
   "mine.title": "Meine Schalter",
   "mine.empty": "Keine Schalter auf diesem Gerät. Legen Sie einen an oder fügen Sie einen über seine Kennung hinzu.",
   "mine.add_by_id": "Über Kennung hinzufügen",
@@ -131,13 +120,11 @@
   "mine.download_vault": "Tresor erneut herunterladen",
   "mine.download_unavailable": "Der Tresor kann ohne den Brief nicht neu gebaut werden, und der Brief existierte nur in dem Tab, in dem Sie ihn geschrieben haben. Wechseln Sie die Wächter, um einen neuen zu erzeugen.",
   "mine.details": "Technische Details",
-
   "cancel.title": "Diesen Schalter widerrufen?",
   "cancel.consequence": "Der Brief kann nie geöffnet werden. Der Tresor wird nutzlos. Die hinterlegten CKB kommen in Ihre Wallet zurück.",
   "cancel.confirm": "Schalter widerrufen",
   "cancel.keep": "Behalten",
   "cancel.done": "Widerrufen. Die Schlüsselstücke der Wächter werden gelöscht.",
-
   "open.title": "Tresor öffnen",
   "open.drop": "Legen Sie die Tresordatei hier ab oder wählen Sie sie aus",
   "open.or_status": "Oder prüfen Sie den Stand eines Schalters über seine Kennung",
@@ -161,10 +148,8 @@
   "open.paste_hint": "Eines pro Zeile, wie auf der Kette veröffentlicht.",
   "open.error.decrypt": "Der Brief ließ sich mit dem wiederhergestellten Schlüssel nicht öffnen. Der Tresor wurde womöglich verändert.",
   "open.error.version": "Dieser Tresor stammt aus einer neueren Version der App.",
-
   "about.title": "So funktioniert es",
   "about.site": "Die vollständige Erklärung auf der Website lesen",
-
   "error.generic": "Etwas ist schiefgegangen: {message}",
   "error.rpc": "Die Kette ist nicht erreichbar. Versuchen Sie es gleich noch einmal.",
   "error.rejected": "Sie haben die Signatur in Ihrer Wallet abgelehnt.",
@@ -176,9 +161,23 @@
   "unit.ckb": "CKB",
   "unit.months": "{count, plural, one {# Monat} other {# Monate}}",
   "unit.days": "{count, plural, one {# Tag} other {# Tage}}",
-
   "ics.summary": "Melden: Dead man's switch",
   "ics.description": "Melden Sie sich auf {url} vor dem {deadline}, sonst öffnet sich der Brief.",
   "ics.alarm_14": "Zwei Wochen vor der Frist",
-  "ics.alarm_2": "Zwei Tage vor der Frist"
+  "ics.alarm_2": "Zwei Tage vor der Frist",
+  "heartbeat.title": "Wie oft prüfen die Wächter?",
+  "heartbeat.option_3h": "Alle 3 Stunden",
+  "heartbeat.option_12h": "Alle 12 Stunden",
+  "heartbeat.option_daily": "Jeden Tag",
+  "heartbeat.option_weekly": "Jede Woche",
+  "heartbeat.option_custom": "Anders: alle {blocks} Blöcke (etwa {duration})",
+  "heartbeat.tradeoff": "Ein Wächter, der verschwindet, fällt innerhalb von {delay} auf. Häufigeres Prüfen kostet mehr.",
+  "heartbeat.tip_label": "Trinkgeld pro Prüfung, je Wächter",
+  "heartbeat.tip_note": "Das verdienen die Wächter bei jeder Prüfung. Unter ihrem Minimum nehmen sie Ihren Brief nicht an.",
+  "price.monthly": "{amount} CKB pro Monat, solange der Schalter läuft",
+  "price.spent_now": "Jetzt bezahlt",
+  "price.spent_term": "An die Wächter über {months} Monate",
+  "price.assumptions": "So wird geschätzt",
+  "price.assumptions_text": "Ausgehend von einem Block alle {seconds} Sekunden, {runs} Prüfungen je Wächter über die Laufzeit und den Zellgrößen der aktuellen Bereitstellung. Trinkgelder werden vorausbezahlt und Prüfung für Prüfung ausgezahlt; was nicht verbraucht ist, kommt bei vorzeitigem Widerruf zurück.",
+  "price.detection": "Ein fehlender Wächter fällt innerhalb von {delay} auf."
 }

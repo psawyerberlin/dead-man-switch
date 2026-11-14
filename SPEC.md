@@ -43,12 +43,17 @@ only on the technical details panel and in the vault's certificate.
 3. **Choose the check-in rhythm**: every 1, 3, 6 or 12 months (custom allowed). The first deadline = now +
    rhythm. Plain-language consequence shown: "If you have not checked in by <date>, the letter opens on <date +
    24 h>." Terms over 5 years in one step are not offered (CRT §10); the rhythm keeps terms short by design.
-4. **Choose the guardians**: default 5-of-8 from the CRT runner directory (CRT §9), with the concentration summary;
-   advanced panel to change `t`, `n`, add the owner's own runner as mandatory (2-of-3 recommended per CRT §7.3;
-   1-of-1 only after typing "I understand" in the UI language).
-5. **See the price**: CRT §11 instantiated for the chosen rhythm and guardians: spent (tips, organiser fee) vs
-   parked (cells, back at the end). Organiser fee default **50 CKB** to the application operator's address from
-   `config/<network>.json`; shown as its own line; zero on cancel.
+4. **Choose the guardians and how closely they watch**: default 5-of-8 from the CRT runner directory (CRT §9),
+   with the concentration summary; `t`, `n`, the owner's own runner as mandatory (2-of-3 recommended per CRT
+   §7.3; 1-of-1 only after typing "I understand" in the UI language); and the **guardian check interval** (CRT
+   `HEARTBEAT`, §6.2) as presets *every 3 hours / every 12 hours / daily / weekly* with the plain-language trade
+   ("a guardian that disappears is noticed within {delay}; checking more often costs more") and the tip per
+   check (default, editable in the advanced panel). All of this is one screen with a **live running-cost panel**.
+5. **See the price**: the output of CRT's cost estimator (CRT §11.1) for the chosen settings — spent now, spent
+   over the term, **per month**, parked (back at the end) — with the assumptions expandable; the same figures,
+   frozen, are what the owner signs for. Organiser fee default **50 CKB** to the application operator's address
+   from `config/<network>.json`; shown as its own line; zero on cancel. Check in and Change guardians show the
+   same estimate for the extension / the new set before signing.
 6. **Create**: sign the CRT Create transaction. Then the app waits for the guardians' commits (progress per
    guardian, typically minutes), verifies hard-fail (CRT §8.3; a failure stops with the rule number and no
    override), builds the descriptor, signs **Arm**.
@@ -131,7 +136,7 @@ the same inputs (CRT §8.2).
 ### 4.3 Configuration
 
 `config/<network>.json`: `organiser_fee_ckb` (50), `organiser_address` (the operator's CKB address; testnet and
-mainnet differ), `default_t` (5), `default_n` (8), `rhythms_months` ([1, 3, 6, 12]), `max_vault_bytes` (26 214 400),
+mainnet differ), `default_t` (5), `default_n` (8), `rhythms_months` ([1, 3, 6, 12]), `heartbeat_presets_blocks` ([1000, 4000, 8000, 56000]), `default_heartbeat_blocks` (8000), `default_heartbeat_tip_ckb` (0.5), `max_vault_bytes` (26 214 400),
 `crt_deployment_url` (path to CRT's `deployments/<network>.json`, vendored copy at build time),
 `faucet_url` (testnet only).
 

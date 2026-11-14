@@ -7,7 +7,6 @@
   "app.loading": "Chargement…",
   "app.chain_time": "heure de la chaîne",
   "app.chain_time_note": "Les dates suivent l'horloge de la chaîne, qui peut différer de la vôtre de quelques minutes.",
-
   "word.letter": "lettre",
   "word.vault": "coffre",
   "word.checkin": "signaler sa présence",
@@ -16,12 +15,10 @@
   "word.guardian": "gardien",
   "word.open": "ouvrir",
   "word.cancel": "annuler",
-
   "nav.write": "Écrire une lettre",
   "nav.mine": "Mes dispositifs",
   "nav.open": "Ouvrir un coffre",
   "nav.about": "Comment ça marche",
-
   "wallet.connect": "Connecter un portefeuille",
   "wallet.disconnect": "Déconnecter",
   "wallet.balance": "Solde : {amount} CKB",
@@ -29,7 +26,6 @@
   "wallet.needed": "Créer, signaler sa présence et annuler se signent avec votre portefeuille. Rien d'autre.",
   "wallet.sign_prompt": "Signez dans votre portefeuille pour continuer.",
   "wallet.insufficient": "Il faut environ {amount} CKB. Votre portefeuille en contient {balance}.",
-
   "letter.title": "Votre lettre",
   "letter.memory_note": "La lettre reste dans cet onglet jusqu'à ce que vous ayez enregistré le coffre. Recharger la page avant la fait disparaître.",
   "letter.text_label": "Texte",
@@ -42,7 +38,6 @@
   "letter.remove_file": "Retirer",
   "letter.sender_label": "Votre nom, tel que les destinataires le verront",
   "letter.next": "Choisir le rythme",
-
   "rhythm.title": "À quelle fréquence signalerez-vous votre présence ?",
   "rhythm.option": "{months, plural, one {Chaque mois} other {Tous les # mois}}",
   "rhythm.custom": "Autre : tous les {months} mois",
@@ -50,7 +45,6 @@
   "rhythm.grace_note": "Les 24 heures qui suivent l'échéance sont un délai de grâce fixe, pas un rappel.",
   "rhythm.long_warning": "Les durées de plus de 5 ans ne sont pas proposées : les clés reposent sur la cryptographie d'aujourd'hui, et des rythmes courts gardent votre lettre sous votre contrôle.",
   "rhythm.next": "Choisir les gardiens",
-
   "guardians.title": "Qui détient les clés ?",
   "guardians.intro": "Des opérateurs indépendants de nœuds CKB conservent chacun un fragment de la clé. {t} fragments sur {n} suffisent à ouvrir la lettre après l'échéance ; moins de {t} ne peuvent rien, ni avant ni après.",
   "guardians.table.rank": "Rang",
@@ -69,7 +63,6 @@
   "guardians.own_node": "Faire tourner votre propre nœud et l'ajouter ici",
   "guardians.limits": "Ce que cela ne peut pas empêcher : {t} de vos gardiens qui s'entendent pour ouvrir avant l'heure, ou un gardien qui copie son fragment dès le premier jour. Choisissez-les en des lieux différents.",
   "guardians.next": "Voir le prix",
-
   "price.title": "Ce que ça coûte",
   "price.spent": "Dépensé",
   "price.parked": "Immobilisé, restitué",
@@ -82,7 +75,6 @@
   "price.total_parked": "{amount} CKB immobilisés",
   "price.cancel_free": "Annuler est gratuit et restitue les CKB immobilisés.",
   "price.next": "Créer le dispositif",
-
   "create.title": "Création du dispositif",
   "create.step.sign": "Signez la création dans votre portefeuille",
   "create.step.wait": "En attente des gardiens ({done} sur {n} prêts)",
@@ -91,7 +83,6 @@
   "create.waiting_note": "Les gardiens répondent en général en quelques minutes. Vous pouvez laisser cet onglet ouvert.",
   "create.verify_failed": "La vérification a échoué (règle {rule}). Le dispositif n'a pas été armé. Rien ne permet de contourner ce contrôle ; annulez et recommencez.",
   "create.done": "Le dispositif est actif. Scellez maintenant la lettre.",
-
   "seal.title": "Sceller la lettre",
   "seal.intro": "La lettre est chiffrée dans votre navigateur et rangée, avec tout ce qu'il faut pour l'ouvrir plus tard, dans un seul fichier : le coffre.",
   "seal.download": "Télécharger le coffre",
@@ -102,13 +93,11 @@
   "seal.certificate": "Imprimer le certificat",
   "seal.calendar": "Ajouter l'échéance à votre agenda",
   "seal.next": "Remettre le coffre",
-
   "handover.title": "Remettez le coffre aux destinataires dès maintenant",
   "handover.p1": "Envoyez le fichier aux personnes qui devront lire la lettre, aujourd'hui. Il ne leur sert à rien tant que l'échéance n'est pas passée sans que vous ayez signalé votre présence.",
   "handover.p2": "Gardez-en une copie, à un endroit où elles pourraient aussi la trouver : une clé USB, un espace partagé, un notaire.",
   "handover.p3": "Si vous changez les gardiens plus tard, un nouveau coffre remplace celui-ci. Envoyez-le à nouveau.",
   "handover.done": "Aller à mes dispositifs",
-
   "mine.title": "Mes dispositifs",
   "mine.empty": "Aucun dispositif sur cet appareil. Créez-en un, ou ajoutez-en un par son identifiant.",
   "mine.add_by_id": "Ajouter par identifiant",
@@ -131,13 +120,11 @@
   "mine.download_vault": "Télécharger le coffre à nouveau",
   "mine.download_unavailable": "Le coffre ne peut pas être reconstruit sans la lettre, qui n'existait que dans l'onglet où vous l'avez écrite. Changez de gardiens pour en produire un nouveau.",
   "mine.details": "Détails techniques",
-
   "cancel.title": "Annuler ce dispositif ?",
   "cancel.consequence": "La lettre ne pourra jamais être ouverte. Le coffre devient inutile. Les CKB immobilisés reviennent dans votre portefeuille.",
   "cancel.confirm": "Annuler le dispositif",
   "cancel.keep": "Le garder",
   "cancel.done": "Annulé. Les fragments de clé des gardiens sont en cours de suppression.",
-
   "open.title": "Ouvrir un coffre",
   "open.drop": "Déposez le fichier du coffre ici, ou choisissez-le",
   "open.or_status": "Ou vérifiez l'état d'un dispositif par son identifiant",
@@ -161,10 +148,8 @@
   "open.paste_hint": "Un par ligne, tels que publiés sur la chaîne.",
   "open.error.decrypt": "La lettre n'a pas pu être ouverte avec la clé reconstituée. Le coffre a peut-être été modifié.",
   "open.error.version": "Ce coffre a été produit par une version plus récente de l'application.",
-
   "about.title": "Comment ça marche",
   "about.site": "Lire l'explication complète sur le site",
-
   "error.generic": "Une erreur s'est produite : {message}",
   "error.rpc": "La chaîne est injoignable. Réessayez dans un instant.",
   "error.rejected": "Vous avez refusé la signature dans votre portefeuille.",
@@ -176,9 +161,23 @@
   "unit.ckb": "CKB",
   "unit.months": "{count, plural, one {# mois} other {# mois}}",
   "unit.days": "{count, plural, one {# jour} other {# jours}}",
-
   "ics.summary": "Signaler ma présence : dead man's switch",
   "ics.description": "Signalez votre présence sur {url} avant le {deadline}, sinon la lettre s'ouvre.",
   "ics.alarm_14": "Deux semaines avant l'échéance",
-  "ics.alarm_2": "Deux jours avant l'échéance"
+  "ics.alarm_2": "Deux jours avant l'échéance",
+  "heartbeat.title": "À quelle fréquence les gardiens vérifient-ils ?",
+  "heartbeat.option_3h": "Toutes les 3 heures",
+  "heartbeat.option_12h": "Toutes les 12 heures",
+  "heartbeat.option_daily": "Chaque jour",
+  "heartbeat.option_weekly": "Chaque semaine",
+  "heartbeat.option_custom": "Autre : tous les {blocks} blocs (environ {duration})",
+  "heartbeat.tradeoff": "Un gardien qui disparaît est remarqué en moins de {delay}. Vérifier plus souvent coûte plus cher.",
+  "heartbeat.tip_label": "Pourboire par vérification, par gardien",
+  "heartbeat.tip_note": "Les gardiens le gagnent à chaque vérification. En dessous de leur minimum, ils ne prendront pas votre lettre.",
+  "price.monthly": "{amount} CKB par mois tant que le dispositif tourne",
+  "price.spent_now": "Payé maintenant",
+  "price.spent_term": "Versé aux gardiens sur {months} mois",
+  "price.assumptions": "Comment c'est estimé",
+  "price.assumptions_text": "Sur la base d'un bloc toutes les {seconds} secondes, de {runs} vérifications par gardien sur la durée, et des tailles de cellules du déploiement actuel. Les pourboires sont prépayés et versés vérification après vérification ; ce qui n'est pas utilisé revient si vous annulez avant la fin.",
+  "price.detection": "Un gardien manquant est remarqué en moins de {delay}."
 }

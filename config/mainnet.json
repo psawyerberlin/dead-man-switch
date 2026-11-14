@@ -6,8 +6,21 @@
   "organiser_address": "ckb1FILL_ME_WITH_THE_OPERATOR_MAINNET_ADDRESS",
   "default_t": 5,
   "default_n": 8,
-  "rhythms_months": [1, 3, 6, 12],
+  "rhythms_months": [
+    1,
+    3,
+    6,
+    12
+  ],
   "max_vault_bytes": 26214400,
   "crt_deployment_url": "/deployments/mainnet.json",
-  "app_url": "https://dead-man-switch.chainsolution.net"
+  "app_url": "https://dead-man-switch.chainsolution.net",
+  "heartbeat_presets_blocks": [
+    1000,
+    4000,
+    8000,
+    56000
+  ],
+  "default_heartbeat_blocks": 8000,
+  "default_heartbeat_tip_ckb": 0.5
 }

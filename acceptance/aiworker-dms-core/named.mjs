@@ -2,7 +2,7 @@
 import { spawnSync } from 'node:child_process';
 const names = ['bundle_roundtrip', 'bundle_wrong_identity_fails', 'bundle_size_limit', 'vault_deterministic', 'vault_self_contained',
   'vault_roundtrip_parse', 'vault_filename', 'ics_has_two_alarms', 'i18n_same_keys_in_all_languages', 'i18n_detect_order', 'i18n_plural_forms',
-  'quote_matches_crt_defaults', 'opener_registers_hook', 'opener_renders_letter_in_three_languages', 'opener_markdown_is_sanitised', 'opener_file_download_links'];
+  'quote_matches_crt_defaults', 'quote_heartbeat_presets', 'opener_registers_hook', 'opener_renders_letter_in_three_languages', 'opener_markdown_is_sanitised', 'opener_file_download_links'];
 const install = spawnSync('npm', ['ci', '--no-audit', '--no-fund'], { cwd: 'app', stdio: 'inherit' });
 if (install.status !== 0) { console.log('npm ci failed'); process.exit(1); }
 const r = spawnSync('npm', ['test', '--silent'], { cwd: 'app', encoding: 'utf8', env: { ...process.env, CI: '1', FORCE_COLOR: '0', NO_COLOR: '1' } });

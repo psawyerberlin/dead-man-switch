@@ -21,7 +21,10 @@ that tests check:
 * the guardians screen shows the concentration summary and the "harder to steal, easier to lose" sentence
   (`guardians.mandatory_trade`) when a mandatory guardian is added; `1-of-1` requires the typed acknowledgement
   (`guardians.ack_phrase` in the UI language);
-* the price screen has the organiser fee as its own line, editable down to 0;
+* the guardians screen also carries the **check interval** presets (`heartbeat.title`, `heartbeat.tradeoff` with the
+  detection delay) and the tip per check in the advanced panel, and a **live cost panel** (`price.ts`) that updates on
+  every change (`ui_cost_panel_live`: moving from daily to weekly lowers the monthly figure);
+* the price screen has the organiser fee as its own line, editable down to 0, and a per-month figure;
 * Create → progress per guardian (reads Node Cells) → hard-fail verification → Arm → Seal (download; the "I have
   saved the vault" checkbox gates the Next button) → Hand over (the three sentences of §3.1.8 and the `.ics`).
 
@@ -40,7 +43,7 @@ that tests check:
 strings, not of markup); no hard-coded strings (`SPEC.md` §5 heuristic, test `i18n_no_hardcoded_strings`); the
 built app makes no request outside the configured RPC, monitor and wallet origins (grep `site/app/`); the quote on
 the price screen equals `price.quote`. Fixed test names: `ui_renders_three_languages`, `i18n_no_hardcoded_strings`,
-`ui_cancel_two_clicks`, `ui_price_matches_quote`, `ui_mainnet_disabled`, `ui_seal_checkbox_gates_next`. `docs/app.md`,
+`ui_cancel_two_clicks`, `ui_price_matches_quote`, `ui_mainnet_disabled`, `ui_seal_checkbox_gates_next`, `ui_cost_panel_live`. `docs/app.md`,
 `CHANGELOG.md`.
 
 ## Acceptance
