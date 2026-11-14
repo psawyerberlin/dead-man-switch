@@ -1,7 +1,7 @@
 # Spec 01 — core: letter bundle, vault, opener (`dms-core`)
 
 **Branch:** `aiworker/dms-core`. **Acceptance:** `acceptance/aiworker-dms-core/`.
-**Normative:** `SPEC.md` §4, §5, §6, §7. **Depends on:** `@crt/client` built in `../ckb-revocable-timelock/client`.
+**Normative:** `SPEC.md` §4, §5, §6, §7. **Depends on:** `@crt/client` built in `.refs/crt/client`.
 
 ## Phase 1 — project
 
@@ -9,7 +9,7 @@
 `dist/` to `../site/app/`), `test`, `typecheck`, `lint` (eslint with the recommended TS rules; one config file).
 Runtime dependencies only those of `SPEC.md` §7. `app/src/config.ts` loads `config/<network>.json` and the
 vendored CRT deployment (`app/public/deployments/<network>.json`, copied by a script from
-`../ckb-revocable-timelock/deployments/` with the source commit in `app/public/deployments/SOURCE`).
+`.refs/crt/deployments/` with the source commit in `app/public/deployments/SOURCE`).
 
 ## Phase 2 — `app/src/core/`
 

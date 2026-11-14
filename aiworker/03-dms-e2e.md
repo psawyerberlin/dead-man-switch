@@ -1,7 +1,7 @@
 # Spec 03 — end-to-end on devnet, packaging, the manual step (`dms-e2e`)
 
 **Branch:** `aiworker/dms-e2e`. **Acceptance:** `acceptance/aiworker-dms-e2e/`. **Depends on:** specs 01–02 and the CRT
-devnet (`../ckb-revocable-timelock/scripts/devnet-e2e.sh`).
+devnet (`.refs/crt/scripts/devnet-e2e.sh`).
 
 ## Phase 1 — scripted scenario
 

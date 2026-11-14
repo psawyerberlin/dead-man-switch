@@ -1,5 +1,11 @@
 # Working on this repository as an AI worker
 
+> **Note (2026-11-15).** The work is run by **AIWorker** on `pswsl` (see `aiworker/README.md`). The ready-to-upload specs
+> are in `aiworker/specs/`; they point back to this file and to `aiworker/0N-*.md` for the details. Where this file
+> talks about branches, commits, pull requests or a `../` checkout, the rules in each spec's "How this project runs"
+> section win. `.refs/crt` is a read-only clone of the CRT repository.
+
+
 This file is the contract between the maintainer and an autonomous coding agent ("the worker"). It follows the
 convention used in `ckb-service-runner` (branches `aiworker/<name>`, protected `acceptance/aiworker-<name>/`
 directories, `DECISIONS.md`). Read it fully before touching anything.
@@ -23,9 +29,9 @@ decision (§5). The worker never waits for a human.
 
 * Linux x86_64. No Rust is needed in this repository.
 * Node.js ≥ 22 (`node --test`), npm. No global npm packages.
-* A checkout of `ckb-revocable-timelock` at `../ckb-revocable-timelock` with specs 01–05 merged (the client library
+* A checkout of `ckb-revocable-timelock` at `.refs/crt` with specs 01–05 merged (the client library
   `client/` built), and of `ckb-service-runner` at `../ckb-service-runner` for the devnet. `@crt/client` is
-  consumed as a file dependency (`"@crt/client": "file:../ckb-revocable-timelock/client"`) until it is published;
+  consumed as a file dependency (`"@crt/client": "file:.refs/crt/client"`) until it is published;
   the commit it was built from is recorded in `DECISIONS.md`.
 * Network: npm, GitHub. No testnet CKB is needed before spec 03 phase 3.
 
