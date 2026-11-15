@@ -1,7 +1,7 @@
 // SQLite store (node:sqlite). Personal fields and the record JSON are sealed with AES-256-GCM under NOTIFIER_DATA_KEY,
 // one random nonce per value; tokens are kept as SHA-256 hashes; looked-up addresses as HMACs.
 import { DatabaseSync } from 'node:sqlite';
-import { hmac, open, seal, sha256Hex } from './crypto.ts';
+import { hexToBytes, hmac, open, seal, sha256Hex } from './crypto.ts';
 
 export type Role = 'owner' | 'recipient';
 export type Confirmation = 'none' | 'asked' | 'confirmed' | 'stopped';
@@ -16,7 +16,11 @@ export interface OutboxRow { id: number; network: string; T: string; kind: strin
 export interface ClaimRow { network: string; T: string; adminHash: string; createdAt: number }
 export interface TombstoneRow { network: string; T: string; state: string; createdAt: number; endedAt: number }
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2;
+
+/** The address-HMAC key is kept in `meta`, sealed under the data key, so rotating the data key leaves address
+ * HMACs, the never list and stop links valid. Its value is the v1 derivation, so v1 databases keep working. */
+const HMAC_KEY_AAD = 'meta/hmac_key';
 
 const MIGRATIONS: string[][] = [
   [
@@ -38,6 +42,9 @@ const MIGRATIONS: string[][] = [
     `CREATE TABLE never (hmac TEXT PRIMARY KEY, created_at INTEGER NOT NULL)`,
     `CREATE TABLE tombstones (network TEXT NOT NULL, T TEXT NOT NULL, state TEXT NOT NULL, created_at INTEGER NOT NULL, ended_at INTEGER NOT NULL, PRIMARY KEY (network, T))`,
   ],
+  [
+    `CREATE TABLE meta (k TEXT PRIMARY KEY, v TEXT NOT NULL)`,
+  ],
 ];
 
 export class Store {
@@ -48,10 +55,18 @@ export class Store {
   constructor(path: string, dataKey: Uint8Array) {
     if (dataKey.length !== 32) throw new Error('data key must be 32 bytes');
     this.key = dataKey;
-    this.hmacKey = new Uint8Array(hmac(dataKey, 'dms-notifier/address-hmac/v1'));
     this.db = new DatabaseSync(path);
     this.db.exec('PRAGMA foreign_keys = ON');
     this.migrate();
+    this.hmacKey = this.loadHmacKey();
+  }
+
+  private loadHmacKey(): Uint8Array {
+    const row = this.db.prepare('SELECT v FROM meta WHERE k = ?').get('hmac_key') as { v: string } | undefined;
+    if (row) return hexToBytes(open(this.key, row.v, HMAC_KEY_AAD));
+    const k = new Uint8Array(hmac(this.key, 'dms-notifier/address-hmac/v1'));
+    this.db.prepare('INSERT INTO meta (k, v) VALUES (?, ?)').run('hmac_key', seal(this.key, Buffer.from(k).toString('hex'), HMAC_KEY_AAD));
+    return k;
   }
 
   close(): void { this.db.close(); }

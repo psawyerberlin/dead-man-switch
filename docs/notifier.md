@@ -24,7 +24,14 @@ equal `SMTP_USER`), `APP_URL`, `NETWORKS` and one `RPC_<NETWORK>` each. Optional
 
 ## Running
 
-Build `@crt/client` in `.refs/crt/client` first, then from the repository root:
+Clone CRT into `.refs/crt` (the image builds `@crt/client` itself, so the host needs no Node), then from the
+repository root:
+
+```sh
+git clone --depth 1 https://github.com/psawyerberlin/ckb-revocable-timelock .refs/crt   # or: git -C .refs/crt pull -q
+```
+
+and:
 
 ```sh
 docker compose -f notifier/compose.yaml up -d --build
@@ -48,9 +55,11 @@ cannot be recovered; losing it loses the data.
    (one transaction; on error nothing changes).
 3. Put the new key in the env file and start the service.
 
-The script re-encrypts records, emails and names and recomputes the address HMACs and stop-link hashes, so
-existing stop links keep working. Entries of the "never" list hold only HMACs and cannot be re-keyed; they stay but no
-longer match (the script warns).
+The script re-encrypts the switch records, the emails and names, and the address-HMAC key kept in the `meta` table.
+It changes nothing else: address HMACs, the "never" list and the stop-link hashes depend on that HMAC key, not on
+`NOTIFIER_DATA_KEY`, so the never list keeps matching and stop links already in people's mailboxes keep working. A
+database must be at schema 2 (start the notifier once with the old key) before it can be rotated. A wrong data key is
+refused when the store opens.
 
 ## Logs
 

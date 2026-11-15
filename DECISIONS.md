@@ -2,6 +2,18 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-notifier, maintainer review (2026-11-15)
+
+- Address-HMAC key moved into a `meta` table (schema 2), sealed under `NOTIFIER_DATA_KEY`, with the v1 value. Before,
+  it was derived from the data key, so `rotate-key.mjs` invalidated the never list (people who chose "never" would be
+  emailed again) and every stop link already sent. Rotation now re-seals only that key; tests
+  `rotate_keeps_never_list_and_stop_links`, `rotate_refuses_wrong_old_key_and_changes_nothing`,
+  `v1_database_keeps_its_address_hmacs`. A wrong data key is now refused when the store opens.
+- Dockerfile: builds `@crt/client` in its own stage (no Node on the VPS), copies `notifier/.npmrc` (without it `npm ci`
+  on npm 10 rejects the lockfile), loads CRT's `deployments/` instead of the app's `config/` (which made startup fail),
+  no `|| true` around the build. Runtime stage reproduced by hand: starts, `/api/v1/health` answers.
+- eslint: Node globals (`globals` dev dependency); `npm run lint` was failing on `scripts/rotate-key.mjs`.
+
 ## dms-notifier, phase 4 (container and docs)
 
 - 2026-11-15 — The image is built from the repository root (`context: ..`) because `@crt/client` is a file dependency in `.refs/crt/client` (must be built beforehand); it is copied to `/.refs/crt/client` in both stages so `../.refs` resolves from `/src/notifier` and `/app`. `config/*.json` become `/app/deployments`.

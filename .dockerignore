@@ -1,0 +1,7 @@
+# Build context of notifier/Dockerfile is the repository root.
+.git
+**/node_modules
+**/dist
+app
+site
+.devnet

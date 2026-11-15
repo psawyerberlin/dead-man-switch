@@ -28,10 +28,8 @@ test('store_encrypts_at_rest', () => {
     const raw = readFileSync(join(dir, f)).toString('latin1');
     for (const needle of ['owner-zed', 'example.net', 'Annabelle', 'Olaf', 'secret-link', 'vault.example.com', 'never.person']) assert.ok(!raw.includes(needle), `${f} contains ${needle}`);
   }
-  // wrong key cannot read
-  const bad = new Store(file, hexToBytes('11'.repeat(32)));
-  assert.throws(() => bad.getSwitch('testnet', '0xaa'));
-  bad.close();
+  // a wrong key is refused when the store opens (the sealed HMAC key does not authenticate), before any read
+  assert.throws(() => new Store(file, hexToBytes('11'.repeat(32))));
 });
 
 test('store keeps confirmation of unchanged addresses and enforces outbox uniqueness', () => {
@@ -44,7 +42,7 @@ test('store keeps confirmation of unchanged addresses and enforces outbox unique
   assert.equal(s.findByConfirmToken('c')?.id, x!.id);
   assert.ok(s.enqueue('testnet', '0x01', 'told_now', x!.id, '', 1));
   assert.equal(s.enqueue('testnet', '0x01', 'told_now', x!.id, '', 2), undefined);
-  assert.equal(s.schemaVersion, 1);
+  assert.equal(s.schemaVersion, 2);
   s.close();
 });
 

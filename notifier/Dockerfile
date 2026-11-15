@@ -1,24 +1,32 @@
-# Build from the repository root (the CRT client is a file dependency in .refs/crt/client, built beforehand):
-#   docker build -f notifier/Dockerfile -t dms-notifier .
+# Build from the repository root, with CRT cloned into .refs/crt (no Node needed on the host):
+#   git clone --depth 1 https://github.com/psawyerberlin/ckb-revocable-timelock .refs/crt
+#   docker compose -f notifier/compose.yaml up -d --build
+# Stage 1 builds @crt/client from source; stage 2 builds the notifier; stage 3 is the runtime image.
+
+FROM node:22-slim AS crt
+WORKDIR /crt/client
+COPY .refs/crt/client/ ./
+RUN rm -rf node_modules dist && npm ci && npm run build
+
 FROM node:22-slim AS build
-WORKDIR /src
-COPY .refs/crt/client /src/.refs/crt/client
-COPY notifier/package.json notifier/package-lock.json /src/notifier/
 WORKDIR /src/notifier
+COPY --from=crt /crt/client /src/.refs/crt/client
+COPY notifier/package.json notifier/package-lock.json notifier/.npmrc ./
 RUN npm ci
-COPY notifier/tsconfig.json notifier/tsconfig.build.json /src/notifier/
-COPY notifier/src /src/notifier/src
-RUN npm run build && cp -r src/i18n dist/ 2>/dev/null || true
+COPY notifier/tsconfig.json notifier/tsconfig.build.json ./
+COPY notifier/src ./src
+RUN npm run build
 
 FROM node:22-slim
 ENV NODE_ENV=production DATA_DIR=/data PORT=8787 CRT_DEPLOYMENTS_DIR=/app/deployments
 WORKDIR /app
-COPY --from=build /src/.refs/crt/client /.refs/crt/client
-COPY notifier/package.json notifier/package-lock.json /app/
-RUN npm ci --omit=dev && npm cache clean --force
+COPY --from=crt /crt/client /.refs/crt/client
+COPY notifier/package.json notifier/package-lock.json notifier/.npmrc /app/
+RUN npm ci --omit=dev && npm cache clean --force && rm -rf /.refs
 COPY --from=build /src/notifier/dist /app/dist
 COPY notifier/scripts /app/scripts
-COPY config /app/deployments
+# CRT's deployment files (<network>.json), which the chain reader loads; not the app's config/.
+COPY .refs/crt/deployments /app/deployments
 RUN mkdir -p /data && chown node:node /data
 VOLUME /data
 USER node
