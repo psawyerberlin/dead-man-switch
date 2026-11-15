@@ -572,5 +572,8 @@
   "practice.sender": "Un ami",
   "practice.letter_title": "Ceci est une lettre d'entraînement",
   "practice.letter_body": "Si vous lisez ceci, l'ouverture d'un coffre fonctionne sur cet appareil.\n\nUne vraie lettre ressemblera à ceci : son texte, puis les fichiers qui l'accompagnent, chacun avec un bouton de téléchargement. Rien de ce que vous voyez ici ne quitte la page.",
-  "practice.note": "Une note personnelle apparaîtrait ici."
+  "practice.note": "Une note personnelle apparaîtrait ici.",
+  "nav.menu": "Menu",
+  "nav.menu_close": "Fermer",
+  "error.network": "Le réseau CKB est injoignable. Vérifiez votre connexion et réessayez."
 }

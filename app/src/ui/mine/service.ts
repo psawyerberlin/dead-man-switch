@@ -1,3 +1,4 @@
+import { t } from '../../core/i18n';
 // My switches (SPEC.md §3.2) without the DOM: the local list, what the chain and the messenger say about each switch,
 // and the owner's actions (check in, away until, cancel, reclaim, messenger settings). The chain side is behind
 // `OwnerDriver` (real: `chain-owner.ts`; tests: a fake), the messenger behind `OwnerMessenger`.
@@ -101,7 +102,12 @@ export const EVENT_KEYS: Record<string, string> = {
   record_changed: 'timeline.event.changed',
 };
 
-const message = (e: unknown): string => (e as Error)?.message || String(e);
+// Network failures surface as browser-specific TypeErrors ("Failed to fetch", "Load failed", …): one plain sentence.
+const NETWORK_ERROR = /failed to fetch|fetch failed|networkerror|load failed|network request failed/i;
+const message = (e: unknown): string => {
+  const m = (e as Error)?.message || String(e);
+  return NETWORK_ERROR.test(m) ? t('error.network') : m;
+};
 
 export class MineService {
   readonly now: () => number;

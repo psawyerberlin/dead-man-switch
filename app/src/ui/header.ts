@@ -78,11 +78,23 @@ export function header(deps: HeaderDeps): HTMLElement {
     h('a', { href: '#/open' }, t('nav.open')),
     h('a', { href: '#/guide' }, t('nav.guide')),
     h('a', { href: '#/about' }, t('nav.about')));
-  return h('header', { class: 'dms-header' },
+  // Below 720 px the tools and the bar fold into a menu (SPEC.md §8: one-handed at 360 px); above, the button is hidden.
+  const barId = nextId('menu');
+  const menuButton = h('button', { type: 'button', class: 'dms-header__menu-btn', 'aria-expanded': 'false', 'aria-controls': barId }, t('nav.menu'));
+  const root = h('header', { class: 'dms-header' },
     h('div', { class: 'dms-header__top' },
       h('a', { href: '#/', class: 'dms-brand' }, h('span', { class: 'dms-brand__mark', 'aria-hidden': 'true' }, icon('seal', 28)),
         h('span', { class: 'dms-brand__name' }, t('app.name'))),
-      h('div', { class: 'dms-header__tools' }, languageSwitch(deps.onLanguage), themeToggle(), networkBadge(deps.network))),
-    h('div', { class: 'dms-header__bar' }, nav, walletArea(deps.wallet, deps.network)));
+      h('div', { class: 'dms-header__tools' }, languageSwitch(deps.onLanguage), themeToggle(), networkBadge(deps.network)),
+      menuButton),
+    h('div', { class: 'dms-header__bar', id: barId }, nav, walletArea(deps.wallet, deps.network)));
+  const setOpen = (open: boolean): void => {
+    root.classList.toggle('is-open', open);
+    menuButton.setAttribute('aria-expanded', String(open));
+    menuButton.textContent = open ? t('nav.menu_close') : t('nav.menu');
+  };
+  menuButton.addEventListener('click', () => setOpen(!root.classList.contains('is-open')));
+  nav.addEventListener('click', (ev) => { if ((ev.target as HTMLElement).closest('a')) setOpen(false); });
+  return root;
 }
 

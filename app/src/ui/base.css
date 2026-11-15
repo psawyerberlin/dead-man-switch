@@ -54,6 +54,23 @@ main:focus, [tabindex="-1"]:focus { outline: none; }
   min-height: var(--touch); padding: var(--s-0) var(--s-1);
 }
 .dms-nav { display: flex; flex-wrap: wrap; gap: 0 var(--s-2); }
+.dms-header__menu-btn { display: none; }
+@media (max-width: 719px) {
+  .dms-header__top { flex-wrap: nowrap; }
+  .dms-header__tools { flex: 1; justify-content: flex-end; }
+  .dms-header__menu-btn {
+    display: inline-flex; align-items: center; min-height: var(--touch); min-width: var(--touch); padding: 0 var(--s-2);
+    font: inherit; font-weight: 600; color: var(--ink); background: var(--sheet); border: 1px solid var(--line); border-radius: 999px; cursor: pointer;
+  }
+  .dms-header:not(.is-open) .dms-lang,
+  .dms-header:not(.is-open) .dms-header__control,
+  .dms-header:not(.is-open) .dms-badge--mainnet,
+  .dms-header:not(.is-open) .dms-header__bar { display: none; }
+  .dms-header.is-open .dms-header__top { flex-wrap: wrap; }
+  .dms-header__bar { flex-direction: column; align-items: stretch; }
+  .dms-nav { flex-direction: column; }
+  .dms-brand__name { font-size: var(--fs-body); }
+}
 .dms-nav a { display: inline-flex; align-items: center; min-height: var(--touch); color: var(--ink); text-decoration: none; }
 .dms-nav a:hover { color: var(--seal); text-decoration: underline; }
 

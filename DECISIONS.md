@@ -2,6 +2,15 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-ui, maintainer review (2026-11-15)
+
+- Checked rendered in headless Chrome (home, Write, practice vault, drill, guides, My switches, check-in at 390 px,
+  dark mode, German): design per SPEC §8 holds. One fix: at phone width the header filled ~40 % of the screen and
+  pushed the check-in button down; below 720 px the language, theme, mainnet badge, navigation and wallet now fold
+  behind a Menu button (keys `nav.menu`, `nav.menu_close`). Desktop unchanged.
+- Raw browser network errors ("Failed to fetch") on My switches and check-in now read as one sentence
+  (`error.network`, en/fr/de).
+
 ## dms-ui, phase 4 (quality and build)
 
 - 2026-11-15 — New tests: `app/test/quality.test.ts` (`ui_renders_three_languages`, `i18n_no_hardcoded_strings`, `ui_mainnet_disabled`) and

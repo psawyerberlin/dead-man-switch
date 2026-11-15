@@ -572,5 +572,8 @@
   "practice.sender": "A friend",
   "practice.letter_title": "This is a practice letter",
   "practice.letter_body": "If you can read this, opening a vault works on this device.\n\nA real letter will look like this: its text, then any files that came with it, each with a download button. Nothing you see here leaves the page.",
-  "practice.note": "A personal note would appear here."
+  "practice.note": "A personal note would appear here.",
+  "nav.menu": "Menu",
+  "nav.menu_close": "Close",
+  "error.network": "The CKB network could not be reached. Check your connection and try again."
 }

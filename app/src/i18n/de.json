@@ -572,5 +572,8 @@
   "practice.sender": "Eine Freundin",
   "practice.letter_title": "Dies ist ein Übungsbrief",
   "practice.letter_body": "Wenn Sie das lesen können, funktioniert das Öffnen eines Tresors auf diesem Gerät.\n\nEin echter Brief sieht so aus: sein Text, danach die mitgeschickten Dateien, jede mit einer Schaltfläche zum Herunterladen. Nichts, was Sie hier sehen, verlässt die Seite.",
-  "practice.note": "Hier stünde eine persönliche Notiz."
+  "practice.note": "Hier stünde eine persönliche Notiz.",
+  "nav.menu": "Menü",
+  "nav.menu_close": "Schließen",
+  "error.network": "Das CKB-Netzwerk ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
 }
