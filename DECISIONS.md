@@ -9,7 +9,7 @@ Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER
   reminders, grace alarms and release emails, holding only encrypted links before release; guided cloud handover without
   integrations; fire drill on testnet (30 min – 48 h deadline; CRT `7ceca10` allows terms ≥ 30 min on test networks;
   GRACE stays 24 h); owner archive, owner code, check-in from the phone, away mode, templates, paper backup, practice vault;
-  visual design in SPEC §8. Four projects now: dms-core, dms-notifier, dms-ui, dms-e2e. Organiser fee 61 CKB (the operator addresses are secp256k1): a
+  visual design in SPEC §8. Four projects now: dms-core, dms-notifier, dms-ui, dms-e2e. Organiser fee 70 CKB (maintainer choice; the operator addresses are secp256k1, minimum 61): a
   fee output below its occupied capacity (61 CKB secp256k1, 63 JoyID) is rejected by CRT's `buildCreate`, so 50 CKB
   cannot work. i18n: maintainer strings updated to the plural (letters, vaults) and 53 keys added.
 - 2026-11-15 — maintainer: specs aligned with CRT `main` 7fd2e32 before the first run. Vault `application` uses CRT's

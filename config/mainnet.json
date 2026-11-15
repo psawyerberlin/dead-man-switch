@@ -11,7 +11,7 @@
   "drill": null,
   "crt_deployment_url": "/app/deployments/mainnet.json",
   "crt_runners_url": "/app/deployments/mainnet-runners.json",
-  "organiser_fee_ckb": 61,
+  "organiser_fee_ckb": 70,
   "rhythms_months": [
     1,
     3,

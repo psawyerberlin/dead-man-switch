@@ -311,7 +311,7 @@ link}] }`.
 | Key | testnet | mainnet | Meaning |
 |---|---|---|---|
 | `enabled` | true | false | network usable |
-| `organiser_fee_ckb` | 61 | 61 | fee per Create; must be ≥ the occupied capacity of the organiser output (61 CKB for a secp256k1 address, 63 for JoyID) |
+| `organiser_fee_ckb` | 70 | 70 | fee per Create; must be ≥ the occupied capacity of the organiser output (61 CKB for a secp256k1 address, 63 for JoyID) |
 | `organiser_address` | `ckt1…` | `ckb1…` | the operator's address; placeholder fails the build |
 | `default_t`, `default_n` | 1, 1 | 5, 8 | guardian defaults before clamping |
 | `n_min`, `n_max` | 1, 16 | 3, 16 | guardian range |
