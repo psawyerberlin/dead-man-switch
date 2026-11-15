@@ -232,5 +232,20 @@
   "paper.heading": "Ein versiegelter Brief von {sender} für {recipient}",
   "open.practice": "Übungstresor — hier ist nichts echt.",
   "open.practice_link": "So sieht das Öffnen eines Tresors aus",
-  "privacy.title": "Datenschutz"
+  "privacy.title": "Datenschutz",
+  "unit.hours": "{count, plural, one {# Stunde} other {# Stunden}}",
+  "unit.minutes": "{count, plural, one {# Minute} other {# Minuten}}",
+  "ics.alarm_half": "Die Hälfte der Frist ist vorbei",
+  "ics.alarm_deadline": "Die Frist ist erreicht: 24 Stunden Kulanz bleiben",
+  "drill.subject_prefix": "[Probealarm]",
+  "template.legacy_checklist.title": "Checkliste für den digitalen Nachlass",
+  "template.legacy_checklist.body": "## Konten\n\n- E-Mail:\n- Bank und Zahlungsdienste:\n- Soziale Netzwerke (behalten, in Gedenkzustand versetzen oder löschen?):\n\n## Passwort-Manager\n\n- Welcher, und wo das Master-Passwort oder das Notfallblatt liegt:\n\n## Geräte\n\n- Telefon (der Entsperrcode liegt):\n- Computer:\n- Sicherungen und Speicher:\n\n## Abos, die gekündigt werden sollen\n\n- \n",
+  "template.practical_wishes.title": "Praktische Wünsche",
+  "template.practical_wishes.body": "## Wer zuerst Bescheid bekommen soll\n\n- \n\n## Bestattung und Abschied\n\n- \n\n## Tiere, Pflanzen, Wohnung\n\n- \n\n## Was ihr behalten oder verschenken sollt\n\n- \n",
+  "template.documents.title": "Wo die Unterlagen liegen",
+  "template.documents.body": "## Papiere\n\n- Testament:\n- Versicherungen:\n- Verträge (Wohnung, Energie, Telefon):\n- Steuerunterlagen:\n\n## Schlüssel und Tresore\n\n- \n\n## Wer helfen kann\n\n- Notar oder Anwalt:\n- Steuerberater:\n",
+  "template.crypto_assets.title": "Krypto-Werte",
+  "template.crypto_assets.body": "Nach der Freigabe kann jeder diesen Tresor lesen, der ihn hat. Schreiben Sie, wo möglich, lieber auf, wo etwas liegt, als die Geheimnisse selbst.\n\n## Wallets\n\n- Welches Wallet, welches Netzwerk:\n- Wo das Wiederherstellungsmaterial liegt:\n\n## Börsen\n\n- \n\n## Wer euch dabei sicher helfen kann\n\n- \n",
+  "template.personal_letter.title": "Ein persönlicher Brief",
+  "template.personal_letter.body": "## Was ich dir sagen möchte\n\n\n\n## Eine Erinnerung an uns\n\n\n\n## Was ich dir wünsche\n\n\n"
 }

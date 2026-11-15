@@ -2,6 +2,59 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-core, phase 2 (core modules)
+
+- 2026-11-15 — `@crt/client` resolves at runtime (Vite/vitest alias) to CRT's TypeScript sources `client/src/index.ts`:
+  the built `dist/src/chain/deployment.js` imports `../../vendor/csr-job.mjs`, which `tsc` does not copy into `dist/`,
+  so the dist entry cannot load. Types still come from `dist/src/index.d.ts` (`tsconfig.json` `paths`).
+- vitest uses the `tap` reporter: every test is printed as `ok n - <name>`, which is what
+  `acceptance/aiworker-dms-core/named.mjs` reads (the default reporter prints only file names).
+- Byte helpers live in `core/bytes.ts` and AES-GCM in `core/aead.ts` (no import of `@crt/client` in the crypto path,
+  so the phase 3 opener stays small). `K`, `I` are accepted as bytes or `0x` hex.
+- `encryptBundle` takes a `Letter` or its encoded bytes (the vector plaintext `{"version":2}` is not a full letter) and
+  an optional `{maxBytes}` (default 26 214 400, the config's `max_vault_bytes`); the limit applies to the ciphertext
+  (plaintext + 16-byte tag) and is checked before encrypting. `decryptBundle` returns the bundle bytes;
+  `openBundle` = decrypt + `decodeBundle` + check that the bundle is addressed to `r`. Only `version` 2 decodes.
+- `encodeBundle` writes the fields in the fixed order of SPEC §4.1, so the same letter gives the same bytes.
+- Links: absolute `https://` URL with a host, ≤ 2048 characters, no whitespace or control characters; checked on
+  encryption and again after decryption. Sealed links are `{nonce, ciphertext}` `0x` hex as in the record (§4.4).
+- `buildVault` takes `script` optionally; without it the script set by `setOpenerScript` is used (phase 3 sets the
+  built opener). Until then the default is a one-line `window.crtApplication` stub. `payload.size` = ciphertext bytes.
+- `vaultFileName`: lower case, `ß→ss`, `æ→ae`, `œ→oe`, `ø→o`, then NFKD without marks, other runs → `-`, each part
+  at most 40 characters; an empty part becomes `sender` / `recipient`. `zipVaults` uses a fixed mtime (2020-01-01)
+  so the zip is deterministic too.
+- Messenger: the bearer token is `A` in base64url (as in the owner code); `adminHash` = `0x` hex SHA-256(A).
+  `buildRecord` copies only the fields of §4.4 (whatever else the caller passes, e.g. `K` or letters, is dropped),
+  checks `T`/`I` against the descriptor, `rhythm` as an ISO 8601 duration, emails syntactically (empty = `null`),
+  and requires links to be sealed. `MessengerClient` throws `MessengerError` carrying the HTTP status (409 on claim).
+- Archive: `scryptAsync` (non-blocking), passphrase NFC-normalised; `openArchive` accepts the JSON text or object and
+  refuses scrypt parameters other than `r = 8, p = 1, 2^14 ≤ N ≤ 2^20` (a crafted file cannot exhaust memory).
+  `passphraseStrength`: < 8 characters → 0; 8–11 → 1, 12–15 → 2, 16–19 → 3, ≥ 20 → 4; +1 with ≥ 3 character classes;
+  −2 for very few distinct characters, −1 for short repeated patterns. `ARCHIVE_MIN_STRENGTH = 3` for the UI.
+- Calendar: `icsForDeadline` takes optional `termSeconds` (the ≤ 2-day rule needs the term), `appUrl` and `now`
+  (DTSTAMP, for deterministic tests). The event links to `<app_url>/app/#/checkin?T=`; the description prints the
+  deadline in UTC. Drill summaries get the `drill.subject_prefix`.
+- i18n: `translate(lang, key, params)` next to `t(key, params)` (vaults, calendar and templates need an explicit
+  language); missing keys fall back to English, then to the key. Supported syntax: `{x}`, `plural` (with `=n`,
+  CLDR categories through `Intl.PluralRules`, `#`), `select`. Storage key `dms.language`. Numbers use thin-space
+  grouping; `formatCkb` takes CKB as a number or shannons as a bigint and appends ` CKB`.
+  `formatDuration`: days from 2 days (or whole days), then hours, then minutes.
+- Price: `quote` uses CRT's default keygen tip (1 CKB) and max fee (0.002 CKB); `heartbeatTip` is in CKB; block time
+  from the deployment's `block_seconds` when present, else CRT's 10.8 s. Each line carries an i18n `key`.
+- Drill: `drillOpensAt(deadline, heartbeatBlocks, blockSeconds = 10.8)`: earliest = deadline + 24 h, latest = + one
+  check interval (1000 blocks ≈ 3 h). `drillBounds` refuses mainnet even when a config object carries drill settings.
+- QR: byte mode over the UTF-8 bytes (the library's default truncates each UTF-16 unit to one byte), error correction
+  M, automatic version, 4-module quiet zone, one `<path fill="currentColor">`.
+- Chain: `switchSummary` adds the tip's median time (`get_blockchain_info`) and `secondsLeft`; `checkinHistory` reads
+  `get_transactions` (node-lock prefix `T`, grouped) — `@crt/client` has no call for it — then each transaction and
+  its header; an entry is listed when the Node Cells' deadline increases (first one = `create`, later = `checkin`),
+  so runner commits, Arm, releases and rewraps are not counted. The RPC fixture `app/test/fixtures/checkin-rpc.json`
+  is synthetic (generated, no node reachable here); `test/fixtures/descriptor.json` is CRT's descriptor vector.
+- i18n keys added (for review by the maintainer): `unit.hours`, `unit.minutes`, `ics.alarm_half`,
+  `ics.alarm_deadline`, `drill.subject_prefix` (`[Drill]` / `[Exercice]` / `[Probealarm]`, as in SPEC §3.4), and
+  `template.<id>.title` / `template.<id>.body` for `legacy_checklist`, `practical_wishes`, `documents`,
+  `crypto_assets`, `personal_letter` (en, fr, de).
+
 ## dms-core, phase 1 (project and configuration)
 
 - 2026-11-15 — `app/` is Vite 6 + TypeScript strict + vitest (jsdom available for the opener tests); `@crt/client` is a

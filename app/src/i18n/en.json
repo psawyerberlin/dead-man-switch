@@ -232,5 +232,20 @@
   "paper.heading": "A sealed letter from {sender} for {recipient}",
   "open.practice": "Practice vault — nothing here is real.",
   "open.practice_link": "See what opening a vault looks like",
-  "privacy.title": "Privacy"
+  "privacy.title": "Privacy",
+  "unit.hours": "{count, plural, one {# hour} other {# hours}}",
+  "unit.minutes": "{count, plural, one {# minute} other {# minutes}}",
+  "ics.alarm_half": "Half of the term has passed",
+  "ics.alarm_deadline": "The deadline is now: 24 hours of grace remain",
+  "drill.subject_prefix": "[Drill]",
+  "template.legacy_checklist.title": "Digital legacy checklist",
+  "template.legacy_checklist.body": "## Accounts\n\n- Email:\n- Bank and payment:\n- Social networks (keep, memorialise or close?):\n\n## Password manager\n\n- Which one, and where the master password or emergency kit is:\n\n## Devices\n\n- Phone (unlock code is kept at):\n- Computer:\n- Backups and storage:\n\n## Subscriptions to cancel\n\n- \n",
+  "template.practical_wishes.title": "Practical wishes",
+  "template.practical_wishes.body": "## Who to tell first\n\n- \n\n## Funeral and ceremony\n\n- \n\n## Pets, plants, home\n\n- \n\n## Things I would like you to keep or give away\n\n- \n",
+  "template.documents.title": "Where the documents are",
+  "template.documents.body": "## Papers\n\n- Will:\n- Insurance policies:\n- Contracts (home, energy, phone):\n- Tax records:\n\n## Keys and safes\n\n- \n\n## People who can help\n\n- Notary or lawyer:\n- Tax adviser:\n",
+  "template.crypto_assets.title": "Crypto assets",
+  "template.crypto_assets.body": "After release, whoever holds this vault can read it. Write down where things are rather than the secrets themselves where you can.\n\n## Wallets\n\n- Which wallet, which network:\n- Where the recovery material is:\n\n## Exchanges\n\n- \n\n## Someone who can help you do this safely\n\n- \n",
+  "template.personal_letter.title": "A personal letter",
+  "template.personal_letter.body": "## What I want you to know\n\n\n\n## A memory I keep of us\n\n\n\n## What I hope for you\n\n\n"
 }

@@ -232,5 +232,20 @@
   "paper.heading": "Une lettre scellée de {sender} pour {recipient}",
   "open.practice": "Coffre d'entraînement — rien ici n'est réel.",
   "open.practice_link": "Voir à quoi ressemble l'ouverture d'un coffre",
-  "privacy.title": "Confidentialité"
+  "privacy.title": "Confidentialité",
+  "unit.hours": "{count, plural, one {# heure} other {# heures}}",
+  "unit.minutes": "{count, plural, one {# minute} other {# minutes}}",
+  "ics.alarm_half": "La moitié du délai est écoulée",
+  "ics.alarm_deadline": "C'est l'échéance : il reste 24 heures de grâce",
+  "drill.subject_prefix": "[Exercice]",
+  "template.legacy_checklist.title": "Liste pour mon héritage numérique",
+  "template.legacy_checklist.body": "## Comptes\n\n- E-mail :\n- Banque et paiement :\n- Réseaux sociaux (garder, transformer en compte commémoratif ou fermer ?) :\n\n## Gestionnaire de mots de passe\n\n- Lequel, et où se trouve le mot de passe principal ou le kit d'urgence :\n\n## Appareils\n\n- Téléphone (le code de déverrouillage se trouve) :\n- Ordinateur :\n- Sauvegardes et stockage :\n\n## Abonnements à résilier\n\n- \n",
+  "template.practical_wishes.title": "Souhaits pratiques",
+  "template.practical_wishes.body": "## Qui prévenir en premier\n\n- \n\n## Obsèques et cérémonie\n\n- \n\n## Animaux, plantes, logement\n\n- \n\n## Ce que j'aimerais que vous gardiez ou donniez\n\n- \n",
+  "template.documents.title": "Où sont les documents",
+  "template.documents.body": "## Papiers\n\n- Testament :\n- Contrats d'assurance :\n- Contrats (logement, énergie, téléphone) :\n- Documents fiscaux :\n\n## Clés et coffres\n\n- \n\n## Personnes qui peuvent aider\n\n- Notaire ou avocat :\n- Conseiller fiscal :\n",
+  "template.crypto_assets.title": "Crypto-actifs",
+  "template.crypto_assets.body": "Après l'ouverture, quiconque détient ce coffre peut le lire. Notez plutôt où se trouvent les choses que les secrets eux-mêmes, quand c'est possible.\n\n## Portefeuilles\n\n- Quel portefeuille, quel réseau :\n- Où se trouve le matériel de récupération :\n\n## Plateformes d'échange\n\n- \n\n## Quelqu'un qui peut vous aider à le faire en sécurité\n\n- \n",
+  "template.personal_letter.title": "Une lettre personnelle",
+  "template.personal_letter.body": "## Ce que je veux que tu saches\n\n\n\n## Un souvenir de nous que je garde\n\n\n\n## Ce que je te souhaite\n\n\n"
 }

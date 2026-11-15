@@ -7,7 +7,9 @@ const opener = process.env.OPENER === '1';
 
 export default defineConfig({
   base: './',
-  resolve: { alias: { '@crt/client': resolve(__dirname, '../.refs/crt/client/dist/src/index.js') } },
+  // Runtime: CRT's TypeScript sources (its `dist/` lacks `vendor/csr-job.mjs`, which `src/chain/deployment.ts`
+  // imports relative to the package root). Types: `tsconfig.json` `paths` → `dist/src/index.d.ts`.
+  resolve: { alias: { '@crt/client': resolve(__dirname, '../.refs/crt/client/src/index.ts') } },
   build: opener
     ? {
         outDir: 'dist-opener',
@@ -16,5 +18,6 @@ export default defineConfig({
         rollupOptions: { output: { inlineDynamicImports: true } },
       }
     : { outDir: 'dist', emptyOutDir: true },
-  test: { environment: 'node', include: ['test/**/*.test.ts'] },
+  // TAP output lists every test by its fixed name (`ok n - <name>`), which the acceptance check reads.
+  test: { environment: 'node', include: ['test/**/*.test.ts'], reporters: ['tap'], testTimeout: 60_000 },
 });
