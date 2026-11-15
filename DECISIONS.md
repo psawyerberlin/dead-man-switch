@@ -2,6 +2,12 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-notifier, phase 4 (container and docs)
+
+- 2026-11-15 — The image is built from the repository root (`context: ..`) because `@crt/client` is a file dependency in `.refs/crt/client` (must be built beforehand); it is copied to `/.refs/crt/client` in both stages so `../.refs` resolves from `/src/notifier` and `/app`. `config/*.json` become `/app/deployments`.
+- `scripts/rotate-key.mjs` lives in `notifier/scripts/`, is self-contained (no build needed) and runs in one transaction. The never list holds only HMACs, so it cannot be re-keyed: entries are kept but stop matching; the script and docs say so.
+- Compose joins the external network under the service-local name `web`, named by `${WEB_NETWORK:-vericell_default}`.
+
 ## dms-notifier, phase 3 (the watcher and the emails)
 
 - 2026-11-15 — Files: `src/watcher.ts` (`createWatcher` → `tick(network)`, `status()` for `/health`), `src/log.ts` (JSON lines, `redact`, `setLogSink` for tests), `src/chain.ts` (`CrtChain` over `@crt/client`: `readSwitch`, `recoverOnline`, tip header), `src/main.ts` (env → store → API + watcher; one tick at start, then every 5 min, never two at once; `expireClaims` runs with each tick; SIGTERM closes cleanly), the watcher's emails and `SmtpMailer` (nodemailer) in `src/mail.ts`. Tests in `test/watcher.test.ts`.
