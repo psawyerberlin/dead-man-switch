@@ -1,0 +1,19 @@
+# Run from the repository root:  docker compose -f notifier/compose.yaml up -d --build
+services:
+  dms-notifier:
+    build:
+      context: ..
+      dockerfile: notifier/Dockerfile
+    image: dms-notifier
+    container_name: dms-notifier
+    env_file: ${DMS_NOTIFIER_ENV:-~/dms-notifier.env}
+    volumes:
+      - ${DMS_NOTIFIER_DATA:-~/dms-notifier-data}:/data
+    restart: unless-stopped
+    networks:
+      - web
+
+networks:
+  web:
+    name: ${WEB_NETWORK:-vericell_default}
+    external: true

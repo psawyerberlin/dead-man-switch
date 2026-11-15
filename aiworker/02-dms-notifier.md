@@ -5,7 +5,9 @@
 `.refs/crt/client`; spec 01 only for the shared vectors (`spec/vectors/keys.json`).
 
 `notifier/` is its own npm package (Node 22, TypeScript strict, ESM), independent of `app/`, with `@crt/client` as a file
-dependency (`"@crt/client": "file:../.refs/crt/client"`, built as for `app/`): it re-implements the
+dependency (`"@crt/client": "file:../.refs/crt/client"`, built as for `app/`; import it as `@crt/client`, which resolves to
+CRT's built `dist/` since CRT `8572f1f`; `notifier/.npmrc` contains `install-links=true` like `app/.npmrc`, so the lockfile
+is the same for npm 9 on pswsl and npm 10 in the container): it re-implements the
 two small primitives it needs (`linkKey`, `decryptLink`) and proves them against the same vectors. Everything
 that touches the outside world sits behind an interface so the tests run offline:
 

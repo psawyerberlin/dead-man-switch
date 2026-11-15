@@ -16,6 +16,7 @@ test('package and dependencies', () => {
   const allowed = /^(@crt\/client|@ckb-ccc\/.*|@noble\/.*|nodemailer)$/;
   for (const d of Object.keys(pkg.dependencies || {})) assert.match(d, allowed, `runtime dependency ${d} not allowed by SPEC.md §9`);
   assert.ok(exists('notifier', 'package-lock.json'));
+  assert.match(read('notifier', '.npmrc'), /^install-links=true$/m, 'same lockfile for npm 9 and 10');
 });
 
 test('modules and the interfaces of the spec', () => {

@@ -1,0 +1,422 @@
+{
+ "description": "Synthetic recording of the CKB RPC answers for switch T = 0x5a\u20265a (2 runners): Create (state 0), a runner commit, Arm, two Renews; plus one unrelated output per tx. Generated, not captured from a live node (no node is reachable from the build machine).",
+ "T": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a",
+ "node_lock_code_hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+ "deadlines": [
+  1770000000,
+  1777776000,
+  1785552000
+ ],
+ "calls": [
+  {
+   "method": "get_transactions",
+   "params": [
+    {
+     "script": {
+      "code_hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+      "hash_type": "data2",
+      "args": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a"
+     },
+     "script_type": "lock",
+     "script_search_mode": "prefix",
+     "group_by_transaction": true
+    },
+    "asc",
+    "0x64"
+   ],
+   "result": {
+    "objects": [
+     {
+      "tx_hash": "0x0101010101010101010101010101010101010101010101010101010101010101",
+      "block_number": "0x64",
+      "tx_index": "0x1",
+      "cells": [
+       [
+        "output",
+        "0x0"
+       ],
+       [
+        "output",
+        "0x1"
+       ]
+      ]
+     },
+     {
+      "tx_hash": "0x0202020202020202020202020202020202020202020202020202020202020202",
+      "block_number": "0x69",
+      "tx_index": "0x1",
+      "cells": [
+       [
+        "output",
+        "0x0"
+       ]
+      ]
+     },
+     {
+      "tx_hash": "0x0303030303030303030303030303030303030303030303030303030303030303",
+      "block_number": "0x78",
+      "tx_index": "0x1",
+      "cells": [
+       [
+        "output",
+        "0x0"
+       ],
+       [
+        "output",
+        "0x1"
+       ]
+      ]
+     },
+     {
+      "tx_hash": "0x0404040404040404040404040404040404040404040404040404040404040404",
+      "block_number": "0x1388",
+      "tx_index": "0x1",
+      "cells": [
+       [
+        "output",
+        "0x0"
+       ],
+       [
+        "output",
+        "0x1"
+       ]
+      ]
+     },
+     {
+      "tx_hash": "0x0505050505050505050505050505050505050505050505050505050505050505",
+      "block_number": "0x2328",
+      "tx_index": "0x1",
+      "cells": [
+       [
+        "output",
+        "0x0"
+       ],
+       [
+        "output",
+        "0x1"
+       ]
+      ]
+     }
+    ],
+    "last_cursor": "0xffffffffffffffffffffffffffffffffffffffff"
+   }
+  },
+  {
+   "method": "get_transaction",
+   "params": [
+    "0x0101010101010101010101010101010101010101010101010101010101010101"
+   ],
+   "result": {
+    "transaction": {
+     "version": "0x0",
+     "cell_deps": [],
+     "header_deps": [],
+     "inputs": [],
+     "witnesses": [],
+     "outputs": [
+      {
+       "capacity": "0x5d21dba000",
+       "lock": {
+        "code_hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "hash_type": "data2",
+        "args": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a7272727272727272727272727272727272727272727272727272727272727272"
+       },
+       "type": null
+      },
+      {
+       "capacity": "0x5d21dba000",
+       "lock": {
+        "code_hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "hash_type": "data2",
+        "args": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a7373737373737373737373737373737373737373737373737373737373737373"
+       },
+       "type": null
+      },
+      {
+       "capacity": "0x5d21dba000",
+       "lock": {
+        "code_hash": "0x9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b",
+        "hash_type": "type",
+        "args": "0x0101010101010101010101010101010101010101"
+       },
+       "type": null
+      }
+     ],
+     "outputs_data": [
+      "0x0100800e806900000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "0x0100800e806900000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+      "0x"
+     ],
+     "hash": "0x0101010101010101010101010101010101010101010101010101010101010101"
+    },
+    "tx_status": {
+     "status": "committed",
+     "block_hash": "0xb001010101010101010101010101010101010101010101010101010101010101",
+     "block_number": "0x64",
+     "reason": null
+    }
+   }
+  },
+  {
+   "method": "get_header",
+   "params": [
+    "0xb001010101010101010101010101010101010101010101010101010101010101"
+   ],
+   "result": {
+    "number": "0x64",
+    "hash": "0xb001010101010101010101010101010101010101010101010101010101010101",
+    "timestamp": "0x19a3f625400",
+    "epoch": "0x0",
+    "compact_target": "0x0"
+   }
+  },
+  {
+   "method": "get_transaction",
+   "params": [
+    "0x0202020202020202020202020202020202020202020202020202020202020202"
+   ],
+   "result": {
+    "transaction": {
+     "version": "0x0",
+     "cell_deps": [],
+     "header_deps": [],
+     "inputs": [],
+     "witnesses": [],
+     "outputs": [
+      {
+       "capacity": "0x5d21dba000",
+       "lock": {
+        "code_hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "hash_type": "data2",
+        "args": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a7272727272727272727272727272727272727272727272727272727272727272"
+       },
+       "type": null
+      }
+     ],
+     "outputs_data": [
+      "0x0101800e806900000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee000000000000000000000000000000000000000000000000000000000000000002aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0000000000000000000000000000000000000000000000000000000000000000"
+     ],
+     "hash": "0x0202020202020202020202020202020202020202020202020202020202020202"
+    },
+    "tx_status": {
+     "status": "committed",
+     "block_hash": "0xb002020202020202020202020202020202020202020202020202020202020202",
+     "block_number": "0x69",
+     "reason": null
+    }
+   }
+  },
+  {
+   "method": "get_header",
+   "params": [
+    "0xb002020202020202020202020202020202020202020202020202020202020202"
+   ],
+   "result": {
+    "number": "0x69",
+    "hash": "0xb002020202020202020202020202020202020202020202020202020202020202",
+    "timestamp": "0x19a3f69f520",
+    "epoch": "0x0",
+    "compact_target": "0x0"
+   }
+  },
+  {
+   "method": "get_transaction",
+   "params": [
+    "0x0303030303030303030303030303030303030303030303030303030303030303"
+   ],
+   "result": {
+    "transaction": {
+     "version": "0x0",
+     "cell_deps": [],
+     "header_deps": [],
+     "inputs": [],
+     "witnesses": [],
+     "outputs": [
+      {
+       "capacity": "0x5d21dba000",
+       "lock": {
+        "code_hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "hash_type": "data2",
+        "args": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a7272727272727272727272727272727272727272727272727272727272727272"
+       },
+       "type": null
+      },
+      {
+       "capacity": "0x5d21dba000",
+       "lock": {
+        "code_hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "hash_type": "data2",
+        "args": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a7373737373737373737373737373737373737373737373737373737373737373"
+       },
+       "type": null
+      }
+     ],
+     "outputs_data": [
+      "0x0101800e806900000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd02aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0000000000000000000000000000000000000000000000000000000000000000",
+      "0x0101800e806900000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd02aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0000000000000000000000000000000000000000000000000000000000000000"
+     ],
+     "hash": "0x0303030303030303030303030303030303030303030303030303030303030303"
+    },
+    "tx_status": {
+     "status": "committed",
+     "block_hash": "0xb003030303030303030303030303030303030303030303030303030303030303",
+     "block_number": "0x78",
+     "reason": null
+    }
+   }
+  },
+  {
+   "method": "get_header",
+   "params": [
+    "0xb003030303030303030303030303030303030303030303030303030303030303"
+   ],
+   "result": {
+    "number": "0x78",
+    "hash": "0xb003030303030303030303030303030303030303030303030303030303030303",
+    "timestamp": "0x19a3f719640",
+    "epoch": "0x0",
+    "compact_target": "0x0"
+   }
+  },
+  {
+   "method": "get_transaction",
+   "params": [
+    "0x0404040404040404040404040404040404040404040404040404040404040404"
+   ],
+   "result": {
+    "transaction": {
+     "version": "0x0",
+     "cell_deps": [],
+     "header_deps": [],
+     "inputs": [],
+     "witnesses": [],
+     "outputs": [
+      {
+       "capacity": "0x5d21dba000",
+       "lock": {
+        "code_hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "hash_type": "data2",
+        "args": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a7272727272727272727272727272727272727272727272727272727272727272"
+       },
+       "type": null
+      },
+      {
+       "capacity": "0x5d21dba000",
+       "lock": {
+        "code_hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "hash_type": "data2",
+        "args": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a7373737373737373737373737373737373737373737373737373737373737373"
+       },
+       "type": null
+      },
+      {
+       "capacity": "0x5d21dba000",
+       "lock": {
+        "code_hash": "0x9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b9b",
+        "hash_type": "type",
+        "args": "0x0101010101010101010101010101010101010101"
+       },
+       "type": null
+      }
+     ],
+     "outputs_data": [
+      "0x010180b5f66900000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd02aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0000000000000000000000000000000000000000000000000000000000000000",
+      "0x010180b5f66900000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd02aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0000000000000000000000000000000000000000000000000000000000000000",
+      "0x"
+     ],
+     "hash": "0x0404040404040404040404040404040404040404040404040404040404040404"
+    },
+    "tx_status": {
+     "status": "committed",
+     "block_hash": "0xb004040404040404040404040404040404040404040404040404040404040404",
+     "block_number": "0x1388",
+     "reason": null
+    }
+   }
+  },
+  {
+   "method": "get_header",
+   "params": [
+    "0xb004040404040404040404040404040404040404040404040404040404040404"
+   ],
+   "result": {
+    "number": "0x1388",
+    "hash": "0xb004040404040404040404040404040404040404040404040404040404040404",
+    "timestamp": "0x19be09dda00",
+    "epoch": "0x0",
+    "compact_target": "0x0"
+   }
+  },
+  {
+   "method": "get_transaction",
+   "params": [
+    "0x0505050505050505050505050505050505050505050505050505050505050505"
+   ],
+   "result": {
+    "transaction": {
+     "version": "0x0",
+     "cell_deps": [],
+     "header_deps": [],
+     "inputs": [],
+     "witnesses": [],
+     "outputs": [
+      {
+       "capacity": "0x5d21dba000",
+       "lock": {
+        "code_hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "hash_type": "data2",
+        "args": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a7272727272727272727272727272727272727272727272727272727272727272"
+       },
+       "type": null
+      },
+      {
+       "capacity": "0x5d21dba000",
+       "lock": {
+        "code_hash": "0xa1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1",
+        "hash_type": "data2",
+        "args": "0x5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a7373737373737373737373737373737373737373737373737373737373737373"
+       },
+       "type": null
+      }
+     ],
+     "outputs_data": [
+      "0x0101805c6d6a00000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd02aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0000000000000000000000000000000000000000000000000000000000000000",
+      "0x0101805c6d6a00000000eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeedddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd02aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa0000000000000000000000000000000000000000000000000000000000000000"
+     ],
+     "hash": "0x0505050505050505050505050505050505050505050505050505050505050505"
+    },
+    "tx_status": {
+     "status": "committed",
+     "block_hash": "0xb005050505050505050505050505050505050505050505050505050505050505",
+     "block_number": "0x2328",
+     "reason": null
+    }
+   }
+  },
+  {
+   "method": "get_header",
+   "params": [
+    "0xb005050505050505050505050505050505050505050505050505050505050505"
+   ],
+   "result": {
+    "number": "0x2328",
+    "hash": "0xb005050505050505050505050505050505050505050505050505050505050505",
+    "timestamp": "0x19d81d96000",
+    "epoch": "0x0",
+    "compact_target": "0x0"
+   }
+  },
+  {
+   "method": "get_blockchain_info",
+   "params": [],
+   "result": {
+    "chain": "ckb_testnet",
+    "median_time": "0x19d81e10120",
+    "epoch": "0x0",
+    "difficulty": "0x1",
+    "is_initial_block_download": false,
+    "alerts": []
+   }
+  }
+ ]
+}

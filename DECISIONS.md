@@ -2,6 +2,422 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-e2e, phase 2 (packaging, deployment files, manual steps)
+
+- 2026-11-15 — `scripts/build-site.sh` checks the organiser address first (testnet always, mainnet only when enabled), then runs
+  `npm run build` (vendor, sync, build, copy), writes `site/app/BUILD` (commit, CRT commit, version, date), repeats the
+  acceptance test's external-reference check, and packs `dist/dead-man-switch-site-<version>.tar.gz`. Not run here (needs the CRT build).
+- `config/testnet.json` keeps its existing `organiser_address` (a syntactically valid address, tests rely on it); the manual step asks
+  the human to confirm or replace it. `config/mainnet.json` stays `enabled: false`.
+- Caddy snippet: CSP also allows the CRT coordinator (`crt.chainsolution.net`) because the practice vault names it; `style-src 'unsafe-inline'` kept as in `site/DEPLOY.md`. Not validated here (no Docker).
+- `docs/manual-steps.md` has six numbered items; the devnet output goes into a `DECISIONS.md` section (the file mentions devnet/PASS).
+
+## dms-e2e, phase 1 (scripted scenario, written, not run)
+
+- 2026-11-15 — `test/e2e/scenario.mjs` written and checked with `node --check` only (no devnet, no Chromium here); the maintainer
+  runs it (`node test/e2e/scenario.mjs`, `--help` for options). Its own dev dependencies live in `test/e2e/package.json`
+  (`smtp-server`, `mailparser`, `playwright-core`, `tsx`) so neither `app/` nor `notifier/` gains test-only packages.
+- The script re-runs itself under `tsx` and imports `app/src/core/*.ts` and `.refs/crt/client/src/index.ts` as sources (the
+  same way CRT's `scripts/devnet-scenario.mjs` uses the client); devnet helpers (time travel with
+  `generate_block_with_template`, 86.4 s per block, heartbeat 1000 blocks, CCC devnet script table, genesis key) are taken
+  over from that script. The vault opener is `app/dist/opener.js` (built with `npm run build:opener` when missing).
+- The devnet is started with `.refs/crt/scripts/devnet-e2e.sh --runners 3 --state .devnet/crt` (`--no-devnet` when it is
+  already up, `--down` to stop it at the end).
+- The app (`Network`) and the notifier (`NETWORKS`) only know `testnet` and `mainnet`, and adding a third network to both
+  would be a product change outside this phase. The scenario therefore serves the devnet to them **under the name `testnet`**:
+  `NETWORKS=testnet`, `RPC_TESTNET=<devnet RPC>`, `CRT_DEPLOYMENTS_DIR=.devnet/notifier/deployments` holding CRT's
+  `deployments/devnet.json` copied as `testnet.json` (I is computed from the deployment's `network_id`, so it stays consistent).
+- SMTP sink: the notifier only accepts port 465 or 587, so the sink listens on 127.0.0.1:587 with STARTTLS and a throwaway
+  self-signed certificate in `.devnet/smtp-tls/`; only the notifier child gets `NODE_TLS_REJECT_UNAUTHORIZED=0`. Every
+  message is stored as `.devnet/mail/<n>.eml` and parsed with `mailparser`. `APP_URL` is the notifier's own origin, so the
+  confirm links in the emails can be followed by the script. The sink's STARTTLS/auth/parse path was smoke-tested here with
+  nodemailer.
+- Rhythm `P1D` (CRT's shortest term): the messenger treats it as a short term, so step 4's "next reminder" is the 50 % reminder
+  of the **new** deadline (its UTC date is in the subject/text); the script also asserts no reminder names the old deadline.
+  Both the owner and recipient 1 confirm through their links (reminders and alarms go to a confirmed owner only). Recipient 2
+  has an email but no "tell now", so the release email is the only one it may get.
+- The notifier's watcher ticks every 5 minutes of wall time (not configurable); email steps wait up to 7 minutes and do not
+  mine while waiting, so the chain time the watcher sees stays in the intended window (first alarm = "24 hours").
+- Opener in headless Chromium (`playwright-core`, `--chromium`/`CHROMIUM_PATH` or its own browser) over `file://`, vaults
+  built with `rpcUrls: [devnet RPC]`; the script drives `window.__dmsOpener.checkChain()` and `window.CRT_KIT.api.recover()`
+  and reads the files back from the opener's object URLs. This relies on the CKB node answering CORS for a `file://` page
+  (it sends `Access-Control-Allow-Origin: *`); if a run shows `offline`, that is the first thing to check.
+- Step 8 accepts 404/410/401 for the `GET` after deletion (the record and its owner hash are gone).
+
+## dms-ui, maintainer review (2026-11-15)
+
+- Checked rendered in headless Chrome (home, Write, practice vault, drill, guides, My switches, check-in at 390 px,
+  dark mode, German): design per SPEC §8 holds. One fix: at phone width the header filled ~40 % of the screen and
+  pushed the check-in button down; below 720 px the language, theme, mainnet badge, navigation and wallet now fold
+  behind a Menu button (keys `nav.menu`, `nav.menu_close`). Desktop unchanged.
+- Raw browser network errors ("Failed to fetch") on My switches and check-in now read as one sentence
+  (`error.network`, en/fr/de).
+
+## dms-ui, phase 4 (quality and build)
+
+- 2026-11-15 — New tests: `app/test/quality.test.ts` (`ui_renders_three_languages`, `i18n_no_hardcoded_strings`, `ui_mainnet_disabled`) and
+  `ui_price_matches_quote` in `write.test.ts`. Same-keys check for en/fr/de is part of the hard-coded-strings test.
+- Build: `npm run build` runs `vendor-crt.sh` and `sync-config.sh` before the build (inputs in `app/public/`) and again after
+  copying to `site/app/`. App base is `/app/` (opener build keeps `./`).
+- CCC carries origins the app never contacts (docs link, COTA aggregator, fallback RPC nodes); a post-build plugin writes their `//` as `\x2f\x2f` (same string at runtime) so the built app names no foreign origin.
+
+## dms-ui, phase 3 (My switches, check-in, open, drill, privacy)
+
+- 2026-11-15 — Files: `app/src/core/{away,switches,practice}.ts` (+ `practice-descriptor.json`), `app/src/ui/mine/` (`service.ts` the
+  logic without DOM, `card.ts`, `dialogs.ts`, `screen.ts` = `#/mine`, `checkin.ts` = `#/checkin`, `view.ts`, `chain-owner.ts` the real
+  driver), `app/src/ui/screens/{open,drill,privacy}.ts`, `app/src/ui/write/steps-drill.ts`, `app/src/ui/mine.css`. Tests in
+  `app/test/mine.test.ts` (jsdom, fake `OwnerDriver` and fake messenger), with the fixed names `ui_cancel_two_clicks`,
+  `ui_checkin_deeplink`, `ui_away_until`, `ui_drill_bounds`, `ui_drill_hidden_on_mainnet`.
+- The chain side of the owner screens is behind `OwnerDriver` (summary = `switchSummary`, history = `checkinHistory`, wallet lock hash,
+  renew / cancel / reclaim through CRT's `txBuilders`). The real one (`chain-owner.ts`) is a lazily imported chunk; typechecked, not run
+  (no devnet here). The local list moved to `core/switches.ts` (`dms.switches`, unchanged format plus `heartbeat_blocks` /
+  `heartbeat_tip_ckb` for the check-in estimate); Write's `remember()` uses it.
+- Check in = chain median time + rhythm (`addRhythm`); allowed while armed/committed, including the grace; refused once released or
+  cancelled. The estimate shown before a check-in is CRT's cost estimator over the new term with organiser fee 0, plus the overlap sentence
+  (days of the current term still covered by the old heartbeat jobs).
+- Away until: `<input type=date>` with `min` = tomorrow and `max` = today + 5 years (local dates); the Renew deadline is the chosen day at
+  12:00 local time (`awayDeadline`). Earliest/latest are checked again in code, not only by the picker.
+- Cancel: one danger button with the same size class as Check in (`dms-card__action`, min 44 px × 10 em), one confirm dialog
+  (`cancel.consequence`, "no fee"), one signature (`buildCancel` with the Node Cells reclaimed), then `DELETE` at the messenger when this
+  browser holds the owner code. A messenger error after the cancel is shown but does not undo it.
+- Phone check-in `#/checkin?network=&T=&rhythm=`: invalid parameters show `checkin.bad_link`. Without a wallet the one button connects;
+  with one, the page compares the wallet's lock hash with the Node Cells' owner lock hash and shows `checkin.not_owner` (button disabled)
+  when they differ. A switch opened from a link is not added to this device's list (only listed switches are updated).
+- Restore from owner code: the code carries only the first 8 hex of T, so the full T is asked for too and must match; the code is stored
+  and the messenger's record (`GET`) fills sender, rhythm, recipients and descriptor.
+- Timeline = chain history (created, check-ins) + messenger events (mapped to `timeline.event.*`, unknown kinds shown generically) + the
+  next deadline. Recipient states from the messenger's confirmations: confirmed ✓ / waiting … / not asked – / stopped ×, with text.
+- Download the vaults again: from this page's Write (or drill) session when it built them; otherwise after opening the owner archive
+  (kept in memory for the page only) the vaults are rebuilt with the same letters and K and fresh envelopes (`wrapKeyAnchored`).
+- Change guardians: without K (no archive, no Write tab) the dialog explains and offers to open the archive; with K it shows the
+  "new vaults" warning and the steps. **The rewrap transaction sequence itself (buildRewrap → commits → new descriptor → Arm → new vaults)
+  is not implemented in this phase**: it needs live guardians to be meaningful and has no acceptance test here; left for the devnet phase.
+- Messenger settings dialog: owner email and reminders, each recipient's email, language and "tell them now" (`PATCH`, then `GET`);
+  without an owner code it asks for one. Links and letters are said to need the owner archive.
+- Fire drill: `#/drill` (intro) and `#/drill/<step>` = the Write flow with a separate `WriteSession({ drill: true })`; the rhythm step is
+  replaced by the drill term (presets of `presets_minutes`, custom minutes within `drillBounds`, both dates of `drillOpensAt`). The term is
+  a new rhythm kind `minutes` (ISO `PT<n>M`, accepted by the record's regex and by `parseRhythmIso`, which also reads `PT<n>H`). Check
+  interval fixed to `drill.heartbeat_blocks` (the presets are not shown), "tell them now" forced on and shown disabled, ribbon on every
+  drill screen; `create()` validates the term again. On mainnet (or without a drill config) every drill route shows `drill.unavailable`
+  and nothing else; My switches and home show no drill entry. `#/drill/report?T=`: timeline as in My switches + a five-item checklist;
+  without T it lists this device's drills.
+- `#/open`: a dropped/chosen file is checked with `parseVault` and then runs its own code (kit + opener) in an `<iframe srcdoc>` with
+  `sandbox="allow-scripts allow-downloads allow-modals allow-popups"` (no `allow-same-origin`: the vault cannot touch the app or its
+  storage). `?T=` reads only the status (summary). jsdom lacks `File.text`, hence `readText` with a FileReader fallback.
+- `#/open/demo`: `practiceVault(lang, opener)` builds a real vault (CRT's descriptor test vector, dummy envelopes, a public fixed key
+  `0x70…70`, deterministic nonce) with the prelude `DMS_PRACTICE=true; DMS_PRACTICE_KEY=…` before the opener. It is built **at build
+  time** by the Vite plugin `virtual:dms-practice` (an SSR build of `core/practice.ts`, run once in Node with the built opener), loaded
+  lazily as its own chunk; one vault per language, the one of the UI language is shown.
+- `main.ts` now calls `setOpenerScript` with `virtual:dms-opener`, so vaults made in Write carry the real opener (phase 2 left the stub).
+- `#/privacy`: SPEC.md §7 in six short sections + the operator contact link (only `https:` or `mailto:` are linked).
+- i18n keys added (en, fr, de; for the maintainer's review): `away.confirm`, `away.date_label`, `away.hint`, `away.too_early`, `away.too_late`, `away.invalid`, `cancel.no_fee`, `checkin.bad_link`, `checkin.checking_owner`, `checkin.connect`, `checkin.new_deadline`, `checkin.state.released`, `checkin.state.cancelled`, `checkin.state.other`, `drill.check_interval`, `drill.checklist_title`, `drill.check1`, `drill.check2`, `drill.check3`, `drill.check4`, `drill.check5`, `drill.custom`, `drill.custom_hint`, `drill.custom_minutes`, `drill.deadline_at`, `drill.heartbeat_fixed`, `drill.point_term`, `drill.point_marked`, `drill.point_confirm`, `drill.point_report`, `drill.report_needs_code`, `drill.report_none`, `drill.retention`, `drill.start`, `drill.tell_now_forced`, `drill.term_invalid`, `drill.term_label`, `drill.term_title`, `drill.unavailable`, `drill.state.absent`, `drill.state.pending`, `drill.state.committed`, `drill.state.armed`, `drill.state.released`, `drill.state.cancelled`, `drill.state.inconsistent`, `mine.archive_failed`, `mine.archive_file`, `mine.archive_missing`, `mine.archive_open`, `mine.archive_title`, `mine.card_title`, `mine.card_untitled`, `mine.chain_time`, `mine.local_time`, `mine.change_needs_archive`, `mine.change_steps`, `mine.checkin_cost`, `mine.descriptor_hash`, `mine.error`, `mine.forget`, `mine.id_invalid`, `mine.lead`, `mine.messenger_error`, `mine.more_title`, `mine.restore`, `mine.restore_failed`, `mine.restore_hint`, `mine.ring_caption`, `mine.ring_grace`, `mine.ring_unknown`, `mine.signing`, `mine.recipient.confirmed`, `mine.recipient.waiting`, `mine.recipient.not_asked`, `mine.recipient.stopped`, `mine.link_set`, `mine.link_unset`, `open.frame_title`, `open.local_only`, `open.practice_failed`, `open.practice_note`, `open.practice_title`, `open.running`, `open.status.absent`, `open.step1`, `open.step2`, `open.step3`, `privacy.intro`, `privacy.browser.title`, `privacy.browser.text`, `privacy.messenger.title`, `privacy.messenger.text`, `privacy.retention.title`, `privacy.retention.text`, `privacy.delete.title`, `privacy.delete.text`, `privacy.operator.title`, `privacy.operator.text`, `privacy.none.title`, `privacy.none.text`, `privacy.contact.title`, `privacy.contact.text`, `settings.links_need_archive`, `settings.needs_code`, `settings.not_loaded`, `settings.save`, `settings.saved`, `reclaim.done`, `timeline.empty`, `timeline.title`, `timeline.created`, `timeline.checkin`, `timeline.deadline`, `timeline.event.reminder`, `timeline.event.alarm`, `timeline.event.release`, `timeline.event.report`, `timeline.event.cancelled`, `timeline.event.asked`, `timeline.event.confirmed`, `timeline.event.stopped`, `timeline.event.skipped`, `timeline.event.mail_failed`, `timeline.event.changed`, `timeline.event.other`, `practice.recipient`, `practice.sender`, `practice.letter_title`, `practice.letter_body`, `practice.note`.
+
+## dms-ui, phase 2 (Write)
+
+- 2026-11-15 — Files: `app/src/ui/write/` (`session.ts` state and logic without DOM, `flow.ts` the `#/write/<step>` screen,
+  `steps-plan.ts` letters / recipients / rhythm, `steps-guardians.ts` guardians and price, `steps-seal.ts` create / seal /
+  hand over, `controls.ts`, `view.ts`, `chain-driver.ts`), `app/src/ui/screens/guide.ts`, `app/src/ui/files.ts`,
+  `app/src/ui/write.css`, `app/src/core/{places,rhythm,guardians}.ts`. Tests in `app/test/write.test.ts` (jsdom) against a
+  fake `SwitchDriver` and a fake messenger, including the fixed names `ui_recipients_max_ten`, `ui_guardians_clamped`,
+  `ui_cost_panel_live`, `ui_fee_below_capacity_refused`, `ui_claim_before_create`, `ui_seal_reduced_motion`,
+  `ui_owner_code_shown_once`, `ui_seal_checkbox_gates_next`, `ui_handover_guides_three_languages`.
+- The chain side is behind `SwitchDriver` (runners, organiser lock, prepare Create, wait for commits, describe, Arm,
+  wrap). The real one (`chain-driver.ts`: `fetchRunners` with the vendored list as `crtList`, `buildCreate`,
+  `buildVerifiedDescriptor`, `buildArm`, `wrapKeyAnchored`, RPC = the CRT deployment's `rpc_urls`) is dynamically
+  imported by `main.ts`, so CCC stays out of the shell chunk. It is typechecked but not run (no devnet here).
+  The wallet's CCC client now uses the deployment's first RPC URL (phase 1 note).
+- One Write session per page load (`appServices` in `shell.ts`); `screenFor(route, network)` without services still
+  renders every step (used by the phase 1 route test). A session change repaints the step and refocuses the control
+  with the same `data-k`; typing does not repaint (sizes and buttons are updated in place).
+- `K` is generated at Create, not at Seal: CRT's descriptor (needed for Arm) carries share commitments derived from
+  `K`. The order is: build Create (T, I) → owner code + `claim` (messenger on) → signature → guardians' commits →
+  `buildVerifiedDescriptor` (hard-fail; a `VerificationError` shows `create.verify_failed` with the rule, no retry,
+  no override) → Arm → `wrapKeyAnchored`. Once Create was sent, a second Create from the same flow is refused. A failed
+  claim stops before any signature; the owner can turn the messenger off and try again.
+- After Create the planning steps (letters … price) are closed; `create` / `seal` / `handover` need what comes
+  before (seal: Create done; handover: vaults and the saved checkbox).
+- Letters: in "one per person" and "shared + note" modes the per-recipient editors are on the letters screen (with a
+  name field and "add a recipient", the same list as the recipients step), because letters come before recipients
+  in the stepper. Files: shared in "shared" and "shared + note", per recipient in "each". Template insertion appends
+  `# title\n\nbody` of `templateText(id, language)` (the recipient's language for their own letter, else the UI
+  language). Live size = the exact encrypted bundle size (`sealedSize` of the JSON, files counted by their base64
+  length without re-encoding). A letter needs text or a file, and a sender name.
+- Recipients: the messenger section (use it, owner email, reminders) sits on the recipients step; "tell them now" is
+  shown only when the messenger is on. Messenger unavailable when `notifier_url` is null.
+- Rhythm: presets `rhythms_months` (calendar months, UTC, clamped to the month end) plus a custom rhythm in days
+  (1–1826); ISO 8601 `P<n>M` / `P<n>D` (`rhythmIso`, `parseRhythmIso`).
+- Guardians: the candidates are the largest set `selectRunners` returns with `requireCrt: true`,
+  `requireDepositedValid` from config, the mandatory list and the heartbeat limits (`candidatePool`); `n` is limited to
+  `max(n_min, mandatory)`..`min(n_max, candidates)`; defaults clamped. Mandatory guardians are all required
+  (`j = m`): tree `xor(m-of-m over the mandatory, t-of-(n−m) over the others)`, or `m-of-m` when all are mandatory.
+  The acknowledgement phrase is required for a mandatory 1-of-1 on every real switch (stricter than CRT, which asks only
+  above one year; SPEC.md §3.8), never on a drill. The overall 1-of-1 of testnet needs no phrase. Concentration:
+  operators = distinct payout locks, networks = ASN, countries; unknown values never collide.
+- Heartbeat presets 1000 / 4000 / 8000 / 56000 blocks are labelled 3 h / 12 h / daily / weekly; other values use
+  `heartbeat.option_custom`. The tip is in the advanced panel. The live cost panel beside the guardians shows
+  `price.monthly`, paid now and parked; it is recomputed on every change.
+- Price: the organiser fee is its own read-only line; the CRT line `organiser_fee` is left out of the detailed lines.
+  `organiserFeeCheck` needs the organiser lock (from the address, through CCC); while it is unknown or invalid there is
+  no Create button, an invalid config shows `price.config_error` with the reason. Without a wallet the primary action is
+  "connect a wallet".
+- Seal: one wax seal per recipient, `press()` once each (no class under reduced motion, read from `WriteIO.motion`).
+  Downloads per vault, `.zip` (`vaults-<T8>.zip`, `drill-` prefix for drills) and `.ics` (`deadline-<T8>.ics`). The owner
+  code is stored in `localStorage` (`dms.owner_code.<network>.<T>`) at claim time and rendered on the first seal screen
+  instance only; when another screen renders, it is dropped from memory (if storage holds it) and rendered again only
+  after a click on "show". The owner archive is offered in a collapsed panel (warning, passphrase, strength 0–4, button
+  disabled below `ARCHIVE_MIN_STRENGTH`); links are added later by "download the owner archive with the links" on the
+  handover screen while the archive is open in the session. Paper backup: printed through a hidden frame; cover sheet
+  only (the CRT certificate is the vault's own first page and is printed from the vault).
+- Saved switches are listed in `localStorage` `dms.switches` (network, T, I, deadline, sender, rhythm, drill, messenger,
+  descriptor and its hash, recipients' names and languages; nothing secret) for My switches in phase 3.
+- Hand over: one card per recipient (download, paper backup, place picker with the tutorial inline and a link to
+  `#/guide/<place>`, https link ≤ 2048 characters). With the messenger: links sealed with `encryptLink`, `buildRecord`,
+  `put` with the owner code's `A`; then `K` and the letters are dropped (vaults stay downloadable in this tab), unless
+  the archive is open. Without the messenger the button is "Finish" and does the same drop.
+- Places (ids): `google_drive`, `onedrive`, `dropbox`, `icloud`, `synology`, `nextcloud`, `gmx_webde`, `proton_drive`,
+  `own_server`, `usb_paper`; 4 steps each (Synology 5), the same count in en/fr/de. Menu names in the tutorials follow
+  the services' English/French/German UIs as of 2026 and may need the maintainer's check.
+- i18n keys added (en, fr, de; for the maintainer's review): `action.retry`, `write.title.letters`, `write.title.recipients`, `write.title.rhythm`, `write.title.guardians`, `write.title.price`, `write.title.create`, `write.title.seal`, `write.title.handover`, `write.closed`, `write.not_yet`, `write.resume`, `letter.size`, `letters.mode_label`, `letters.shared_label`, `letters.note_label`, `letters.for`, `letters.sizes`, `letters.template_insert`, `recipients.unnamed`, `recipients.name_note`, `recipients.email_note`, `recipients.email_invalid`, `recipients.remove`, `messenger.use`, `messenger.owner_email_note`, `messenger.reminders`, `messenger.unavailable`, `rhythm.label`, `rhythm.custom_days`, `rhythm.days_label`, `guardians.loading`, `guardians.load_failed`, `guardians.available`, `guardians.too_few`, `guardians.count_label`, `guardians.fewer`, `guardians.more`, `guardians.mandatory_tag`, `guardians.mandatory_pick`, `guardians.add_mandatory`, `guardians.remove_mandatory`, `guardians.advanced`, `cost.title`, `price.config_error`, `price.incomplete`, `create.step.claim`, `create.guardian_ready`, `create.guardian_waiting`, `create.to_seal`, `seal.sealing`, `seal.for`, `seal.download_one`, `seal.download_zip`, `owner_code.once`, `owner_code.stored`, `owner_code.print`, `archive.intro`, `archive.passphrase_note`, `archive.strength`, `archive.create`, `archive.saved`, `archive.unavailable`, `archive.download_updated`, `paper.note`, `paper.print`, `paper.sealed_on`, `paper.switch_id`, `paper.step1`, `paper.step2`, `paper.step3`, `handover.for`, `handover.where_choose`, `handover.guide_link`, `handover.link_invalid`, `handover.failed`, `handover.send`, `handover.finish`, `handover.sent`, `handover.finished`, `guide.intro`, `guide.covers`, `guide.facts_title`, `guide.fact_closed`, `guide.fact_years`, `guide.all`, `guide.back_to_write`, and `guide.<place>.name`, `guide.<place>.step1`…
+  for the ten places.
+
+## dms-ui, phase 1 (shell and design system)
+
+- 2026-11-15 — Files: `app/index.html` + `app/src/main.ts` (entry), `src/ui/tokens.css` (the §8 colours written once per
+  theme as `#RRGGBB`, 8 px spacing `--s-*`, radii, two shadows, type scale 1.25 from 17 px, `--touch: 44px`, `--t-seal:
+  600ms`), `src/ui/base.css`, `src/ui/components.css`, `src/ui/dom.ts` (`h`/`s` helpers, text only through
+  textContent), `src/ui/a11y.ts`, `src/ui/theme.ts`, `src/ui/router.ts`, `src/ui/network.ts`, `src/ui/wallet.ts`,
+  `src/ui/header.ts`, `src/ui/shell.ts`, `src/ui/screens/{home,placeholder}.ts`, `src/ui/components/*`,
+  `src/ui/illustrations/*`. Tests in `app/test/ui.test.ts` (jsdom per file), including `ui_contrast_tokens`.
+- Dark mode: `@media (prefers-color-scheme: dark) :root:not([data-theme="light"])` plus `:root[data-theme="dark"]`, so the
+  toggle (system / light / dark, `localStorage` key `dms.theme`) can force either. `public/theme-init.js` applies the
+  remembered theme before the first paint; a file, not an inline script, so the CSP can forbid inline scripts.
+- Font: Fraunces (`@fontsource-variable/fraunces`, dev dependency, OFL), imported as `wght.css` from `main.ts`; Vite copies
+  its woff2 files into `assets/` (`font-display: swap` comes with fontsource). All three subsets ship (the browser loads
+  only what `unicode-range` needs). The opener keeps a system serif (no font files in vaults).
+- `ui_contrast_tokens` reads the palettes from `tokens.css` (`parseTokens`), checks them against the §8 table, checks
+  every pair of `COLOUR_PAIRS` (a11y.ts) in both themes (4.5:1, 3:1 for the ring stroke / focus ring), and checks that
+  every CSS rule setting both `color` and `background` to tokens uses a listed pair. All pass; the tightest is `--gold`
+  on `--paper` in light (4.54, used only for non-text). The drill ribbon is `--seal-ink` on `--warn` (5.78 / 9.34).
+  Text is never set on `--line`. Disabled controls do not use opacity (that would break the ratios); the greyed
+  mainnet badge is `--ink-soft`, dashed and struck through.
+- Stepper: seven steps `letters, recipients, rhythm, guardians, price, seal, handover` with original icons pen, people,
+  calendar, shield, coin, seal, hand. The route `#/write/create` (phase 2) shows the `seal` step as current: creating the
+  switch is the first half of sealing. Done steps become links back; on narrow screens only the current step's name is
+  shown (all names stay in the accessibility tree).
+- Seal: original procedural wax outline (`waxPath`, three sine wobbles), embossed rims and rays, monogram = first letters
+  of the first and last word of the sender's name. `press()` adds `dms-seal--pressing` for 600 ms; under
+  `prefers-reduced-motion` it adds nothing and returns false (and the CSS disables the animation as well).
+- Dialog: a plain `role="dialog" aria-modal` element (not `<dialog>`, which jsdom does not fully support), focus trap
+  (`trapFocus` in a11y.ts), Escape / backdrop / × close it unless `dismissible: false`, focus returns to the opener.
+  Toasts: one polite `role=status` region, errors in a separate assertive region and stay until closed.
+- Router: fixed hash routes plus `#/write/<step>` and `#/guide/<place>` (parameter `[a-z0-9_-]+`); trailing slash
+  ignored; anything else is a not-found screen. On a route change focus moves to `<main>` and `document.title` follows
+  the screen's `<h1>`. Routes of phases 2–3 render a placeholder sheet (title + `shell.coming_soon`); the drill routes
+  already show the ribbon, `#/write` the stepper.
+- Network: testnet always; mainnet becomes selectable only if `config/mainnet.json` validates and has `enabled: true`.
+  Otherwise its badge is greyed, `aria-disabled`, and described by `app.network.mainnet_disabled` (§3.8 text).
+- Wallet: CCC with JoyID's CKB signer (`@ckb-ccc/joy-id` 1.2.6, same CCC core 1.23.0; JoyID is the only connector
+  shipped, so "JoyID first" means connect goes straight to it). Both CCC modules are dynamically imported (own chunk),
+  so tests, shell and opener never load them. `Wallet` keeps status / address / balance, restores a remembered JoyID
+  session silently at start, and survives the header being rebuilt on a language change. The faucet link (testnet
+  `faucet_url`) is shown next to the wallet. The CCC client uses CCC's public endpoints for now; phase 2 passes the
+  CRT deployment's RPC URL through `cccDriver`'s `rpcUrl`.
+- Open for phase 4: the built CCC/JoyID chunk contains library URLs outside the acceptance allow-list
+  (`cota.nervina.dev` = JoyID sub-key aggregator, `testnet/mainnet.ckbapp.dev` = CCC fallback RPCs, and documentation
+  links to `api.ckbccc.com` and `nervosnetwork.github.io` in error messages). They must be dealt with when the build is
+  finished (explicit RPC URLs, and a build step for the strings that are never requested).
+- `npm run build` was run so that `site/app/` holds the shell and the font files (it replaces the "not deployed yet"
+  placeholder page).
+- CRT reference clone `.refs/crt` at commit 8572f1f.
+- i18n keys added (en, fr, de; for the maintainer's review): `app.network.label`, `app.network.mainnet`, `theme.label`,
+  `theme.system`, `theme.light`, `theme.dark`, `wallet.connecting`, `wallet.connected`, `wallet.error`,
+  `wallet.balance_unknown`, `nav.label`, `nav.guide`, `nav.home`, `shell.skip`, `shell.coming_soon`, `shell.not_found`,
+  `shell.footer_note`, `home.lead`, `home.write_note`, `home.mine_note`, `home.drill_note`, `home.recipient_title`,
+  `home.recipient_note`, `step.letters`, `step.recipients`, `step.rhythm`, `step.guardians`, `step.price`, `step.seal`,
+  `step.handover`, `stepper.label`, `stepper.status`, `stepper.done`, `seal.monogram_label`, `constellation.label`,
+  `constellation.missing`, `constellation.mandatory`, `toast.region`, `ring.label`, `guide.title`.
+
+## dms-notifier, maintainer review (2026-11-15)
+
+- Address-HMAC key moved into a `meta` table (schema 2), sealed under `NOTIFIER_DATA_KEY`, with the v1 value. Before,
+  it was derived from the data key, so `rotate-key.mjs` invalidated the never list (people who chose "never" would be
+  emailed again) and every stop link already sent. Rotation now re-seals only that key; tests
+  `rotate_keeps_never_list_and_stop_links`, `rotate_refuses_wrong_old_key_and_changes_nothing`,
+  `v1_database_keeps_its_address_hmacs`. A wrong data key is now refused when the store opens.
+- Dockerfile: builds `@crt/client` in its own stage (no Node on the VPS), copies `notifier/.npmrc` (without it `npm ci`
+  on npm 10 rejects the lockfile), loads CRT's `deployments/` instead of the app's `config/` (which made startup fail),
+  no `|| true` around the build. Runtime stage reproduced by hand: starts, `/api/v1/health` answers.
+- eslint: Node globals (`globals` dev dependency); `npm run lint` was failing on `scripts/rotate-key.mjs`.
+
+## dms-notifier, phase 4 (container and docs)
+
+- 2026-11-15 — The image is built from the repository root (`context: ..`) because `@crt/client` is a file dependency in `.refs/crt/client` (must be built beforehand); it is copied to `/.refs/crt/client` in both stages so `../.refs` resolves from `/src/notifier` and `/app`. `config/*.json` become `/app/deployments`.
+- `scripts/rotate-key.mjs` lives in `notifier/scripts/`, is self-contained (no build needed) and runs in one transaction. The never list holds only HMACs, so it cannot be re-keyed: entries are kept but stop matching; the script and docs say so.
+- Compose joins the external network under the service-local name `web`, named by `${WEB_NETWORK:-vericell_default}`.
+
+## dms-notifier, phase 3 (the watcher and the emails)
+
+- 2026-11-15 — Files: `src/watcher.ts` (`createWatcher` → `tick(network)`, `status()` for `/health`), `src/log.ts` (JSON lines, `redact`, `setLogSink` for tests), `src/chain.ts` (`CrtChain` over `@crt/client`: `readSwitch`, `recoverOnline`, tip header), `src/main.ts` (env → store → API + watcher; one tick at start, then every 5 min, never two at once; `expireClaims` runs with each tick; SIGTERM closes cleanly), the watcher's emails and `SmtpMailer` (nodemailer) in `src/mail.ts`. Tests in `test/watcher.test.ts`.
+- Outbox: each send is found or recorded first, then `markAttempt`, send, `markDone`. A row that was attempted but never marked done (a crash, or an SMTP error) is retried on the next tick, and only once (`attempts < 2`). The step carries the deadline (`14d@<deadline>`, `half@…`, `12h@…`), so after a check-in the reminders follow the new deadline and a restart never sends anything twice. The API's confirmation emails that did not finish are retried by the watcher once they are more than one tick old, so a request still in flight is never sent twice.
+- Decisions use the chain's median time (`SwitchState.medianTime`; the clock only if that is 0). If several reminder steps are already due (the service was down), only the latest is sent. The term is the record's `rhythm` (years count as 365 d, months as 30 d). A drill, or any term ≤ 2 days, gets reminders at 50 % and at the deadline instead of 14/3/1 days. Drills get grace alarms at +0/+12/+20 h; real switches also get one at +23 h. Alarms stop once any guardian has released (`releases > 0`).
+- The owner gets reminders and alarms only when the address is confirmed, `owner.reminders` is on, and the address is not stopped or on the never list. `reminders: false` turns off alarms as well, because the owner opted out of the messenger's warnings (they may use the calendar file).
+- Release: needs ≥ `piecesNeeded(descriptor.access_tree)` releases (`t` for a threshold tree, the sum over the groups for an xor tree, as in the opener), with `SwitchState.t` as the fallback. The real chain cannot know `t` without the descriptor and returns 0. A link that does not decrypt, or is not https, gives the no-link email and a `link_unreadable` event. `K.fill(0)` runs in a `finally`. The owner's report (names plus sent / not sent, never links) goes out after every recipient's send has settled; then the switch state becomes `delivered` and the chain is not read for it again. A failed recovery writes one `recover_failed` event and is tried again on every tick.
+- Who gets the release email: confirmed recipients, plus unconfirmed ones that are not stopped and not on the never list (one email, since recipients get nothing else unless they confirmed). A drill sends it to confirmed recipients only. Skipped recipients get a `release_skipped` event (written once, using a done outbox row as the marker).
+- Cancel: the owner email first (if confirmed), then `deleteSwitch` with tombstone `cancelled`, also for drills. §5.3 ("then the record is deleted") wins over §3.4's 7 days. A failed send keeps the record for its one retry. A stored switch the chain reports as `absent` on two consecutive reads is treated as cancelled, so one flaky indexer answer deletes nothing. `inconsistent` Node Cells are a read error (logged, skipped).
+- Retention: a `delivered` record is deleted 30 days after max(last email, release); a drill 7 days after its release. The tombstone (`delivered`, created, ended) then refuses a new claim or PUT.
+- Stop links: the stop token is now derived (HMAC under the server key over address id, switch, role, index and address HMAC; only its SHA-256 is stored), so every email to an address, including the phase 2 confirmation emails, carries the same working stop link. Confirm tokens stay random.
+- Dates in emails: `Intl.DateTimeFormat(lang, {dateStyle: long, timeStyle: short, timeZone: UTC})` plus "UTC". The phone check-in link `<APP_URL>/app/#/checkin?network=&T=&rhythm=` is in every reminder and alarm.
+- Logs: switches are logged as `0x` plus 8 hex digits; addresses as `owner` or `recipient N`; names never. `redact` then removes anything shaped like an email, a URL, a 64-hex value, an owner code or a 43-character base64url token. The API logs unexpected errors. `LOG_LEVEL` is optional.
+- New optional env `CRT_DEPLOYMENTS_DIR` (default `deployments`; `.env.example` suggests `/app/deployments` for the container, phase 4) for CRT's `<network>.json`. `Chain` gets an optional `tip(network)` for `/health`. `api.ts` gets a `ROUTES` table (for the 404 message, and so the acceptance test finds the route paths).
+- i18n keys added (for the maintainer's review): `reminder_subject_one`, `alarm_subject_one`, `report_line_sent`, `report_line_not_sent`, `deadline_utc` (en, fr, de).
+
+## dms-notifier, phase 2 (the API)
+
+- 2026-11-15 — Files: `src/api.ts` (`createApi`/`createServer`, routes, rate limiter, pages), `src/interfaces.ts` (`Clock`, `Chain`, `Mailer`, `SwitchState`), `src/record.ts` (strict validation of the §4.4 record and the PATCH body), `src/i18n.ts` (`t()`, JSON imported with `with { type: 'json' }`), and a first `src/mail.ts` with the two confirmation emails (owner, "told now") plus `compose()` (text + HTML, stop link, `List-Unsubscribe`, drill prefix); phase 3 adds the watcher's emails there.
+- Descriptor check: the API computes `descriptorHash(record.descriptor)` with `@crt/client` (it loads from `dist/` in Node) and compares it, and `I`, with what `Chain.switchState` returns from the Node Cells (the real `Chain`, phase 3, fills it through `verifyNodes`). Only state `armed` is accepted; anything else is `not_on_chain`; a chain read error is 502 `not_on_chain`.
+- Status codes: claim 201, PUT 201 (new) / 200 (replaced), 400 `bad_request`, 401 `unauthorized`, 409 `conflict`, 422 `not_on_chain`/`mismatch`, 429 `rate_limited` (+ `Retry-After`), 413 `too_large`. Unknown routes, wrong methods and "no record yet" use `bad_request` with 404/405, since the code list is fixed.
+- Bearer `A` is accepted as the full owner code `dms1-<network>-<T8>-<A base64url>`, the bare base64url, or 32-byte hex; `SHA-256(A)` is compared in constant time with the claim's `admin_hash` (stored as lower-case hex without `0x`). The claim stays as the authorisation of the switch; `T`/`I` are normalised to lower-case `0x` hex.
+- Claim expiry: a claim older than 2 h without a record is deleted when the chain says `absent` (pending/committed count as live); done lazily on `POST /claim` and `PUT`, and by `api.expireClaims()` for the watcher.
+- `DELETE` removes everything and leaves a tombstone with state `deleted`, so the `T` cannot be claimed or PUT again by anyone.
+- The record is strict: unknown fields are refused (so `K` or a clear link cannot be stored by mistake); ≥ 1 recipient; names and `sender_label` 1–100 characters without control characters; emails by a conservative syntax check (no CR/LF); `rhythm` an ISO 8601 duration; `tell_now` forced on for drills (also in PATCH). PATCH accepts only `owner.{email,language,reminders}` and `recipients[].{index,email,language,tell_now}`.
+- Confirmation emails are sent right after PUT/PATCH for addresses in state `none` (owner always, recipients with `tell_now`): outbox row first (kind `owner_confirm`/`told_now`, step = 16 hex of the address HMAC so a changed email is asked again and an unchanged one never twice), then new confirm/stop tokens (32 random bytes base64url, only SHA-256 stored), send, mark done. A failed send stays pending for the watcher. Skipped for "never"/stopped addresses and beyond 3 confirmation emails per address per 7 days (event `confirm_skipped`, detail without personal data).
+- Pages: `GET /confirm/:token` → confirmed; `GET /stop/:token` → stopped for this switch, with a POST form to the same URL that adds the address HMAC to `never`. Language of the address; unknown tokens get a 404 page in the `Accept-Language` language. CSP `default-src 'none'`, no scripts, `noindex`.
+- Rate limits in memory (sliding window): 30 requests/min per IP for every route except `/health`, 5 claims/hour per IP. With `TRUST_PROXY=1` the right-most `X-Forwarded-For` entry (the one the reverse proxy appended) is the client IP.
+- `/health` returns `{ok, networks: {<n>: {tip, lag_s}}}` from an optional `status()` provider (the watcher supplies it in phase 3); `null`s until then.
+- No new i18n keys: the owner's confirmation email reuses `told_now_confirm` ("Confirm: {url}").
+
+## dms-notifier, phase 1 (package, store, configuration)
+
+- 2026-11-15 — `notifier/` is its own ESM package; runtime deps only `@crt/client` (file dependency on `.refs/crt/client`, `install-links=true`) and `nodemailer`. Crypto uses `node:crypto` (HKDF, AES-256-GCM, HMAC), so no `@noble/*` is needed.
+- Tests run as `node --import tsx --test --test-reporter=tap test/*.test.ts`; imports use `.ts` extensions (`rewriteRelativeImportExtensions`, build via `tsconfig.build.json`).
+- Store: schema version in `PRAGMA user_version`, migrations in an array. The record JSON, emails and names are sealed (`v1.` + base64 of nonce ‖ ct ‖ tag, AAD = network/T/field, so values cannot be swapped between rows). Tokens are SHA-256 hashes; addresses are looked up by HMAC (key derived from `NOTIFIER_DATA_KEY`), also used for the `never` list and the 3-confirmations-per-7-days count. Language and confirmation state are stored in clear (not personal). `events.detail` must hold no personal data.
+- Outbox: `enqueue` records before sending and returns `undefined` for a duplicate key; rows are retried while `attempts < 2` (one retry after a crash, never more). Address id 0 is used for owner-less steps.
+- `syncAddresses` keeps id, tokens and confirmation for an unchanged (role, index, email); a changed email resets them. The owner is stored as role `owner`, index 0.
+- `env.ts`: also reads optional `PORT` (8787), `DATA_DIR` (/data), `TRUST_PROXY`; `RPC_<NETWORK>` is required for each network in `NETWORKS`; 465 → implicit TLS, 587 → STARTTLS required; `MAIL_FROM` address must equal `SMTP_USER` (case-insensitive).
+- i18n: flat keys with `{placeholder}`s, identical keys and placeholders in en/fr/de. The strings cover owner confirmation, told-now, reminder (also drill), alarm, release, delivery report, cancel and the confirm/stop/never pages. Keys for the maintainer's review of translations: all of them (machine-written).
+- `src/api.ts`, `watcher.ts`, `mail.ts`, `log.ts`, `main.ts` belong to phases 2–3 and are not created yet; `acceptance/.../wiring.test.mjs` fails until then.
+
+## dms-core, phase 4 (documentation)
+
+- 2026-11-15 — `docs/formats.md` links SPEC §4 to code and tests instead of copying it; `app/README.md` and CHANGELOG added.
+
+## dms-core, phase 3 (the opener)
+
+- 2026-11-15 — Files: `app/src/opener/index.ts` (IIFE entry), `opener.ts` (`installOpener(window)`: hook, UI, decrypt),
+  `markdown.ts` (marked + DOMPurify), `styles.ts` (inline CSS). The opener imports only `core/aead`, `core/bundle`,
+  `core/bytes`, `core/i18n`, `core/keys` (no `@crt/client`): built bundle ≈ 153 KB minified with the three languages.
+- Build: `OPENER=1 vite build` (`npm run build:opener`) writes `app/dist/opener.js` as the phase says (phase 1 used
+  `dist-opener/`); `emptyOutDir: false`, and `npm run build` runs it after the app build, which empties `dist/`.
+  `vite.config.ts` also exports `buildOpener()` (in-memory build, used by the tests) and a `virtual:dms-opener`
+  plugin, so the app can `import opener from 'virtual:dms-opener'` and call `setOpenerScript` (types in
+  `src/opener/virtual.d.ts`). The default vault script stays the phase 2 stub until the UI does that.
+- A final-chunk plugin rewrites `</script` → `<\/script` and `<!--` → `\x3C!--` (DOMPurify's source contains `<!-->`,
+  which would put an inline `<script>` into the HTML parser's escaped state). Both rewrites are equivalent in JS
+  strings and regular expressions; the test asserts neither appears.
+- `window.crtApplication = { onKey }` is set synchronously when the script is evaluated; the UI mounts on
+  `DOMContentLoaded` (after the kit's own `wire`, which ran its self-verification), moves `#crt-application` to the
+  top of `<body>` and leaves the kit's certificate and tools below (a note says the certificate is not needed).
+  `onKey` never throws (the kit's `recover` would then report a failure over the opener's own message); it resolves
+  to `true`/`false`. It accepts bytes or `0x` hex.
+- Integrity is read from the kit's `#crt-verify` banner (class `match`/`mismatch`); online, `readSwitch` adds the
+  chain comparison (`descriptorHashMatches`). The opener reads the chain once on open (not in practice mode) and on
+  "Check the chain". The "opens if … by <deadline>" date is the chain's deadline when known, otherwise the deadline
+  printed on the kit's certificate (the `Deadline` row; the payload of §4.3 has no deadline field).
+- Status order: `released ≥ needed` → released (+ "Open the letter" = `CRT_KIT.api.recover()`, the kit then calls
+  `onKey`); Alive Cell gone → cancelled (the chain read gives no cancel date, so `open.status.cancelled_undated`); some
+  released → `open.short`; else not yet. Pieces needed: `t` of a threshold tree, the sum of the groups' `t` for an
+  xor tree. A failed recovery with CRT's `RecoveryError.report` names each guardian whose piece is wrong
+  (`bad-privkey`, `commitment-mismatch`; label from the descriptor, else `R` shortened) and explains the margin.
+- Practice: `window.DMS_PRACTICE = true` shows `open.practice` on the screen, skips the chain, and opens with
+  `window.DMS_PRACTICE_KEY` (hex or bytes) or the text of an element `#dms-practice-key`.
+- Markdown: raw HTML tokens are rendered as escaped text, images as their alt text; DOMPurify (own instance per
+  window) allows headings, paragraphs, emphasis, lists, links, code, blockquotes, tables and disabled task-list
+  check boxes; URIs `http(s):`/`mailto:` only; links get `rel="noopener noreferrer" target="_blank"`.
+- Files: one object URL per file at opening (`Blob` of the decoded bytes); HTML/SVG/XML/JS MIME types are downloaded
+  as `application/octet-stream`; the `download` name is the last path segment without control characters. Sizes
+  through `formatBytes` (new in `core/i18n.ts`, `Intl` units, no strings). Print: once open, `@media print` shows
+  the letter alone (overriding the kit's rule that hides `#crt-application`).
+- Errors are i18n sentences only: `open.error.key_length`, `open.error.decrypt` (wrong key, wrong recipient, altered
+  data, invalid bundle), `open.error.version`, `open.error.not_vault`, `open.error.recover`, `error.rpc`.
+- Tests: the six fixed names, plus `opener_chain_status_and_recovery` and `opener_bundle_runs_in_vault` (the built
+  bundle inside a real vault in JSDOM with scripts enabled: the kit runs, the hook is registered, the letter opens).
+  `test/jsdom.d.ts` declares the few jsdom types used (`@types/jsdom` is not installed).
+- i18n keys added (for review by the maintainer): `app.language_name` (English / Français / Deutsch),
+  `open.drill_banner`, `open.integrity.pending`, `open.integrity.chain_match`, `open.integrity.chain_mismatch`,
+  `open.status.cancelled_undated`, `open.check`, `open.recover`, `open.paste_button`, `open.practice_open`,
+  `open.note`, `open.no_files`, `open.certificate_note`, `open.error.key_length`, `open.error.recover`,
+  `open.error.not_vault` (en, fr, de).
+
+## dms-core, phase 2 (core modules)
+
+- 2026-11-15 — `@crt/client` resolves at runtime (Vite/vitest alias) to CRT's TypeScript sources `client/src/index.ts`:
+  the built `dist/src/chain/deployment.js` imports `../../vendor/csr-job.mjs`, which `tsc` does not copy into `dist/`,
+  so the dist entry cannot load. Types still come from `dist/src/index.d.ts` (`tsconfig.json` `paths`).
+- vitest uses the `tap` reporter: every test is printed as `ok n - <name>`, which is what
+  `acceptance/aiworker-dms-core/named.mjs` reads (the default reporter prints only file names).
+- Byte helpers live in `core/bytes.ts` and AES-GCM in `core/aead.ts` (no import of `@crt/client` in the crypto path,
+  so the phase 3 opener stays small). `K`, `I` are accepted as bytes or `0x` hex.
+- `encryptBundle` takes a `Letter` or its encoded bytes (the vector plaintext `{"version":2}` is not a full letter) and
+  an optional `{maxBytes}` (default 26 214 400, the config's `max_vault_bytes`); the limit applies to the ciphertext
+  (plaintext + 16-byte tag) and is checked before encrypting. `decryptBundle` returns the bundle bytes;
+  `openBundle` = decrypt + `decodeBundle` + check that the bundle is addressed to `r`. Only `version` 2 decodes.
+- `encodeBundle` writes the fields in the fixed order of SPEC §4.1, so the same letter gives the same bytes.
+- Links: absolute `https://` URL with a host, ≤ 2048 characters, no whitespace or control characters; checked on
+  encryption and again after decryption. Sealed links are `{nonce, ciphertext}` `0x` hex as in the record (§4.4).
+- `buildVault` takes `script` optionally; without it the script set by `setOpenerScript` is used (phase 3 sets the
+  built opener). Until then the default is a one-line `window.crtApplication` stub. `payload.size` = ciphertext bytes.
+- `vaultFileName`: lower case, `ß→ss`, `æ→ae`, `œ→oe`, `ø→o`, then NFKD without marks, other runs → `-`, each part
+  at most 40 characters; an empty part becomes `sender` / `recipient`. `zipVaults` uses a fixed mtime (2020-01-01)
+  so the zip is deterministic too.
+- Messenger: the bearer token is `A` in base64url (as in the owner code); `adminHash` = `0x` hex SHA-256(A).
+  `buildRecord` copies only the fields of §4.4 (whatever else the caller passes, e.g. `K` or letters, is dropped),
+  checks `T`/`I` against the descriptor, `rhythm` as an ISO 8601 duration, emails syntactically (empty = `null`),
+  and requires links to be sealed. `MessengerClient` throws `MessengerError` carrying the HTTP status (409 on claim).
+- Archive: `scryptAsync` (non-blocking), passphrase NFC-normalised; `openArchive` accepts the JSON text or object and
+  refuses scrypt parameters other than `r = 8, p = 1, 2^14 ≤ N ≤ 2^20` (a crafted file cannot exhaust memory).
+  `passphraseStrength`: < 8 characters → 0; 8–11 → 1, 12–15 → 2, 16–19 → 3, ≥ 20 → 4; +1 with ≥ 3 character classes;
+  −2 for very few distinct characters, −1 for short repeated patterns. `ARCHIVE_MIN_STRENGTH = 3` for the UI.
+- Calendar: `icsForDeadline` takes optional `termSeconds` (the ≤ 2-day rule needs the term), `appUrl` and `now`
+  (DTSTAMP, for deterministic tests). The event links to `<app_url>/app/#/checkin?T=`; the description prints the
+  deadline in UTC. Drill summaries get the `drill.subject_prefix`.
+- i18n: `translate(lang, key, params)` next to `t(key, params)` (vaults, calendar and templates need an explicit
+  language); missing keys fall back to English, then to the key. Supported syntax: `{x}`, `plural` (with `=n`,
+  CLDR categories through `Intl.PluralRules`, `#`), `select`. Storage key `dms.language`. Numbers use thin-space
+  grouping; `formatCkb` takes CKB as a number or shannons as a bigint and appends ` CKB`.
+  `formatDuration`: days from 2 days (or whole days), then hours, then minutes.
+- Price: `quote` uses CRT's default keygen tip (1 CKB) and max fee (0.002 CKB); `heartbeatTip` is in CKB; block time
+  from the deployment's `block_seconds` when present, else CRT's 10.8 s. Each line carries an i18n `key`.
+- Drill: `drillOpensAt(deadline, heartbeatBlocks, blockSeconds = 10.8)`: earliest = deadline + 24 h, latest = + one
+  check interval (1000 blocks ≈ 3 h). `drillBounds` refuses mainnet even when a config object carries drill settings.
+- QR: byte mode over the UTF-8 bytes (the library's default truncates each UTF-16 unit to one byte), error correction
+  M, automatic version, 4-module quiet zone, one `<path fill="currentColor">`.
+- Chain: `switchSummary` adds the tip's median time (`get_blockchain_info`) and `secondsLeft`; `checkinHistory` reads
+  `get_transactions` (node-lock prefix `T`, grouped) — `@crt/client` has no call for it — then each transaction and
+  its header; an entry is listed when the Node Cells' deadline increases (first one = `create`, later = `checkin`),
+  so runner commits, Arm, releases and rewraps are not counted. The RPC fixture `app/test/fixtures/checkin-rpc.json`
+  is synthetic (generated, no node reachable here); `test/fixtures/descriptor.json` is CRT's descriptor vector.
+- i18n keys added (for review by the maintainer): `unit.hours`, `unit.minutes`, `ics.alarm_half`,
+  `ics.alarm_deadline`, `drill.subject_prefix` (`[Drill]` / `[Exercice]` / `[Probealarm]`, as in SPEC §3.4), and
+  `template.<id>.title` / `template.<id>.body` for `legacy_checklist`, `practical_wishes`, `documents`,
+  `crypto_assets`, `personal_letter` (en, fr, de).
+
+## dms-core, phase 1 (project and configuration)
+
+- 2026-11-15 — `app/` is Vite 6 + TypeScript strict + vitest (jsdom available for the opener tests); `@crt/client` is a
+  `file:../.refs/crt/client` dependency (CRT commit 7ceca10, recorded in `app/public/deployments/SOURCE`). CRT's
+  `package.json` points `main` at `dist/index.js` but `tsc` emits `dist/src/index.js`, so `tsconfig.json` (`paths`) and
+  `vite.config.ts` (`alias`) map `@crt/client` to `dist/src`.
+- Runtime dependencies (SPEC §9): `@ckb-ccc/core`, `@crt/client`, `@noble/hashes`, `marked` + `dompurify` (sanitising
+  Markdown), `qrcode-generator`, `fflate`. JoyID connector is added by the UI project when needed.
+- `vite.config.ts` builds the app by default and the opener (`OPENER=1`, IIFE, `dist-opener/`) separately; `npm run build`
+  copies `dist/` to `../site/app/` through `scripts/copy-to-site.mjs`.
+- `loadConfig` fetches `/app/config/<network>.json`; mainnet must have `drill: null`; `n_min ≤ default_n ≤ n_max`,
+  `default_t ≤ default_n`, default heartbeat must be one of the presets. `organiserFeeCheck` takes any object with
+  `occupiedSize` (CCC `Script` fits) so config.ts has no chain dependency; placeholder = not a bech32-like `ckb1`/`ckt1`
+  address of the right network or containing "placeholder/replace/todo".
+- `vendor-crt.sh` vendors both networks; `sync-config.sh` also creates `site/app/config/` (committed, per SPEC §4.6).
+- `.refs/crt` was built with `npm ci && npm run build` in `client/`.
+
 ## (no spec run yet)
 
 - 2026-11-15 — maintainer: SPEC.md 2.0 replaces 1.0 before any run. Recipients (1–10) with their own letters and vaults

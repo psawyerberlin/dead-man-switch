@@ -1,0 +1,42 @@
+# dead-man-switch.chainsolution.net — add to the web server's Caddyfile.
+# The compose file mounts ~/src/dead-man-switch/site at /sites/dead-man-switch (read-only).
+dead-man-switch.chainsolution.net {
+	root * /sites/dead-man-switch
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+		Content-Security-Policy "default-src 'self'; connect-src 'self' https://testnet.ckb.dev https://mainnet.ckb.dev https://csr-monitor.chainsolution.net https://crt.chainsolution.net https://*.joy.id; frame-src https://*.joy.id; img-src 'self' data: blob:; font-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'wasm-unsafe-eval'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'"
+		-Server
+	}
+
+	# the messenger
+	handle /api/* {
+		reverse_proxy dms-notifier:8787
+	}
+
+	# cache: hashed assets never change, config/ and the deployment files may
+	@hashed path /app/assets/* /assets/*
+	header @hashed Cache-Control "public, max-age=31536000, immutable"
+	@short path /app/config/* /app/deployments/* /app/BUILD
+	header @short Cache-Control "public, max-age=300"
+
+	handle {
+		# /en/, /fr/, /de/ are directories with index.html; /app/ is a single-page app
+		@app path /app /app/*
+		handle @app {
+			try_files {path} {path}/ /app/index.html
+			file_server
+		}
+		try_files {path} {path}/index.html
+		file_server
+	}
+
+	handle_errors {
+		rewrite * /404.html
+		file_server
+	}
+}

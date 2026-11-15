@@ -1,0 +1,46 @@
+{
+  "network": "testnet",
+  "enabled": true,
+  "organiser_address": "ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq04zh9h2sdzs80m7p46q5hzxwz5336ncncap8udf",
+  "default_t": 1,
+  "default_n": 1,
+  "n_min": 1,
+  "n_max": 16,
+  "require_deposited_valid": false,
+  "drill": {
+    "min_minutes": 30,
+    "max_hours": 48,
+    "presets_minutes": [
+      30,
+      60,
+      180,
+      720,
+      1440,
+      2880
+    ],
+    "heartbeat_blocks": 1000
+  },
+  "crt_deployment_url": "/app/deployments/testnet.json",
+  "crt_runners_url": "/app/deployments/testnet-runners.json",
+  "faucet_url": "https://faucet.nervos.org/",
+  "organiser_fee_ckb": 70,
+  "rhythms_months": [
+    1,
+    3,
+    6,
+    12
+  ],
+  "heartbeat_presets_blocks": [
+    1000,
+    4000,
+    8000,
+    56000
+  ],
+  "default_heartbeat_blocks": 8000,
+  "default_heartbeat_tip_ckb": 0.5,
+  "max_vault_bytes": 26214400,
+  "max_recipients": 10,
+  "notifier_url": "/api/v1",
+  "app_url": "https://dead-man-switch.chainsolution.net",
+  "operator_contact": "https://psawyer.de"
+}
