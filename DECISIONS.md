@@ -2,6 +2,21 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-notifier, phase 2 (the API)
+
+- 2026-11-15 — Files: `src/api.ts` (`createApi`/`createServer`, routes, rate limiter, pages), `src/interfaces.ts` (`Clock`, `Chain`, `Mailer`, `SwitchState`), `src/record.ts` (strict validation of the §4.4 record and the PATCH body), `src/i18n.ts` (`t()`, JSON imported with `with { type: 'json' }`), and a first `src/mail.ts` with the two confirmation emails (owner, "told now") plus `compose()` (text + HTML, stop link, `List-Unsubscribe`, drill prefix); phase 3 adds the watcher's emails there.
+- Descriptor check: the API computes `descriptorHash(record.descriptor)` with `@crt/client` (it loads from `dist/` in Node) and compares it, and `I`, with what `Chain.switchState` returns from the Node Cells (the real `Chain`, phase 3, fills it through `verifyNodes`). Only state `armed` is accepted; anything else is `not_on_chain`; a chain read error is 502 `not_on_chain`.
+- Status codes: claim 201, PUT 201 (new) / 200 (replaced), 400 `bad_request`, 401 `unauthorized`, 409 `conflict`, 422 `not_on_chain`/`mismatch`, 429 `rate_limited` (+ `Retry-After`), 413 `too_large`. Unknown routes, wrong methods and "no record yet" use `bad_request` with 404/405, since the code list is fixed.
+- Bearer `A` is accepted as the full owner code `dms1-<network>-<T8>-<A base64url>`, the bare base64url, or 32-byte hex; `SHA-256(A)` is compared in constant time with the claim's `admin_hash` (stored as lower-case hex without `0x`). The claim stays as the authorisation of the switch; `T`/`I` are normalised to lower-case `0x` hex.
+- Claim expiry: a claim older than 2 h without a record is deleted when the chain says `absent` (pending/committed count as live); done lazily on `POST /claim` and `PUT`, and by `api.expireClaims()` for the watcher.
+- `DELETE` removes everything and leaves a tombstone with state `deleted`, so the `T` cannot be claimed or PUT again by anyone.
+- The record is strict: unknown fields are refused (so `K` or a clear link cannot be stored by mistake); ≥ 1 recipient; names and `sender_label` 1–100 characters without control characters; emails by a conservative syntax check (no CR/LF); `rhythm` an ISO 8601 duration; `tell_now` forced on for drills (also in PATCH). PATCH accepts only `owner.{email,language,reminders}` and `recipients[].{index,email,language,tell_now}`.
+- Confirmation emails are sent right after PUT/PATCH for addresses in state `none` (owner always, recipients with `tell_now`): outbox row first (kind `owner_confirm`/`told_now`, step = 16 hex of the address HMAC so a changed email is asked again and an unchanged one never twice), then new confirm/stop tokens (32 random bytes base64url, only SHA-256 stored), send, mark done. A failed send stays pending for the watcher. Skipped for "never"/stopped addresses and beyond 3 confirmation emails per address per 7 days (event `confirm_skipped`, detail without personal data).
+- Pages: `GET /confirm/:token` → confirmed; `GET /stop/:token` → stopped for this switch, with a POST form to the same URL that adds the address HMAC to `never`. Language of the address; unknown tokens get a 404 page in the `Accept-Language` language. CSP `default-src 'none'`, no scripts, `noindex`.
+- Rate limits in memory (sliding window): 30 requests/min per IP for every route except `/health`, 5 claims/hour per IP. With `TRUST_PROXY=1` the right-most `X-Forwarded-For` entry (the one the reverse proxy appended) is the client IP.
+- `/health` returns `{ok, networks: {<n>: {tip, lag_s}}}` from an optional `status()` provider (the watcher supplies it in phase 3); `null`s until then.
+- No new i18n keys: the owner's confirmation email reuses `told_now_confirm` ("Confirm: {url}").
+
 ## dms-notifier, phase 1 (package, store, configuration)
 
 - 2026-11-15 — `notifier/` is its own ESM package; runtime deps only `@crt/client` (file dependency on `.refs/crt/client`, `install-links=true`) and `nodemailer`. Crypto uses `node:crypto` (HKDF, AES-256-GCM, HMAC), so no `@noble/*` is needed.
