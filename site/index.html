@@ -10,20 +10,10 @@
 <link rel="alternate" hreflang="en" href="https://dead-man-switch.chainsolution.net/en/">
 <link rel="alternate" hreflang="fr" href="https://dead-man-switch.chainsolution.net/fr/">
 <link rel="alternate" hreflang="de" href="https://dead-man-switch.chainsolution.net/de/">
-<script>
-  // Pick the visitor's language once; the choice on a language page is remembered by the pages' own links.
-  (function () {
-    try {
-      var stored = localStorage.getItem('dms-lang');
-      var langs = stored ? [stored] : (navigator.languages || [navigator.language || 'en']);
-      for (var i = 0; i < langs.length; i++) {
-        var l = String(langs[i]).slice(0, 2).toLowerCase();
-        if (l === 'fr' || l === 'de' || l === 'en') { location.replace('/' + l + '/'); return; }
-      }
-      location.replace('/en/');
-    } catch (e) { location.replace('/en/'); }
-  })();
-</script>
+<!-- English by default; French and German through the language links on every page. A meta refresh, not a
+     script: the site CSP (script-src 'self') blocks inline scripts. -->
+<meta http-equiv="refresh" content="0; url=/en/">
+<link rel="canonical" href="https://dead-man-switch.chainsolution.net/en/">
 </head>
 <body>
 <main class="choose">
