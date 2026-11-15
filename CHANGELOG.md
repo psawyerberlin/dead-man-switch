@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- dms-ui: design system (tokens light/dark, self-hosted Fraunces, components, illustrations), app shell with hash
+  router, language and theme switches, network badge, JoyID wallet through CCC, home screen.
 - dms-notifier: the messenger service (store, API, watcher, emails), container (`notifier/Dockerfile`, `notifier/compose.yaml`),
   key rotation script and documentation (`docs/notifier.md`).
 - dms-core: configuration, keys, per-recipient letters and links, vaults, owner archive, messenger client, QR,

@@ -2,6 +2,63 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-ui, phase 1 (shell and design system)
+
+- 2026-11-15 — Files: `app/index.html` + `app/src/main.ts` (entry), `src/ui/tokens.css` (the §8 colours written once per
+  theme as `#RRGGBB`, 8 px spacing `--s-*`, radii, two shadows, type scale 1.25 from 17 px, `--touch: 44px`, `--t-seal:
+  600ms`), `src/ui/base.css`, `src/ui/components.css`, `src/ui/dom.ts` (`h`/`s` helpers, text only through
+  textContent), `src/ui/a11y.ts`, `src/ui/theme.ts`, `src/ui/router.ts`, `src/ui/network.ts`, `src/ui/wallet.ts`,
+  `src/ui/header.ts`, `src/ui/shell.ts`, `src/ui/screens/{home,placeholder}.ts`, `src/ui/components/*`,
+  `src/ui/illustrations/*`. Tests in `app/test/ui.test.ts` (jsdom per file), including `ui_contrast_tokens`.
+- Dark mode: `@media (prefers-color-scheme: dark) :root:not([data-theme="light"])` plus `:root[data-theme="dark"]`, so the
+  toggle (system / light / dark, `localStorage` key `dms.theme`) can force either. `public/theme-init.js` applies the
+  remembered theme before the first paint; a file, not an inline script, so the CSP can forbid inline scripts.
+- Font: Fraunces (`@fontsource-variable/fraunces`, dev dependency, OFL), imported as `wght.css` from `main.ts`; Vite copies
+  its woff2 files into `assets/` (`font-display: swap` comes with fontsource). All three subsets ship (the browser loads
+  only what `unicode-range` needs). The opener keeps a system serif (no font files in vaults).
+- `ui_contrast_tokens` reads the palettes from `tokens.css` (`parseTokens`), checks them against the §8 table, checks
+  every pair of `COLOUR_PAIRS` (a11y.ts) in both themes (4.5:1, 3:1 for the ring stroke / focus ring), and checks that
+  every CSS rule setting both `color` and `background` to tokens uses a listed pair. All pass; the tightest is `--gold`
+  on `--paper` in light (4.54, used only for non-text). The drill ribbon is `--seal-ink` on `--warn` (5.78 / 9.34).
+  Text is never set on `--line`. Disabled controls do not use opacity (that would break the ratios); the greyed
+  mainnet badge is `--ink-soft`, dashed and struck through.
+- Stepper: seven steps `letters, recipients, rhythm, guardians, price, seal, handover` with original icons pen, people,
+  calendar, shield, coin, seal, hand. The route `#/write/create` (phase 2) shows the `seal` step as current: creating the
+  switch is the first half of sealing. Done steps become links back; on narrow screens only the current step's name is
+  shown (all names stay in the accessibility tree).
+- Seal: original procedural wax outline (`waxPath`, three sine wobbles), embossed rims and rays, monogram = first letters
+  of the first and last word of the sender's name. `press()` adds `dms-seal--pressing` for 600 ms; under
+  `prefers-reduced-motion` it adds nothing and returns false (and the CSS disables the animation as well).
+- Dialog: a plain `role="dialog" aria-modal` element (not `<dialog>`, which jsdom does not fully support), focus trap
+  (`trapFocus` in a11y.ts), Escape / backdrop / × close it unless `dismissible: false`, focus returns to the opener.
+  Toasts: one polite `role=status` region, errors in a separate assertive region and stay until closed.
+- Router: fixed hash routes plus `#/write/<step>` and `#/guide/<place>` (parameter `[a-z0-9_-]+`); trailing slash
+  ignored; anything else is a not-found screen. On a route change focus moves to `<main>` and `document.title` follows
+  the screen's `<h1>`. Routes of phases 2–3 render a placeholder sheet (title + `shell.coming_soon`); the drill routes
+  already show the ribbon, `#/write` the stepper.
+- Network: testnet always; mainnet becomes selectable only if `config/mainnet.json` validates and has `enabled: true`.
+  Otherwise its badge is greyed, `aria-disabled`, and described by `app.network.mainnet_disabled` (§3.8 text).
+- Wallet: CCC with JoyID's CKB signer (`@ckb-ccc/joy-id` 1.2.6, same CCC core 1.23.0; JoyID is the only connector
+  shipped, so "JoyID first" means connect goes straight to it). Both CCC modules are dynamically imported (own chunk),
+  so tests, shell and opener never load them. `Wallet` keeps status / address / balance, restores a remembered JoyID
+  session silently at start, and survives the header being rebuilt on a language change. The faucet link (testnet
+  `faucet_url`) is shown next to the wallet. The CCC client uses CCC's public endpoints for now; phase 2 passes the
+  CRT deployment's RPC URL through `cccDriver`'s `rpcUrl`.
+- Open for phase 4: the built CCC/JoyID chunk contains library URLs outside the acceptance allow-list
+  (`cota.nervina.dev` = JoyID sub-key aggregator, `testnet/mainnet.ckbapp.dev` = CCC fallback RPCs, and documentation
+  links to `api.ckbccc.com` and `nervosnetwork.github.io` in error messages). They must be dealt with when the build is
+  finished (explicit RPC URLs, and a build step for the strings that are never requested).
+- `npm run build` was run so that `site/app/` holds the shell and the font files (it replaces the "not deployed yet"
+  placeholder page).
+- CRT reference clone `.refs/crt` at commit 8572f1f.
+- i18n keys added (en, fr, de; for the maintainer's review): `app.network.label`, `app.network.mainnet`, `theme.label`,
+  `theme.system`, `theme.light`, `theme.dark`, `wallet.connecting`, `wallet.connected`, `wallet.error`,
+  `wallet.balance_unknown`, `nav.label`, `nav.guide`, `nav.home`, `shell.skip`, `shell.coming_soon`, `shell.not_found`,
+  `shell.footer_note`, `home.lead`, `home.write_note`, `home.mine_note`, `home.drill_note`, `home.recipient_title`,
+  `home.recipient_note`, `step.letters`, `step.recipients`, `step.rhythm`, `step.guardians`, `step.price`, `step.seal`,
+  `step.handover`, `stepper.label`, `stepper.status`, `stepper.done`, `seal.monogram_label`, `constellation.label`,
+  `constellation.missing`, `constellation.mandatory`, `toast.region`, `ring.label`, `guide.title`.
+
 ## dms-notifier, maintainer review (2026-11-15)
 
 - Address-HMAC key moved into a `meta` table (schema 2), sealed under `NOTIFIER_DATA_KEY`, with the v1 value. Before,
