@@ -2,6 +2,17 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-notifier, phase 1 (package, store, configuration)
+
+- 2026-11-15 — `notifier/` is its own ESM package; runtime deps only `@crt/client` (file dependency on `.refs/crt/client`, `install-links=true`) and `nodemailer`. Crypto uses `node:crypto` (HKDF, AES-256-GCM, HMAC), so no `@noble/*` is needed.
+- Tests run as `node --import tsx --test --test-reporter=tap test/*.test.ts`; imports use `.ts` extensions (`rewriteRelativeImportExtensions`, build via `tsconfig.build.json`).
+- Store: schema version in `PRAGMA user_version`, migrations in an array. The record JSON, emails and names are sealed (`v1.` + base64 of nonce ‖ ct ‖ tag, AAD = network/T/field, so values cannot be swapped between rows). Tokens are SHA-256 hashes; addresses are looked up by HMAC (key derived from `NOTIFIER_DATA_KEY`), also used for the `never` list and the 3-confirmations-per-7-days count. Language and confirmation state are stored in clear (not personal). `events.detail` must hold no personal data.
+- Outbox: `enqueue` records before sending and returns `undefined` for a duplicate key; rows are retried while `attempts < 2` (one retry after a crash, never more). Address id 0 is used for owner-less steps.
+- `syncAddresses` keeps id, tokens and confirmation for an unchanged (role, index, email); a changed email resets them. The owner is stored as role `owner`, index 0.
+- `env.ts`: also reads optional `PORT` (8787), `DATA_DIR` (/data), `TRUST_PROXY`; `RPC_<NETWORK>` is required for each network in `NETWORKS`; 465 → implicit TLS, 587 → STARTTLS required; `MAIL_FROM` address must equal `SMTP_USER` (case-insensitive).
+- i18n: flat keys with `{placeholder}`s, identical keys and placeholders in en/fr/de. The strings cover owner confirmation, told-now, reminder (also drill), alarm, release, delivery report, cancel and the confirm/stop/never pages. Keys for the maintainer's review of translations: all of them (machine-written).
+- `src/api.ts`, `watcher.ts`, `mail.ts`, `log.ts`, `main.ts` belong to phases 2–3 and are not created yet; `acceptance/.../wiring.test.mjs` fails until then.
+
 ## dms-core, phase 4 (documentation)
 
 - 2026-11-15 — `docs/formats.md` links SPEC §4 to code and tests instead of copying it; `app/README.md` and CHANGELOG added.

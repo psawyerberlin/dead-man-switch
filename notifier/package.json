@@ -1,0 +1,28 @@
+{
+  "name": "dms-notifier",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "dead-man-switch messenger (notifier)",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "test": "node --import tsx --test --test-reporter=tap test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@crt/client": "file:../.refs/crt/client",
+    "nodemailer": "^6.9.16"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.0.0",
+    "@types/node": "^22.0.0",
+    "@types/nodemailer": "^6.4.17",
+    "eslint": "^9.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}
