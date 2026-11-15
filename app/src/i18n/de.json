@@ -247,5 +247,21 @@
   "template.crypto_assets.title": "Krypto-Werte",
   "template.crypto_assets.body": "Nach der Freigabe kann jeder diesen Tresor lesen, der ihn hat. Schreiben Sie, wo möglich, lieber auf, wo etwas liegt, als die Geheimnisse selbst.\n\n## Wallets\n\n- Welches Wallet, welches Netzwerk:\n- Wo das Wiederherstellungsmaterial liegt:\n\n## Börsen\n\n- \n\n## Wer euch dabei sicher helfen kann\n\n- \n",
   "template.personal_letter.title": "Ein persönlicher Brief",
-  "template.personal_letter.body": "## Was ich dir sagen möchte\n\n\n\n## Eine Erinnerung an uns\n\n\n\n## Was ich dir wünsche\n\n\n"
+  "template.personal_letter.body": "## Was ich dir sagen möchte\n\n\n\n## Eine Erinnerung an uns\n\n\n\n## Was ich dir wünsche\n\n\n",
+  "open.drill_banner": "Probealarm im Testnet: Dieser Tresor ist eine Übung. Es steht nichts Echtes auf dem Spiel.",
+  "open.integrity.pending": "Die Echtheitsprüfung ist noch nicht gelaufen.",
+  "open.integrity.chain_match": "Die Einträge der Wächter auf der Chain passen zu diesem Tresor.",
+  "open.integrity.chain_mismatch": "Die Einträge auf der Chain passen nicht zu diesem Tresor. Vertrauen Sie seinem Inhalt nicht.",
+  "open.status.cancelled_undated": "Der Eigentümer hat diesen Schalter widerrufen. Der Brief kann nicht geöffnet werden.",
+  "open.check": "Auf der Chain prüfen",
+  "open.recover": "Brief öffnen",
+  "open.paste_button": "Mit diesen Teilen öffnen",
+  "open.practice_open": "Übungsbrief öffnen",
+  "open.note": "Eine persönliche Notiz",
+  "open.no_files": "Diesem Brief liegen keine Dateien bei.",
+  "open.certificate_note": "Unten: das technische Zertifikat dieses Tresors. Sie brauchen es nicht, um den Brief zu öffnen.",
+  "open.error.key_length": "Der Schlüssel hat die falsche Länge und kann nicht der Schlüssel dieses Tresors sein.",
+  "open.error.recover": "Der Schlüssel konnte aus den veröffentlichten Teilen nicht zusammengesetzt werden.",
+  "open.error.not_vault": "Diese Datei ist kein vollständiger Tresor. Verwenden Sie die Datei, die Sie erhalten haben.",
+  "app.language_name": "Deutsch"
 }

@@ -247,5 +247,21 @@
   "template.crypto_assets.title": "Crypto assets",
   "template.crypto_assets.body": "After release, whoever holds this vault can read it. Write down where things are rather than the secrets themselves where you can.\n\n## Wallets\n\n- Which wallet, which network:\n- Where the recovery material is:\n\n## Exchanges\n\n- \n\n## Someone who can help you do this safely\n\n- \n",
   "template.personal_letter.title": "A personal letter",
-  "template.personal_letter.body": "## What I want you to know\n\n\n\n## A memory I keep of us\n\n\n\n## What I hope for you\n\n\n"
+  "template.personal_letter.body": "## What I want you to know\n\n\n\n## A memory I keep of us\n\n\n\n## What I hope for you\n\n\n",
+  "open.drill_banner": "Fire drill on testnet: this vault is a rehearsal. Nothing real is at stake.",
+  "open.integrity.pending": "The integrity check has not run yet.",
+  "open.integrity.chain_match": "The guardians' records on the chain match this vault.",
+  "open.integrity.chain_mismatch": "The records on the chain do not match this vault. Do not trust its contents.",
+  "open.status.cancelled_undated": "The owner cancelled this switch. The letter cannot be opened.",
+  "open.check": "Check the chain",
+  "open.recover": "Open the letter",
+  "open.paste_button": "Open with these pieces",
+  "open.practice_open": "Open the practice letter",
+  "open.note": "A personal note",
+  "open.no_files": "No files came with this letter.",
+  "open.certificate_note": "Below: the technical certificate of this vault. You do not need it to open the letter.",
+  "open.error.key_length": "The key has the wrong length, so it cannot be the key of this vault.",
+  "open.error.recover": "The key could not be put together from the published pieces.",
+  "open.error.not_vault": "This file is not a complete vault. Use the file you received.",
+  "app.language_name": "English"
 }

@@ -247,5 +247,21 @@
   "template.crypto_assets.title": "Crypto-actifs",
   "template.crypto_assets.body": "Après l'ouverture, quiconque détient ce coffre peut le lire. Notez plutôt où se trouvent les choses que les secrets eux-mêmes, quand c'est possible.\n\n## Portefeuilles\n\n- Quel portefeuille, quel réseau :\n- Où se trouve le matériel de récupération :\n\n## Plateformes d'échange\n\n- \n\n## Quelqu'un qui peut vous aider à le faire en sécurité\n\n- \n",
   "template.personal_letter.title": "Une lettre personnelle",
-  "template.personal_letter.body": "## Ce que je veux que tu saches\n\n\n\n## Un souvenir de nous que je garde\n\n\n\n## Ce que je te souhaite\n\n\n"
+  "template.personal_letter.body": "## Ce que je veux que tu saches\n\n\n\n## Un souvenir de nous que je garde\n\n\n\n## Ce que je te souhaite\n\n\n",
+  "open.drill_banner": "Exercice sur testnet : ce coffre est une répétition. Rien de réel n'est en jeu.",
+  "open.integrity.pending": "La vérification d'intégrité n'a pas encore eu lieu.",
+  "open.integrity.chain_match": "Les traces des gardiens sur la chaîne correspondent à ce coffre.",
+  "open.integrity.chain_mismatch": "Les traces sur la chaîne ne correspondent pas à ce coffre. Ne vous fiez pas à son contenu.",
+  "open.status.cancelled_undated": "Le propriétaire a annulé ce dispositif. La lettre ne peut pas être ouverte.",
+  "open.check": "Vérifier sur la chaîne",
+  "open.recover": "Ouvrir la lettre",
+  "open.paste_button": "Ouvrir avec ces fragments",
+  "open.practice_open": "Ouvrir la lettre d'entraînement",
+  "open.note": "Un mot personnel",
+  "open.no_files": "Aucun fichier n'accompagne cette lettre.",
+  "open.certificate_note": "Ci-dessous : le certificat technique de ce coffre. Vous n'en avez pas besoin pour ouvrir la lettre.",
+  "open.error.key_length": "La clé n'a pas la bonne longueur ; ce ne peut pas être la clé de ce coffre.",
+  "open.error.recover": "La clé n'a pas pu être reconstituée à partir des fragments publiés.",
+  "open.error.not_vault": "Ce fichier n'est pas un coffre complet. Utilisez le fichier que vous avez reçu.",
+  "app.language_name": "Français"
 }

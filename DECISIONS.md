@@ -2,6 +2,53 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-core, phase 3 (the opener)
+
+- 2026-11-15 — Files: `app/src/opener/index.ts` (IIFE entry), `opener.ts` (`installOpener(window)`: hook, UI, decrypt),
+  `markdown.ts` (marked + DOMPurify), `styles.ts` (inline CSS). The opener imports only `core/aead`, `core/bundle`,
+  `core/bytes`, `core/i18n`, `core/keys` (no `@crt/client`): built bundle ≈ 153 KB minified with the three languages.
+- Build: `OPENER=1 vite build` (`npm run build:opener`) writes `app/dist/opener.js` as the phase says (phase 1 used
+  `dist-opener/`); `emptyOutDir: false`, and `npm run build` runs it after the app build, which empties `dist/`.
+  `vite.config.ts` also exports `buildOpener()` (in-memory build, used by the tests) and a `virtual:dms-opener`
+  plugin, so the app can `import opener from 'virtual:dms-opener'` and call `setOpenerScript` (types in
+  `src/opener/virtual.d.ts`). The default vault script stays the phase 2 stub until the UI does that.
+- A final-chunk plugin rewrites `</script` → `<\/script` and `<!--` → `\x3C!--` (DOMPurify's source contains `<!-->`,
+  which would put an inline `<script>` into the HTML parser's escaped state). Both rewrites are equivalent in JS
+  strings and regular expressions; the test asserts neither appears.
+- `window.crtApplication = { onKey }` is set synchronously when the script is evaluated; the UI mounts on
+  `DOMContentLoaded` (after the kit's own `wire`, which ran its self-verification), moves `#crt-application` to the
+  top of `<body>` and leaves the kit's certificate and tools below (a note says the certificate is not needed).
+  `onKey` never throws (the kit's `recover` would then report a failure over the opener's own message); it resolves
+  to `true`/`false`. It accepts bytes or `0x` hex.
+- Integrity is read from the kit's `#crt-verify` banner (class `match`/`mismatch`); online, `readSwitch` adds the
+  chain comparison (`descriptorHashMatches`). The opener reads the chain once on open (not in practice mode) and on
+  "Check the chain". The "opens if … by <deadline>" date is the chain's deadline when known, otherwise the deadline
+  printed on the kit's certificate (the `Deadline` row; the payload of §4.3 has no deadline field).
+- Status order: `released ≥ needed` → released (+ "Open the letter" = `CRT_KIT.api.recover()`, the kit then calls
+  `onKey`); Alive Cell gone → cancelled (the chain read gives no cancel date, so `open.status.cancelled_undated`); some
+  released → `open.short`; else not yet. Pieces needed: `t` of a threshold tree, the sum of the groups' `t` for an
+  xor tree. A failed recovery with CRT's `RecoveryError.report` names each guardian whose piece is wrong
+  (`bad-privkey`, `commitment-mismatch`; label from the descriptor, else `R` shortened) and explains the margin.
+- Practice: `window.DMS_PRACTICE = true` shows `open.practice` on the screen, skips the chain, and opens with
+  `window.DMS_PRACTICE_KEY` (hex or bytes) or the text of an element `#dms-practice-key`.
+- Markdown: raw HTML tokens are rendered as escaped text, images as their alt text; DOMPurify (own instance per
+  window) allows headings, paragraphs, emphasis, lists, links, code, blockquotes, tables and disabled task-list
+  check boxes; URIs `http(s):`/`mailto:` only; links get `rel="noopener noreferrer" target="_blank"`.
+- Files: one object URL per file at opening (`Blob` of the decoded bytes); HTML/SVG/XML/JS MIME types are downloaded
+  as `application/octet-stream`; the `download` name is the last path segment without control characters. Sizes
+  through `formatBytes` (new in `core/i18n.ts`, `Intl` units, no strings). Print: once open, `@media print` shows
+  the letter alone (overriding the kit's rule that hides `#crt-application`).
+- Errors are i18n sentences only: `open.error.key_length`, `open.error.decrypt` (wrong key, wrong recipient, altered
+  data, invalid bundle), `open.error.version`, `open.error.not_vault`, `open.error.recover`, `error.rpc`.
+- Tests: the six fixed names, plus `opener_chain_status_and_recovery` and `opener_bundle_runs_in_vault` (the built
+  bundle inside a real vault in JSDOM with scripts enabled: the kit runs, the hook is registered, the letter opens).
+  `test/jsdom.d.ts` declares the few jsdom types used (`@types/jsdom` is not installed).
+- i18n keys added (for review by the maintainer): `app.language_name` (English / Français / Deutsch),
+  `open.drill_banner`, `open.integrity.pending`, `open.integrity.chain_match`, `open.integrity.chain_mismatch`,
+  `open.status.cancelled_undated`, `open.check`, `open.recover`, `open.paste_button`, `open.practice_open`,
+  `open.note`, `open.no_files`, `open.certificate_note`, `open.error.key_length`, `open.error.recover`,
+  `open.error.not_vault` (en, fr, de).
+
 ## dms-core, phase 2 (core modules)
 
 - 2026-11-15 — `@crt/client` resolves at runtime (Vite/vitest alias) to CRT's TypeScript sources `client/src/index.ts`:

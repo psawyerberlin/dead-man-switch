@@ -160,3 +160,9 @@ export function formatDuration(seconds: number, lang: Language = current): strin
   if (s >= 3600) return translate(lang, 'unit.hours', { count: Math.round(s / 3600) });
   return translate(lang, 'unit.minutes', { count: Math.max(1, Math.round(s / 60)) });
 }
+
+/** File size in the locale (`Intl` units, so no strings to translate): bytes below 1 kB, then kB, then MB. */
+export function formatBytes(bytes: number, lang: Language = current): string {
+  const [value, unit] = bytes < 1000 ? [bytes, 'byte'] : bytes < 1_000_000 ? [bytes / 1000, 'kilobyte'] : [bytes / 1_000_000, 'megabyte'];
+  return new Intl.NumberFormat(lang, { style: 'unit', unit, unitDisplay: 'short', maximumFractionDigits: unit === 'byte' ? 0 : 1 }).format(value);
+}
