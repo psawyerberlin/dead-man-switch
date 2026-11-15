@@ -21,6 +21,8 @@ export interface Chain {
   switchState(network: string, T: string): Promise<SwitchState>;
   /** CRT `recoverOnline`. */
   recoverK(network: string, descriptor: unknown, envelopes: unknown): Promise<Uint8Array>;
+  /** Optional: the tip block number and its timestamp (unix seconds), for `/health`. */
+  tip?(network: string): Promise<{ number: number; timestamp: number }>;
 }
 
 export interface MailMessage { to: string; subject: string; text: string; html: string; headers: Record<string, string> }

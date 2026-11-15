@@ -14,6 +14,8 @@ export interface Config {
   rpc: Partial<Record<Network, string>>;
   networks: Network[];
   trustProxy: boolean;
+  /** Directory of the CRT deployment files `<network>.json`. */
+  deploymentsDir: string;
 }
 
 export class EnvError extends Error {
@@ -58,5 +60,6 @@ export function loadConfig(env: Record<string, string | undefined> = process.env
     dataKey, dataDir: env.DATA_DIR?.trim() || '/data', port: listen,
     smtp: { host: need('SMTP_HOST'), port, secure: port === 465, requireTLS: port === 587, user, pass: env.SMTP_PASS ?? '' },
     mailFrom, appUrl, rpc, networks: networks as Network[], trustProxy: env.TRUST_PROXY === '1',
+    deploymentsDir: env.CRT_DEPLOYMENTS_DIR?.trim() || 'deployments',
   };
 }

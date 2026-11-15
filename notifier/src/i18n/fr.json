@@ -32,5 +32,10 @@
   "page_never_title": "Plus jamais",
   "page_never_text": "Cette adresse ne sera plus jamais contactée par le messager.",
   "page_invalid_title": "Lien non valide",
-  "page_invalid_text": "Ce lien est inconnu ou n'est plus valide."
+  "page_invalid_text": "Ce lien est inconnu ou n'est plus valide.",
+  "reminder_subject_one": "L'échéance de votre dead-man-switch est demain",
+  "alarm_subject_one": "Vos lettres s'ouvrent dans 1 heure",
+  "report_line_sent": "{index}. {name} : e-mail envoyé",
+  "report_line_not_sent": "{index}. {name} : pas d'e-mail (adresse non confirmée, arrêtée ou injoignable)",
+  "deadline_utc": "{date} UTC"
 }

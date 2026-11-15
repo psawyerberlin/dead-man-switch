@@ -5,12 +5,15 @@ import { descriptorHash } from '@crt/client';
 import { sha256Hex } from './crypto.ts';
 import { fromAcceptLanguage, t, type Language } from './i18n.ts';
 import type { Chain, Clock, Mailer } from './interfaces.ts';
+import { logger } from './log.ts';
 import { API_PREFIX, TOKEN_RE, canMail, confirmUrl, escapeHtml, newToken, renderConfirmation, stopUrl } from './mail.ts';
 import { ValidationError, applyPatch, hex32, validateRecord, type MessengerRecord } from './record.ts';
 import type { AddressRow, Store } from './store.ts';
 
 export { API_PREFIX };
 export const BODY_LIMIT = 256 * 1024;
+/** The routes of SPEC.md §5.2, under /api/v1 (listed in the "unknown route" error). */
+export const ROUTES = ['POST /claim', 'PUT|GET|PATCH|DELETE /switch/:network/:T', 'GET /confirm/:token', 'GET|POST /stop/:token', 'GET /health'] as const;
 /** A claim whose T is not live on chain this long after the claim expires. */
 export const CLAIM_TTL_S = 2 * 3600;
 export const LIMITS = {
@@ -210,7 +213,7 @@ export function createApi(deps: ApiDeps): Api {
       // One per address and email: a changed email is asked again, an unchanged one never twice.
       const row = store.enqueue(rec.network, rec.T, kind, a.id, store.addressHmac(a.email).slice(0, 16), now);
       if (!row) continue;
-      const confirm = newToken(), stop = newToken();
+      const confirm = newToken(), stop = store.stopToken(a);
       store.setTokens(a.id, confirm, stop, now);
       store.markAttempt(row.id);
       const msg = renderConfirmation(kind, { lang: a.language, sender: rec.sender_label, T: rec.T, drill: rec.drill,
@@ -380,13 +383,14 @@ export function createApi(deps: ApiDeps): Api {
       if (method === 'POST') { await readBody(req); tokenPage(req, res, 'never', seg[1]!); return; }
       throw notAllowed();
     }
-    throw new ApiError(404, 'bad_request', 'unknown route');
+    throw new ApiError(404, 'bad_request', `unknown route; the routes are: ${ROUTES.join(', ')}`);
   }
 
   async function handle(req: IncomingMessage, res: ServerResponse): Promise<void> {
     try {
       await route(req, res);
     } catch (e) {
+      if (!(e instanceof ApiError)) logger.error('request failed', { method: req.method, error: e });
       const err = e instanceof ApiError ? e : new ApiError(500, 'bad_request', 'internal error');
       if (res.headersSent) { res.destroy(); return; }
       const extra: Record<string, string> = { ...err.headers };

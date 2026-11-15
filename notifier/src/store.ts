@@ -12,7 +12,7 @@ export interface AddressRow {
   confirmation: Confirmation; confirmSentAt: number | null;
 }
 export interface EventRow { id: number; at: number; kind: string; detail: string }
-export interface OutboxRow { id: number; network: string; T: string; kind: string; addressId: number; step: string; status: 'pending' | 'done'; attempts: number }
+export interface OutboxRow { id: number; network: string; T: string; kind: string; addressId: number; step: string; status: 'pending' | 'done'; attempts: number; createdAt: number }
 export interface ClaimRow { network: string; T: string; adminHash: string; createdAt: number }
 export interface TombstoneRow { network: string; T: string; state: string; createdAt: number; endedAt: number }
 
@@ -183,6 +183,15 @@ export class Store {
     const r = this.db.prepare('SELECT * FROM addresses WHERE stop_hash = ?').get(sha256Hex(token)) as AddrDb | undefined;
     return r && this.rowToAddress(r);
   }
+  /**
+   * The stop token of an address: derived from the server key, the address id and the address HMAC, so every email
+   * to the address carries the same working stop link (only its SHA-256 is stored, as for random tokens).
+   */
+  stopToken(a: AddressRow): string {
+    const token = hmac(this.hmacKey, `stop/${a.id}/${a.network}/${a.T}/${a.role}/${a.idx}/${this.addressHmac(a.email)}`).subarray(0, 32).toString('base64url');
+    this.db.prepare('UPDATE addresses SET stop_hash = ? WHERE id = ?').run(sha256Hex(token), a.id);
+    return token;
+  }
   setConfirmation(id: number, c: Confirmation): void { this.db.prepare('UPDATE addresses SET confirmation = ? WHERE id = ?').run(c, id); }
   /** Confirmation emails sent to this address (any switch) since `since`; for the 3-per-7-days limit. */
   confirmationsSince(email: string, since: number): number {
@@ -232,5 +241,5 @@ export class Store {
 
 interface SwitchRow { drill: number; state: string; record: string; created_at: number; updated_at: number; last_mail_at: number | null; ended_at: number | null }
 interface AddrDb { id: number; network: string; T: string; role: Role; idx: number; email: string; name: string; language: string; confirmation: Confirmation; confirm_sent_at: number | null }
-interface OutboxDb { id: number; network: string; T: string; kind: string; address_id: number; step: string; status: 'pending' | 'done'; attempts: number }
-const toOutbox = (r: OutboxDb): OutboxRow => ({ id: r.id, network: r.network, T: r.T, kind: r.kind, addressId: r.address_id, step: r.step, status: r.status, attempts: r.attempts });
+interface OutboxDb { id: number; network: string; T: string; kind: string; address_id: number; step: string; status: 'pending' | 'done'; attempts: number; created_at: number }
+const toOutbox = (r: OutboxDb): OutboxRow => ({ id: r.id, network: r.network, T: r.T, kind: r.kind, addressId: r.address_id, step: r.step, status: r.status, attempts: r.attempts, createdAt: r.created_at });

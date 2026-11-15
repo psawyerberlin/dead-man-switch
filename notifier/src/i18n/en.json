@@ -32,5 +32,10 @@
   "page_never_title": "Never again",
   "page_never_text": "This address will never be contacted again by the messenger.",
   "page_invalid_title": "Link not valid",
-  "page_invalid_text": "This link is unknown or no longer valid."
+  "page_invalid_text": "This link is unknown or no longer valid.",
+  "reminder_subject_one": "Your dead-man-switch deadline is tomorrow",
+  "alarm_subject_one": "Your letters open in 1 hour",
+  "report_line_sent": "{index}. {name}: email sent",
+  "report_line_not_sent": "{index}. {name}: no email (address not confirmed, stopped, or unreachable)",
+  "deadline_utc": "{date} UTC"
 }

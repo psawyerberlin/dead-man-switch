@@ -32,5 +32,10 @@
   "page_never_title": "Nie wieder",
   "page_never_text": "Diese Adresse wird vom Boten nie wieder kontaktiert.",
   "page_invalid_title": "Link ungültig",
-  "page_invalid_text": "Dieser Link ist unbekannt oder nicht mehr gültig."
+  "page_invalid_text": "Dieser Link ist unbekannt oder nicht mehr gültig.",
+  "reminder_subject_one": "Die Frist Ihres dead-man-switch endet morgen",
+  "alarm_subject_one": "Ihre Briefe öffnen sich in 1 Stunde",
+  "report_line_sent": "{index}. {name}: E-Mail gesendet",
+  "report_line_not_sent": "{index}. {name}: keine E-Mail (Adresse nicht bestätigt, abgemeldet oder nicht erreichbar)",
+  "deadline_utc": "{date} UTC"
 }
