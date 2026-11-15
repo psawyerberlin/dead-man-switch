@@ -6,3 +6,6 @@ dist/
 .refs/
 target/
 build/
+.env
+*.env
+notifier/data/

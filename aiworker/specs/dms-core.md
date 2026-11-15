@@ -12,7 +12,7 @@ push:
 ---
 
 # Concept
-dead-man-switch is a web application on top of CRT: the user writes a letter, it is encrypted and sealed in a CRT vault, the user checks in regularly, and if they stop, the guardians (CSR runners) release the key so that the recipients can open the letter. Languages: English, French, German (fixed vocabulary in `SPEC.md`). Stack: TypeScript, Vite, no UI framework beyond what the files say, no analytics, no external fonts or CDNs, `@crt/client` from the CRT repository.
+dead-man-switch is a web application on top of CRT (CKB Revocable Timelock): the owner writes letters for up to ten recipients, everything is encrypted in the browser and sealed in one CRT vault per recipient, the owner checks in regularly, and if they stop, the guardians (CSR runners) release the key on the CKB chain so that each recipient can open their vault. A small optional service, the messenger (notifier), reminds the owner before each deadline, raises alarms during the 24 h grace and, after release, emails each recipient the link to their vault; it never holds the key before release and never sees a letter. Testnet has a fire drill (30 min to 48 h). Languages: English, French, German (fixed vocabulary in `SPEC.md` §2). The visual design of `SPEC.md` §8 is part of the work. Stack: TypeScript, Vite, no UI framework, no analytics, no external fonts or CDNs, `@crt/client` from the CRT repository; the notifier is Node 22 with `node:http`, `node:sqlite` and `nodemailer`.
 ## How this project runs (read first)
 
 This repository already contains the full design: `SPEC.md` is **normative**, and the file named in each phase
@@ -39,9 +39,9 @@ acceptance tests already exist under `acceptance/` and are protected: do not edi
   `.devnet/`, `dist/`.
 
 
-This project: letter bundle, i18n, config and the single-file opener (`aiworker/01-dms-core.md`).
+This project: configuration, keys, per-recipient letters and links, vaults, owner archive, messenger client, QR, templates and the single-file opener (`aiworker/01-dms-core.md`).
 
-## Phase 1: Project setup
+## Phase 1: Project and configuration
 
 ### Instructions
 Read `aiworker/01-dms-core.md`, section "Phase 1", the introduction of that file, and the `SPEC.md` sections named there. Implement exactly that phase; translation keys, file names and test names as written. Create the CRT reference clone and build `@crt/client` first (see above).
@@ -53,9 +53,11 @@ cd app && npm run typecheck
 ```
 
 ## Phase 2: Core modules
+model: opus
+timeout: 150m
 
 ### Instructions
-Read `aiworker/01-dms-core.md`, section "Phase 2", the introduction of that file, and the `SPEC.md` sections named there. Implement exactly that phase; translation keys, file names and test names as written.
+Read `aiworker/01-dms-core.md`, section "Phase 2", the introduction of that file, and the `SPEC.md` sections named there. Implement exactly that phase; translation keys, file names and test names as written. The vectors in `spec/vectors/keys.json` are normative; never change them.
 
 ### Acceptance
 ```bash

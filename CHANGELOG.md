@@ -2,4 +2,5 @@
 
 ## Unreleased
 
-- Application specification 1.0, AI worker specs 01–03 with acceptance tests, translations en/fr/de, website.
+- Application specification 2.0 (recipients, messenger, fire drill, owner archive, design), AI worker specs 01–04 with
+  acceptance tests, key vectors, translations en/fr/de, website.

@@ -1,0 +1,58 @@
+{
+  "$comment": "SPEC.md 4.2. K, I, nonce are fixed test inputs; outputs computed independently (Python hmac/hashlib, cryptography AESGCM).",
+  "K": "0x000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f",
+  "I": "0xa5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5",
+  "cases": [
+    {
+      "r": 1,
+      "K_letter": "0xc793d0601a20f761b587945a442ade0a3ac575226dc132a811f9bfe8b73826e5",
+      "K_link": "0x9fb5ce372a535acc2e44c7aad41d50ca4e30b5916cce45f039f5b622875a97f5",
+      "link": {
+        "plaintext": "https://example.org/vault-1.html",
+        "nonce": "0x000102030405060708090a0b",
+        "aad": "0x444d532d76322f6c696e6ba5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a501",
+        "ciphertext": "0x0a46663456e4948ee63a2332106578fdfdc401f00fd8c6c1ed0777b1ef4a030b4de0bb62bd9ed614094efbae7b2360a0"
+      },
+      "letter": {
+        "plaintext_utf8": "{\"version\":2}",
+        "nonce": "0x000102030405060708090a0b",
+        "aad": "0x444d532d7632a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a501",
+        "ciphertext": "0xe5b14e35d0f7e4dc81fa77ebf923d98483d17e4413c08d314ddbf8b7ac"
+      }
+    },
+    {
+      "r": 2,
+      "K_letter": "0x188af996f37eb697a233202ddeabf879e2e04511d1f11cb9a6a0b689c8d1df6d",
+      "K_link": "0xb67fbff980a277e9f4c46d52877a5d3352df476dcd1ff57ea2e26890bcf383ff",
+      "link": {
+        "plaintext": "https://example.org/vault-2.html",
+        "nonce": "0x000102030405060708090a0b",
+        "aad": "0x444d532d76322f6c696e6ba5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a502",
+        "ciphertext": "0xb580db2170e16d7c0cfb7aa780bb9415e2acf631e99f2ea09c3c3b77ed381801c7aefbccf0e05b4ea1dee7f62c02d22c"
+      },
+      "letter": {
+        "plaintext_utf8": "{\"version\":2}",
+        "nonce": "0x000102030405060708090a0b",
+        "aad": "0x444d532d7632a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a502",
+        "ciphertext": "0x8a3286295ffaa15fd98f1c43b67a5e31e3aa064706a4cf775f51f620b2"
+      }
+    },
+    {
+      "r": 10,
+      "K_letter": "0x6f2da124db7888606d28f132a671d4543514f9bc68a94a2276a63a9bb4fee51a",
+      "K_link": "0x9d8b163c290d0ceb8bcf64bcaf810d0eb892385dea99ccda07158310846ffaa8",
+      "link": {
+        "plaintext": "https://example.org/vault-10.html",
+        "nonce": "0x000102030405060708090a0b",
+        "aad": "0x444d532d76322f6c696e6ba5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a50a",
+        "ciphertext": "0x73d9fc9bf78a5f6ab95aa62bc67c3bfa7eb5e44ae35e1fc46bb4414c1ce47fea5570c3a368b2bcfcccf8526251c84195b7"
+      },
+      "letter": {
+        "plaintext_utf8": "{\"version\":2}",
+        "nonce": "0x000102030405060708090a0b",
+        "aad": "0x444d532d7632a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a50a",
+        "ciphertext": "0xd29b4ead35b1064b6eb4fcbb13c1f4e215376050b4ecffda3932808732"
+      }
+    }
+  ]
+}

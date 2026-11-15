@@ -2,19 +2,22 @@
   "network": "mainnet",
   "enabled": false,
   "note": "Enabled when CRT's deployments/mainnet.json is enabled (CSR service runtime on mainnet).",
-  "organiser_fee_ckb": 50,
   "organiser_address": "ckb1FILL_ME_WITH_THE_OPERATOR_MAINNET_ADDRESS",
   "default_t": 5,
   "default_n": 8,
+  "n_min": 3,
+  "n_max": 16,
+  "require_deposited_valid": true,
+  "drill": null,
+  "crt_deployment_url": "/app/deployments/mainnet.json",
+  "crt_runners_url": "/app/deployments/mainnet-runners.json",
+  "organiser_fee_ckb": 65,
   "rhythms_months": [
     1,
     3,
     6,
     12
   ],
-  "max_vault_bytes": 26214400,
-  "crt_deployment_url": "/deployments/mainnet.json",
-  "app_url": "https://dead-man-switch.chainsolution.net",
   "heartbeat_presets_blocks": [
     1000,
     4000,
@@ -23,9 +26,9 @@
   ],
   "default_heartbeat_blocks": 8000,
   "default_heartbeat_tip_ckb": 0.5,
-  "n_min": 3,
-  "n_max": 16,
-  "rhythms_days": [],
-  "require_deposited_valid": true,
-  "crt_runners_url": "/deployments/mainnet-runners.json"
+  "max_vault_bytes": 26214400,
+  "max_recipients": 10,
+  "notifier_url": "/api/v1",
+  "app_url": "https://dead-man-switch.chainsolution.net",
+  "operator_contact": "https://psawyer.de"
 }

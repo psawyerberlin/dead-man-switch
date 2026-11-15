@@ -12,7 +12,7 @@ push:
 ---
 
 # Concept
-dead-man-switch is a web application on top of CRT: the user writes a letter, it is encrypted and sealed in a CRT vault, the user checks in regularly, and if they stop, the guardians (CSR runners) release the key so that the recipients can open the letter. Languages: English, French, German (fixed vocabulary in `SPEC.md`). Stack: TypeScript, Vite, no UI framework beyond what the files say, no analytics, no external fonts or CDNs, `@crt/client` from the CRT repository.
+dead-man-switch is a web application on top of CRT (CKB Revocable Timelock): the owner writes letters for up to ten recipients, everything is encrypted in the browser and sealed in one CRT vault per recipient, the owner checks in regularly, and if they stop, the guardians (CSR runners) release the key on the CKB chain so that each recipient can open their vault. A small optional service, the messenger (notifier), reminds the owner before each deadline, raises alarms during the 24 h grace and, after release, emails each recipient the link to their vault; it never holds the key before release and never sees a letter. Testnet has a fire drill (30 min to 48 h). Languages: English, French, German (fixed vocabulary in `SPEC.md` §2). The visual design of `SPEC.md` §8 is part of the work. Stack: TypeScript, Vite, no UI framework, no analytics, no external fonts or CDNs, `@crt/client` from the CRT repository; the notifier is Node 22 with `node:http`, `node:sqlite` and `nodemailer`.
 ## How this project runs (read first)
 
 This repository already contains the full design: `SPEC.md` is **normative**, and the file named in each phase
@@ -39,12 +39,14 @@ acceptance tests already exist under `acceptance/` and are protected: do not edi
   `.devnet/`, `dist/`.
 
 
-This project: end-to-end scenario, packaging and deployment files (`aiworker/03-dms-e2e.md`).
+This project: end-to-end scenario, packaging and deployment files (`aiworker/04-dms-e2e.md`).
 
 ## Phase 1: Scripted scenario (written, not run)
+model: opus
+timeout: 120m
 
 ### Instructions
-Read `aiworker/03-dms-e2e.md`, section "Phase 1", the introduction of that file, and the `SPEC.md` sections named there. Implement exactly that phase; translation keys, file names and test names as written. Write `test/e2e/scenario.mjs`; do NOT run it (it needs a devnet and headless Chromium, neither exists here). It must pass `node --check`. Ignore the sentence about pasting output into `DECISIONS.md`.
+Read `aiworker/04-dms-e2e.md`, section "Phase 1", the introduction of that file, and the `SPEC.md` sections named there. Implement exactly that phase; translation keys, file names and test names as written. Write `test/e2e/scenario.mjs`; do NOT run it (it needs a devnet and headless Chromium, neither exists here). It must pass `node --check`.
 
 ### Acceptance
 ```bash
@@ -54,7 +56,7 @@ node --check test/e2e/scenario.mjs
 ## Phase 2: Packaging, deployment files and manual-steps file
 
 ### Instructions
-Read `aiworker/03-dms-e2e.md`, section "Phase 2", the introduction of that file, and the `SPEC.md` sections named there. Implement exactly that phase; translation keys, file names and test names as written. Also write `docs/manual-steps.md` as section 'Phase 3 — the manual step' of the file describes; the human performs it in the last phase of this project.
+Read `aiworker/04-dms-e2e.md`, section "Phase 2", the introduction of that file, and the `SPEC.md` sections named there. Implement exactly that phase; translation keys, file names and test names as written. Also write `docs/manual-steps.md` as section 'Phase 3 — the manual step' of the file describes, with exact commands and real paths; the human performs it in the last phase of this project.
 
 ### Acceptance
 ```bash
@@ -62,10 +64,10 @@ bash -n scripts/build-site.sh
 node --test acceptance/aiworker-dms-e2e/
 ```
 
-## Phase 3: The short manual step (manual)
+## Phase 3: The manual step (manual)
 
 ### Instructions
-Manual: follow `docs/manual-steps.md` (set `organiser_address`, build the site and commit `site/app/`, run the scenario against the CRT devnet, the testnet run, deploy by `git pull` on the VPS). Mark this phase passed in the web interface when done.
+Manual: follow `docs/manual-steps.md` (organiser address, build and commit `site/app/`, devnet scenario, VPS deployment with the notifier and Caddy, the testnet fire drills, updates by `git pull`). Mark this phase passed in the web interface when done.
 
 ### Acceptance
 ```bash

@@ -1,4 +1,4 @@
-// Acceptance for aiworker/01-dms-core.md. Run from the repository root.
+// Acceptance for aiworker/01-dms-core.md (SPEC.md 2.0). Run from the repository root.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -15,24 +15,39 @@ test('project and dependencies', () => {
   for (const s of ['dev', 'build', 'test', 'typecheck', 'lint']) assert.ok(pkg.scripts?.[s], `script ${s}`);
   assert.match(pkg.scripts.build, /site\/app|copy/);
   const deps = Object.keys(pkg.dependencies || {});
-  const allowed = /^(@crt\/client|@ckb-ccc\/.*|@noble\/.*|marked|dompurify|micromark.*|isomorphic-dompurify|@joyid\/.*)$/;
+  const allowed = /^(@crt\/client|@ckb-ccc\/.*|@noble\/.*|marked|dompurify|micromark.*|isomorphic-dompurify|@joyid\/.*|qrcode-generator|fflate)$/;
   for (const d of deps) assert.match(d, allowed, `runtime dependency ${d} not allowed by SPEC.md §7`);
   assert.ok(exists('app', 'public', 'deployments', 'SOURCE'));
+  for (const s of ['vendor-crt.sh', 'sync-config.sh']) { assert.ok(exists('scripts', s), `scripts/${s}`); assert.match(read('scripts', s), /set -euo pipefail/); }
+  assert.ok(exists('app', 'src', 'core', 'config.ts'));
   assert.ok(exists('config', 'testnet.json'));
   assert.ok(exists('config', 'mainnet.json'));
   const t = JSON.parse(read('config', 'testnet.json'));
-  for (const k of ['organiser_fee_ckb', 'organiser_address', 'default_t', 'default_n', 'rhythms_months', 'max_vault_bytes', 'faucet_url', 'heartbeat_presets_blocks', 'default_heartbeat_blocks', 'default_heartbeat_tip_ckb']) assert.ok(k in t, `config key ${k}`);
-  assert.equal(JSON.parse(read('config', 'mainnet.json')).enabled, false);
+  const keys = ['enabled', 'organiser_fee_ckb', 'organiser_address', 'default_t', 'default_n', 'n_min', 'n_max', 'require_deposited_valid', 'rhythms_months', 'drill', 'heartbeat_presets_blocks', 'default_heartbeat_blocks', 'default_heartbeat_tip_ckb', 'max_vault_bytes', 'max_recipients', 'notifier_url', 'crt_deployment_url', 'crt_runners_url', 'app_url', 'operator_contact'];
+  const m = JSON.parse(read('config', 'mainnet.json'));
+  for (const k of keys) { assert.ok(k in t, `testnet config key ${k}`); assert.ok(k in m, `mainnet config key ${k}`); }
+  assert.ok('faucet_url' in t);
+  assert.equal(m.enabled, false);
+  assert.equal(m.drill, null, 'no fire drill on mainnet');
+  assert.equal(t.drill.min_minutes, 30); assert.equal(t.drill.max_hours, 48);
+  assert.ok(t.organiser_fee_ckb >= 61, 'organiser fee below the occupied capacity of any output');
 });
 
 test('core modules and constants', () => {
-  for (const m of ['bundle', 'vault', 'calendar', 'i18n', 'price']) assert.ok(exists('app', 'src', 'core', `${m}.ts`), `core/${m}.ts`);
+  for (const m of ['config', 'keys', 'bundle', 'links', 'vault', 'messenger', 'archive', 'calendar', 'i18n', 'price', 'drill', 'qr', 'templates', 'chain']) assert.ok(exists('app', 'src', 'core', `${m}.ts`), `core/${m}.ts`);
+  assert.ok(exists('spec', 'vectors', 'keys.json'));
   const src = walk('app/src/core').map((f) => read(f)).join('\n');
-  assert.match(src, /DMS-v1/);
+  assert.match(src, /DMS-v2\/letter/);
+  assert.match(src, /DMS-v2\/link/);
+  assert.match(src, /DMS-v2\/archive/);
+  assert.match(src, /scrypt/);
+  assert.match(src, /hkdf/i);
+  assert.doesNotMatch(src, /DMS-v1/);
   assert.match(src, /AES-GCM/);
   assert.match(src, /generateKit/);
   assert.match(src, /VALARM/);
   assert.match(src, /dead-man-switch/);
+  assert.match(src, /payload/);
   assert.match(src, /estimateCost/);
   assert.doesNotMatch(src, /skipVerif|insecure|allowUnverified|noVerify/i);
 });
@@ -52,6 +67,8 @@ test('opener is built as a single self-contained bundle', () => {
   assert.ok(exists('app', 'src', 'opener'));
   const src = walk('app/src/opener').map((f) => read(f)).join('\n');
   assert.match(src, /crtApplication/);
+  assert.match(src, /letterKey|DMS-v2\/letter/);
+  assert.match(src, /DMS_PRACTICE/);
   assert.match(src, /onKey/);
   assert.match(src, /crt-application/);
   assert.match(src, /createObjectURL/);

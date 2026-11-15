@@ -17,9 +17,10 @@ in order; a phase is done only when its acceptance tests pass (§4).
 
 | Spec | Produces |
 |---|---|
-| `aiworker/01-dms-core.md` | `app/src/core`, `app/src/opener`: bundle encryption, vault assembly, config, opener |
-| `aiworker/02-dms-ui.md` | `app/src/ui`, `app/src/i18n` wiring, the three flows, `site/app/` build |
-| `aiworker/03-dms-e2e.md` | devnet end-to-end against CRT, release packaging, `docs/manual-steps.md` |
+| `aiworker/01-dms-core.md` | `app/src/core`, `app/src/opener`: keys, per-recipient letters and links, vaults, archive, config, messenger client, opener |
+| `aiworker/02-dms-notifier.md` | `notifier/`: the messenger service (store, API, watcher, emails, container) |
+| `aiworker/03-dms-ui.md` | `app/src/ui`: design system, the flows, fire drill, guides, `site/app/` build |
+| `aiworker/04-dms-e2e.md` | devnet end-to-end against CRT and the notifier, packaging, `deploy/`, `docs/manual-steps.md` |
 
 `SPEC.md` is normative. When a spec file and `SPEC.md` disagree, `SPEC.md` wins and the worker notes the
 disagreement in `DECISIONS.md`. When `SPEC.md` is silent, the worker decides, implements, and records the
@@ -33,7 +34,7 @@ decision (§5). The worker never waits for a human.
   `client/` built), and of `ckb-service-runner` at `../ckb-service-runner` for the devnet. `@crt/client` is
   consumed as a file dependency (`"@crt/client": "file:.refs/crt/client"`) until it is published;
   the commit it was built from is recorded in `DECISIONS.md`.
-* Network: npm, GitHub. No testnet CKB is needed before spec 03 phase 3.
+* Network: npm, GitHub. No testnet CKB is needed before spec 04 phase 3.
 
 ## 3. Rules
 
@@ -48,13 +49,13 @@ decision (§5). The worker never waits for a human.
    `DECISIONS.md` and moves on; it never edits the test.
 3. **Branch and PR.** One branch per spec: `aiworker/<spec-name>` (e.g. `aiworker/crt-contracts`), from `main`.
    Commits `type(scope): summary`. One PR per spec against `main`, body from `.github/pull_request_template.md`,
-   listing the phases done and the acceptance command. Security-sensitive changes (anything under `app/src/core` or
-   `app/src/opener`) tick the box.
+   listing the phases done and the acceptance command. Security-sensitive changes (anything under `app/src/core`,
+   `app/src/opener` or `notifier/src`) tick the box.
 4. **Quality gates** before a phase is called done: `npm run typecheck`, `npm test`, `npm run build` in `app/`; the spec's acceptance command. All green, no skipped tests except those the spec marks as devnet-only.
 5. **Documentation moves with the code.** Every phase updates the documents its spec names (`README.md`, `docs/`,
    `CHANGELOG.md`). Plain prose, no marketing. Numbers stated once, referenced elsewhere.
 6. **No new dependencies without a line in `DECISIONS.md`** naming the crate/package, its version and why.
-   Allowed at runtime: see `SPEC.md` §7. Dev: `vite`, `typescript`, `vitest` or `node:test`, `@testing-library/dom`.
+   Allowed at runtime: see `SPEC.md` §9. Dev: `vite`, `typescript`, `vitest` or `node:test`, `@testing-library/dom`.
 7. **Idempotent scripts.** Every script in `scripts/` can be re-run; it stops at the first failure
    (`set -euo pipefail`).
 8. **Secrets.** Nothing secret enters the repository: no private keys, no funded testnet keys, no tokens. Devnet
