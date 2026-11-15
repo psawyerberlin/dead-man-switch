@@ -2,6 +2,23 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-core, phase 1 (project and configuration)
+
+- 2026-11-15 — `app/` is Vite 6 + TypeScript strict + vitest (jsdom available for the opener tests); `@crt/client` is a
+  `file:../.refs/crt/client` dependency (CRT commit 7ceca10, recorded in `app/public/deployments/SOURCE`). CRT's
+  `package.json` points `main` at `dist/index.js` but `tsc` emits `dist/src/index.js`, so `tsconfig.json` (`paths`) and
+  `vite.config.ts` (`alias`) map `@crt/client` to `dist/src`.
+- Runtime dependencies (SPEC §9): `@ckb-ccc/core`, `@crt/client`, `@noble/hashes`, `marked` + `dompurify` (sanitising
+  Markdown), `qrcode-generator`, `fflate`. JoyID connector is added by the UI project when needed.
+- `vite.config.ts` builds the app by default and the opener (`OPENER=1`, IIFE, `dist-opener/`) separately; `npm run build`
+  copies `dist/` to `../site/app/` through `scripts/copy-to-site.mjs`.
+- `loadConfig` fetches `/app/config/<network>.json`; mainnet must have `drill: null`; `n_min ≤ default_n ≤ n_max`,
+  `default_t ≤ default_n`, default heartbeat must be one of the presets. `organiserFeeCheck` takes any object with
+  `occupiedSize` (CCC `Script` fits) so config.ts has no chain dependency; placeholder = not a bech32-like `ckb1`/`ckt1`
+  address of the right network or containing "placeholder/replace/todo".
+- `vendor-crt.sh` vendors both networks; `sync-config.sh` also creates `site/app/config/` (committed, per SPEC §4.6).
+- `.refs/crt` was built with `npm ci && npm run build` in `client/`.
+
 ## (no spec run yet)
 
 - 2026-11-15 — maintainer: SPEC.md 2.0 replaces 1.0 before any run. Recipients (1–10) with their own letters and vaults
