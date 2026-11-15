@@ -43,9 +43,9 @@ test('emails in three languages with identical keys', () => {
 
 test('environment example carries no secrets', () => {
   const env = read('notifier', '.env.example');
-  for (const v of ['NOTIFIER_DATA_KEY', 'SMTP_URL', 'MAIL_FROM', 'APP_URL', 'RPC_TESTNET', 'NETWORKS']) assert.match(env, new RegExp(`^${v}=`, 'm'), v);
+  for (const v of ['NOTIFIER_DATA_KEY', 'SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASS', 'MAIL_FROM', 'APP_URL', 'RPC_TESTNET', 'NETWORKS']) assert.match(env, new RegExp(`^${v}=`, 'm'), v);
   assert.doesNotMatch(env, /^NOTIFIER_DATA_KEY=[0-9a-f]{64}\s*$/m, 'no real key in the example');
-  assert.doesNotMatch(env, /:\/\/[^:\s]+:[^@\s]{6,}@/, 'no SMTP password in the example');
+  assert.match(env, /^SMTP_PASS=\s*$/m, 'SMTP_PASS stays empty in the example');
 });
 
 test('container and docs', () => {

@@ -23,7 +23,7 @@ interface Mailer { send(msg: { to: string, subject: string, text: string, html: 
 
 * `notifier/package.json`: scripts `build` (tsc to `dist/`), `start` (`node dist/main.js`), `test` (`node --test`
   through `tsx`, TAP output), `typecheck`, `lint`. Runtime dependencies only those of `SPEC.md` §9.
-* `notifier/src/env.ts`: reads and validates the variables of `SPEC.md` §5.5; `notifier/.env.example` with every
+* `notifier/src/env.ts`: reads and validates the variables of `SPEC.md` §5.5 (`SMTP_PORT` 465 → implicit TLS, 587 → STARTTLS required; the address inside `MAIL_FROM` must equal `SMTP_USER`, test `env_rejects_foreign_sender`); `notifier/.env.example` with every
   variable and a comment (no values that look like secrets).
 * `notifier/src/store.ts` over `node:sqlite`: tables `claims`, `switches` (record JSON and personal fields
   encrypted with AES-256-GCM under `NOTIFIER_DATA_KEY`, one random nonce per value), `addresses` (per switch:
@@ -37,7 +37,7 @@ interface Mailer { send(msg: { to: string, subject: string, text: string, html: 
 
 Tests: `store_encrypts_at_rest` (the database file contains no email address, name or link of the fixtures),
 `crypto_matches_vectors` (link cases of `../spec/vectors/keys.json`), `i18n_same_keys_in_all_languages`,
-`env_rejects_missing_key`.
+`env_rejects_missing_key`, `env_rejects_foreign_sender`.
 
 ## Phase 2 — the API
 

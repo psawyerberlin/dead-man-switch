@@ -376,14 +376,14 @@ time) and decides, with an **outbox** (unique per record, kind, address, step) s
 
 ### 5.4 Email
 
-SMTP through `nodemailer`, sender `MAIL_FROM` (e.g. `dead-man-switch <letters@chainsolution.net>`). Plain text plus
+SMTP through `nodemailer` (implicit TLS on 465 or STARTTLS on 587), sender `MAIL_FROM` = `dead-man-switch <dead-man-switch_noreply@chainsolution.psawyer.de>` (a Strato mailbox; Strato refuses a sender address other than the authenticated mailbox, so the notifier refuses to start when the address in `MAIL_FROM` differs from `SMTP_USER`). Plain text plus
 a simple HTML part, the three languages, no remote images, no tracking, a stop link in every email.
 `List-Unsubscribe` header. Subject prefix for drills (§3.4). Templates are code, tested in the three languages.
 
 ### 5.5 Operation
 
 Configuration by environment (`notifier/.env.example`, the real file lives outside the repository):
-`NOTIFIER_DATA_KEY` (32 bytes hex, encrypts personal data at rest), `SMTP_URL`, `MAIL_FROM`, `APP_URL`,
+`NOTIFIER_DATA_KEY` (32 bytes hex, encrypts personal data at rest), `SMTP_HOST` (`smtp.strato.de`), `SMTP_PORT` (465), `SMTP_USER`, `SMTP_PASS` (separate variables, so nothing needs URL-encoding), `MAIL_FROM`, `APP_URL`,
 `RPC_TESTNET`, `RPC_MAINNET`, `NETWORKS` (`testnet` now). Storage: SQLite through `node:sqlite` in `/data`. Logs:
 JSON lines, never an email address, a name, a link or a token (a test greps the logs of the test run). Container:
 `notifier/Dockerfile` (node:22-slim, non-root), `notifier/compose.yaml` (service `dms-notifier`, port 8787 inside

@@ -7,7 +7,7 @@ CRT devnet (`.refs/crt/scripts/devnet-e2e.sh`).
 
 `test/e2e/scenario.mjs` (Node; uses `app/src/core` through the built library, the notifier as a child process with
 a local SMTP sink, and a headless browser only for the opener): start the CRT devnet (three runners) and the
-notifier (`NETWORKS=devnet`, SQLite in `.devnet/`, `SMTP_URL` pointing at a sink written with the `smtp-server` dev
+notifier (`NETWORKS=devnet`, SQLite in `.devnet/`, `SMTP_HOST`/`SMTP_PORT` pointing at a sink written with the `smtp-server` dev
 dependency that stores messages in `.devnet/mail/`), then with a devnet key:
 
 1. two recipients (en, de), per-recipient letters, one text and two files each, recipient 1 with a link;
@@ -52,7 +52,7 @@ Prints PASS/FAIL per step; exit code = failures.
    the address type;
 2. run `scripts/build-site.sh` and commit `site/app/` (it is served from git, not uploaded);
 3. run the devnet scenario (`node test/e2e/scenario.mjs`) and paste its output into `DECISIONS.md`;
-4. on the VPS: clone the repository, create `~/dms-notifier.env` from `notifier/.env.example` (SMTP account,
+4. on the VPS: clone the repository, create `~/dms-notifier.env` from `notifier/.env.example` (Strato mailbox `dead-man-switch_noreply@chainsolution.psawyer.de`, password typed by the human,
    `NOTIFIER_DATA_KEY` from `openssl rand -hex 32`), start the notifier, add the Caddy block and mount, validate,
    rebuild Caddy; DNS records for mail (SPF, DKIM, DMARC);
 5. a **fire drill** on testnet with a JoyID wallet in the deployed app (one recipient who confirms), then a second

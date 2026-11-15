@@ -1,6 +1,6 @@
 // Runs `npm test` in notifier/ and checks the fixed test names of aiworker/02-dms-notifier.md (cwd = repository root).
 import { spawnSync } from 'node:child_process';
-const names = ['store_encrypts_at_rest', 'crypto_matches_vectors', 'i18n_same_keys_in_all_languages', 'env_rejects_missing_key',
+const names = ['store_encrypts_at_rest', 'crypto_matches_vectors', 'i18n_same_keys_in_all_languages', 'env_rejects_missing_key', 'env_rejects_foreign_sender',
   'api_claim_then_put', 'api_rejects_wrong_admin_token', 'api_rejects_duplicate_claim', 'api_claim_expires', 'api_put_checks_chain',
   'api_rejects_eleven_recipients', 'api_rate_limits', 'api_get_hides_other_switches', 'confirm_and_stop_tokens', 'never_list_blocks_future_mail',
   'watcher_sends_reminders_once', 'watcher_reminders_follow_checkin', 'watcher_drill_reminders', 'watcher_grace_alarms',
