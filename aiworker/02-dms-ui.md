@@ -18,6 +18,11 @@ in memory only (a page reload before Seal loses the letter; say so once at the t
 that tests check:
 
 * the consequence sentence on the rhythm screen uses the exact i18n key `rhythm.consequence` with the two dates;
+* the rhythm screen offers `rhythms_days` first when the list is not empty (testnet: "1 day"), then the month presets;
+* the guardians screen lists only CRT runners (`fetchRunners` with the vendored runner list as `crtList`,
+  `selectRunners` with `requireCrt: true` and `requireDepositedValid` from config), limits `n` to
+  `n_min`..min(`n_max`, candidates), clamps the defaults to that range, and shows how many guardians are available
+  (`ui_guardians_clamped`: with one candidate on testnet the default is 1-of-1 and n cannot be raised);
 * the guardians screen shows the concentration summary and the "harder to steal, easier to lose" sentence
   (`guardians.mandatory_trade`) when a mandatory guardian is added; `1-of-1` requires the typed acknowledgement
   (`guardians.ack_phrase` in the UI language);

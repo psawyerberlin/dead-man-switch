@@ -65,7 +65,7 @@ node --test acceptance/aiworker-dms-e2e/
 ## Phase 3: The short manual step (manual)
 
 ### Instructions
-Manual: follow `docs/manual-steps.md` (set `organiser_address`, build the site, upload `site/`, run the scenario against the CRT devnet). Mark this phase passed in the web interface when done.
+Manual: follow `docs/manual-steps.md` (set `organiser_address`, build the site and commit `site/app/`, run the scenario against the CRT devnet, the testnet run, deploy by `git pull` on the VPS). Mark this phase passed in the web interface when done.
 
 ### Acceptance
 ```bash

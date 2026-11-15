@@ -3,5 +3,6 @@ dist/
 .devnet/
 *.log
 .DS_Store
-site/app/assets/
 .refs/
+target/
+build/

@@ -22,5 +22,10 @@
     56000
   ],
   "default_heartbeat_blocks": 8000,
-  "default_heartbeat_tip_ckb": 0.5
+  "default_heartbeat_tip_ckb": 0.5,
+  "n_min": 3,
+  "n_max": 16,
+  "rhythms_days": [],
+  "require_deposited_valid": true,
+  "crt_runners_url": "/deployments/mainnet-runners.json"
 }

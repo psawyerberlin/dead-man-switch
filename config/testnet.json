@@ -3,8 +3,8 @@
   "enabled": true,
   "organiser_fee_ckb": 50,
   "organiser_address": "ckt1FILL_ME_WITH_THE_OPERATOR_TESTNET_ADDRESS",
-  "default_t": 5,
-  "default_n": 8,
+  "default_t": 1,
+  "default_n": 1,
   "rhythms_months": [
     1,
     3,
@@ -22,5 +22,12 @@
     56000
   ],
   "default_heartbeat_blocks": 8000,
-  "default_heartbeat_tip_ckb": 0.5
+  "default_heartbeat_tip_ckb": 0.5,
+  "n_min": 1,
+  "n_max": 16,
+  "rhythms_days": [
+    1
+  ],
+  "require_deposited_valid": false,
+  "crt_runners_url": "/deployments/testnet-runners.json"
 }

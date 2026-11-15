@@ -24,9 +24,18 @@ PASS/FAIL per step; exit code = failures; output pasted into `DECISIONS.md`.
 
 ## Phase 3 — the manual step
 
-`docs/manual-steps.md`, the only place a human is asked to do something, at most these items: set
-`organiser_address` in `config/testnet.json` (and later `mainnet.json`); run `scripts/build-site.sh`; upload
-`site/` to the web root of `dead-man-switch.chainsolution.net`. Nothing else.
+`docs/manual-steps.md`, the only place a human is asked to do something, at most these items:
+
+1. set `organiser_address` in `config/testnet.json` (and later `mainnet.json`);
+2. run `scripts/build-site.sh` and commit `site/app/` (it is served from git, not uploaded);
+3. run the devnet scenario (`node test/e2e/scenario.mjs`) and paste its output into `DECISIONS.md`;
+4. a **testnet run** with a JoyID wallet in the deployed app: one switch with the 1-day rhythm that is cancelled
+   (the vault then shows "cancelled" and does not open), one that is left alone and opens from the vault after the
+   deadline + 24 h; record T, dates and PASS/FAIL in `docs/testing.md`;
+5. deploy: on the VPS `git -C ~/src/dead-man-switch pull -q` (the Caddy site block and mount are set up once,
+   see `site/DEPLOY.md`).
+
+Nothing else.
 
 ## Acceptance
 

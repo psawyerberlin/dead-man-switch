@@ -40,11 +40,16 @@ only on the technical details panel and in the vault's certificate.
    enabled. Show the balance and, on testnet, the faucet link.
 2. **Write the letter**: a text (Markdown allowed, rendered in the vault with a safe subset) and files (drag and
    drop; total ≤ 25 MB after encryption; images, PDFs, anything). Everything stays in memory.
-3. **Choose the check-in rhythm**: every 1, 3, 6 or 12 months (custom allowed). The first deadline = now +
-   rhythm. Plain-language consequence shown: "If you have not checked in by <date>, the letter opens on <date +
+3. **Choose the check-in rhythm**: every 1, 3, 6 or 12 months (custom allowed). On testnet only, the presets
+   from `rhythms_days` (default: 1 day, CRT's minimum term) come first, so a real testnet run releases within about
+   two days (1 day + 24 h grace). The first deadline = now + rhythm. Plain-language consequence shown: "If you have not checked in by <date>, the letter opens on <date +
    24 h>." Terms over 5 years in one step are not offered (CRT §10); the rhythm keeps terms short by design.
-4. **Choose the guardians and how closely they watch**: default 5-of-8 from the CRT runner directory (CRT §9),
-   with the concentration summary; `t`, `n`, the owner's own runner as mandatory (2-of-3 recommended per CRT
+4. **Choose the guardians and how closely they watch**: default `default_t`-of-`default_n` (5-of-8 on mainnet)
+   from the CRT runner directory (CRT §9). Candidates are only runners that run CRT: `fetchRunners` with the
+   vendored `<network>-runners.json` as `crtList`, then `selectRunners` with `requireCrt: true` and
+   `requireDepositedValid` from config. `n` is limited to `n_min`..`n_max` of the network (mainnet 3-16, testnet
+   1-16) and to the number of candidates; the defaults are clamped to what is available (on testnet today: one
+   runner, so 1-of-1) and the screen says how many guardians are available. Shown with the concentration summary; `t`, `n`, the owner's own runner as mandatory (2-of-3 recommended per CRT
    §7.3; 1-of-1 only after typing "I understand" in the UI language); and the **guardian check interval** (CRT
    `HEARTBEAT`, §6.2) as presets *every 3 hours / every 12 hours / daily / weekly* with the plain-language trade
    ("a guardian that disappears is noticed within {delay}; checking more often costs more") and the tip per
@@ -120,16 +125,21 @@ identity, so a ciphertext cannot be moved to another vault.
 
 ### 4.2 Vault = CRT kit + application payload
 
-Produced by CRT's `generateKit({descriptor, envelopes, application})` with
+Produced by CRT's `generateKit({descriptor, envelopes, application, kitVersion: KIT_VERSION, deadline})` with
+CRT's `KitApplication` shape `{ name, version, payload, script }` (`version` is a string; the DMS fields live in
+`payload`, which the kit exposes as `window.CRT_KIT.application.payload`):
 
 ```json
-"application": { "name": "dead-man-switch", "version": 1, "language": "fr", "sender_label": "Patrick",
-  "created_at": 1763000000, "cipher": "AES-256-GCM", "nonce": "0x…", "aad": "DMS-v1",
-  "ciphertext_b64": "…", "size": 123456, "app_url": "https://dead-man-switch.chainsolution.net" }
+"application": { "name": "dead-man-switch", "version": "1",
+  "payload": { "language": "fr", "sender_label": "Patrick", "created_at": 1763000000, "cipher": "AES-256-GCM",
+    "nonce": "0x…", "aad": "DMS-v1", "ciphertext_b64": "…", "size": 123456,
+    "app_url": "https://dead-man-switch.chainsolution.net" },
+  "script": "<the DMS opener>" }
 ```
 
-and the DMS opener script appended (self-contained: Markdown renderer, i18n strings for the three languages,
-file download logic; no network except CRT's own chain reads). The opener registers
+and the DMS opener script passed as `application.script` (the kit appends it (self-contained: Markdown renderer, i18n strings for the three languages,
+file download logic; no network except CRT's own chain reads; it must not contain `</script`, which `generateKit`
+refuses). The opener registers
 `window.crtApplication = { onKey(K) }`. File name: `vault-<sender_label>-<T first 8 hex>.html`. Deterministic for
 the same inputs (CRT §8.2).
 
@@ -138,7 +148,9 @@ the same inputs (CRT §8.2).
 `config/<network>.json`: `organiser_fee_ckb` (50), `organiser_address` (the operator's CKB address; testnet and
 mainnet differ), `default_t` (5), `default_n` (8), `rhythms_months` ([1, 3, 6, 12]), `heartbeat_presets_blocks` ([1000, 4000, 8000, 56000]), `default_heartbeat_blocks` (8000), `default_heartbeat_tip_ckb` (0.5), `max_vault_bytes` (26 214 400),
 `crt_deployment_url` (path to CRT's `deployments/<network>.json`, vendored copy at build time),
-`faucet_url` (testnet only).
+`crt_runners_url` (path to CRT's `deployments/<network>-runners.json`, vendored the same way; a missing file means
+an empty list), `n_min` / `n_max` (mainnet 3 / 16, testnet 1 / 16), `rhythms_days` (testnet `[1]`, mainnet `[]`),
+`require_deposited_valid` (mainnet `true`, testnet `false`), `faucet_url` (testnet only).
 
 ## 5. Internationalisation
 
@@ -171,7 +183,7 @@ mainnet differ), `default_t` (5), `default_n` (8), `rhythms_months` ([1, 3, 6, 1
 | Directory | Contents |
 |---|---|
 | `app/` | Vite + TypeScript, no UI framework; `src/core` (bundle, vault, config), `src/ui` (screens), `src/i18n`, `src/opener` (the script appended to vaults; also built as a standalone bundle for tests) |
-| `site/` | the explainer website in three languages (deploy root; `site/app/` receives the build) |
+| `site/` | the explainer website in three languages (deploy root; `site/app/` receives the build and is committed: the VPS serves `site/` from a `git pull`) |
 | `config/` | per-network application configuration |
 | `test/` | unit and end-to-end tests (devnet via CRT's `scripts/devnet-e2e.sh`) |
 | `aiworker/`, `acceptance/` | build specs and their acceptance tests |
