@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- dms-ui: the Write flow (letters, recipients and messenger, rhythm, guardians with the live cost panel, price with
+  the organiser fee check, create with claim before signature and hard-fail verification, seal with downloads, owner
+  code, owner archive, paper backup and calendar file, hand over to the messenger) and the handover guides for ten places.
 - dms-ui: design system (tokens light/dark, self-hosted Fraunces, components, illustrations), app shell with hash
   router, language and theme switches, network badge, JoyID wallet through CCC, home screen.
 - dms-notifier: the messenger service (store, API, watcher, emails), container (`notifier/Dockerfile`, `notifier/compose.yaml`),

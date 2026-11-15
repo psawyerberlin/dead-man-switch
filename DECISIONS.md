@@ -2,6 +2,74 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-ui, phase 2 (Write)
+
+- 2026-11-15 — Files: `app/src/ui/write/` (`session.ts` state and logic without DOM, `flow.ts` the `#/write/<step>` screen,
+  `steps-plan.ts` letters / recipients / rhythm, `steps-guardians.ts` guardians and price, `steps-seal.ts` create / seal /
+  hand over, `controls.ts`, `view.ts`, `chain-driver.ts`), `app/src/ui/screens/guide.ts`, `app/src/ui/files.ts`,
+  `app/src/ui/write.css`, `app/src/core/{places,rhythm,guardians}.ts`. Tests in `app/test/write.test.ts` (jsdom) against a
+  fake `SwitchDriver` and a fake messenger, including the fixed names `ui_recipients_max_ten`, `ui_guardians_clamped`,
+  `ui_cost_panel_live`, `ui_fee_below_capacity_refused`, `ui_claim_before_create`, `ui_seal_reduced_motion`,
+  `ui_owner_code_shown_once`, `ui_seal_checkbox_gates_next`, `ui_handover_guides_three_languages`.
+- The chain side is behind `SwitchDriver` (runners, organiser lock, prepare Create, wait for commits, describe, Arm,
+  wrap). The real one (`chain-driver.ts`: `fetchRunners` with the vendored list as `crtList`, `buildCreate`,
+  `buildVerifiedDescriptor`, `buildArm`, `wrapKeyAnchored`, RPC = the CRT deployment's `rpc_urls`) is dynamically
+  imported by `main.ts`, so CCC stays out of the shell chunk. It is typechecked but not run (no devnet here).
+  The wallet's CCC client now uses the deployment's first RPC URL (phase 1 note).
+- One Write session per page load (`appServices` in `shell.ts`); `screenFor(route, network)` without services still
+  renders every step (used by the phase 1 route test). A session change repaints the step and refocuses the control
+  with the same `data-k`; typing does not repaint (sizes and buttons are updated in place).
+- `K` is generated at Create, not at Seal: CRT's descriptor (needed for Arm) carries share commitments derived from
+  `K`. The order is: build Create (T, I) → owner code + `claim` (messenger on) → signature → guardians' commits →
+  `buildVerifiedDescriptor` (hard-fail; a `VerificationError` shows `create.verify_failed` with the rule, no retry,
+  no override) → Arm → `wrapKeyAnchored`. Once Create was sent, a second Create from the same flow is refused. A failed
+  claim stops before any signature; the owner can turn the messenger off and try again.
+- After Create the planning steps (letters … price) are closed; `create` / `seal` / `handover` need what comes
+  before (seal: Create done; handover: vaults and the saved checkbox).
+- Letters: in "one per person" and "shared + note" modes the per-recipient editors are on the letters screen (with a
+  name field and "add a recipient", the same list as the recipients step), because letters come before recipients
+  in the stepper. Files: shared in "shared" and "shared + note", per recipient in "each". Template insertion appends
+  `# title\n\nbody` of `templateText(id, language)` (the recipient's language for their own letter, else the UI
+  language). Live size = the exact encrypted bundle size (`sealedSize` of the JSON, files counted by their base64
+  length without re-encoding). A letter needs text or a file, and a sender name.
+- Recipients: the messenger section (use it, owner email, reminders) sits on the recipients step; "tell them now" is
+  shown only when the messenger is on. Messenger unavailable when `notifier_url` is null.
+- Rhythm: presets `rhythms_months` (calendar months, UTC, clamped to the month end) plus a custom rhythm in days
+  (1–1826); ISO 8601 `P<n>M` / `P<n>D` (`rhythmIso`, `parseRhythmIso`).
+- Guardians: the candidates are the largest set `selectRunners` returns with `requireCrt: true`,
+  `requireDepositedValid` from config, the mandatory list and the heartbeat limits (`candidatePool`); `n` is limited to
+  `max(n_min, mandatory)`..`min(n_max, candidates)`; defaults clamped. Mandatory guardians are all required
+  (`j = m`): tree `xor(m-of-m over the mandatory, t-of-(n−m) over the others)`, or `m-of-m` when all are mandatory.
+  The acknowledgement phrase is required for a mandatory 1-of-1 on every real switch (stricter than CRT, which asks only
+  above one year; SPEC.md §3.8), never on a drill. The overall 1-of-1 of testnet needs no phrase. Concentration:
+  operators = distinct payout locks, networks = ASN, countries; unknown values never collide.
+- Heartbeat presets 1000 / 4000 / 8000 / 56000 blocks are labelled 3 h / 12 h / daily / weekly; other values use
+  `heartbeat.option_custom`. The tip is in the advanced panel. The live cost panel beside the guardians shows
+  `price.monthly`, paid now and parked; it is recomputed on every change.
+- Price: the organiser fee is its own read-only line; the CRT line `organiser_fee` is left out of the detailed lines.
+  `organiserFeeCheck` needs the organiser lock (from the address, through CCC); while it is unknown or invalid there is
+  no Create button, an invalid config shows `price.config_error` with the reason. Without a wallet the primary action is
+  "connect a wallet".
+- Seal: one wax seal per recipient, `press()` once each (no class under reduced motion, read from `WriteIO.motion`).
+  Downloads per vault, `.zip` (`vaults-<T8>.zip`, `drill-` prefix for drills) and `.ics` (`deadline-<T8>.ics`). The owner
+  code is stored in `localStorage` (`dms.owner_code.<network>.<T>`) at claim time and rendered on the first seal screen
+  instance only; when another screen renders, it is dropped from memory (if storage holds it) and rendered again only
+  after a click on "show". The owner archive is offered in a collapsed panel (warning, passphrase, strength 0–4, button
+  disabled below `ARCHIVE_MIN_STRENGTH`); links are added later by "download the owner archive with the links" on the
+  handover screen while the archive is open in the session. Paper backup: printed through a hidden frame; cover sheet
+  only (the CRT certificate is the vault's own first page and is printed from the vault).
+- Saved switches are listed in `localStorage` `dms.switches` (network, T, I, deadline, sender, rhythm, drill, messenger,
+  descriptor and its hash, recipients' names and languages; nothing secret) for My switches in phase 3.
+- Hand over: one card per recipient (download, paper backup, place picker with the tutorial inline and a link to
+  `#/guide/<place>`, https link ≤ 2048 characters). With the messenger: links sealed with `encryptLink`, `buildRecord`,
+  `put` with the owner code's `A`; then `K` and the letters are dropped (vaults stay downloadable in this tab), unless
+  the archive is open. Without the messenger the button is "Finish" and does the same drop.
+- Places (ids): `google_drive`, `onedrive`, `dropbox`, `icloud`, `synology`, `nextcloud`, `gmx_webde`, `proton_drive`,
+  `own_server`, `usb_paper`; 4 steps each (Synology 5), the same count in en/fr/de. Menu names in the tutorials follow
+  the services' English/French/German UIs as of 2026 and may need the maintainer's check.
+- i18n keys added (en, fr, de; for the maintainer's review): `action.retry`, `write.title.letters`, `write.title.recipients`, `write.title.rhythm`, `write.title.guardians`, `write.title.price`, `write.title.create`, `write.title.seal`, `write.title.handover`, `write.closed`, `write.not_yet`, `write.resume`, `letter.size`, `letters.mode_label`, `letters.shared_label`, `letters.note_label`, `letters.for`, `letters.sizes`, `letters.template_insert`, `recipients.unnamed`, `recipients.name_note`, `recipients.email_note`, `recipients.email_invalid`, `recipients.remove`, `messenger.use`, `messenger.owner_email_note`, `messenger.reminders`, `messenger.unavailable`, `rhythm.label`, `rhythm.custom_days`, `rhythm.days_label`, `guardians.loading`, `guardians.load_failed`, `guardians.available`, `guardians.too_few`, `guardians.count_label`, `guardians.fewer`, `guardians.more`, `guardians.mandatory_tag`, `guardians.mandatory_pick`, `guardians.add_mandatory`, `guardians.remove_mandatory`, `guardians.advanced`, `cost.title`, `price.config_error`, `price.incomplete`, `create.step.claim`, `create.guardian_ready`, `create.guardian_waiting`, `create.to_seal`, `seal.sealing`, `seal.for`, `seal.download_one`, `seal.download_zip`, `owner_code.once`, `owner_code.stored`, `owner_code.print`, `archive.intro`, `archive.passphrase_note`, `archive.strength`, `archive.create`, `archive.saved`, `archive.unavailable`, `archive.download_updated`, `paper.note`, `paper.print`, `paper.sealed_on`, `paper.switch_id`, `paper.step1`, `paper.step2`, `paper.step3`, `handover.for`, `handover.where_choose`, `handover.guide_link`, `handover.link_invalid`, `handover.failed`, `handover.send`, `handover.finish`, `handover.sent`, `handover.finished`, `guide.intro`, `guide.covers`, `guide.facts_title`, `guide.fact_closed`, `guide.fact_years`, `guide.all`, `guide.back_to_write`, and `guide.<place>.name`, `guide.<place>.step1`…
+  for the ten places.
+
 ## dms-ui, phase 1 (shell and design system)
 
 - 2026-11-15 — Files: `app/index.html` + `app/src/main.ts` (entry), `src/ui/tokens.css` (the §8 colours written once per
