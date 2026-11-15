@@ -18,5 +18,9 @@ export interface StepView {
   /** the number of this screen instance (changes on every route change or language change) */
   screen: number;
   go(step: string): void;
+  /** the hash of a step of this flow (`#/write/<step>`, or `#/drill/<step>` for a fire drill) */
+  href(step: string): string;
+  /** this flow is a fire drill */
+  drill: boolean;
   repaint(): void;
 }

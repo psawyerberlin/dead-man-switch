@@ -146,7 +146,9 @@ export function recipientsStep(v: StepView): HTMLElement {
       field({ label: t('recipients.name_label'), hint: t('recipients.name_note'), control: name }).el,
       field({ label: t('recipients.language_label'), control: lang }).el,
       emailField.el,
-      s.messengerOn ? checkbox(t('recipients.tell_now'), r.tellNow, (c) => { r.tellNow = c; }, { 'data-k': `r${r.index}:tell` }) : null,
+      s.messengerOn ? checkbox(t('recipients.tell_now'), s.drill || r.tellNow, (c) => { r.tellNow = c; },
+        s.drill ? { 'data-k': `r${r.index}:tell`, disabled: true } : { 'data-k': `r${r.index}:tell` }) : null,
+      s.messengerOn && s.drill ? note(t('drill.tell_now_forced')) : null,
       s.recipients.length > 1 ? h('div', { class: 'dms-actions' }, button(t('recipients.remove'), { kind: 'quiet', onClick: () => s.removeRecipient(r.index) })) : null);
   });
   const add = button(t('recipients.add'), { kind: 'secondary', disabled: !s.canAddRecipient, onClick: () => { s.addRecipient(); } });
@@ -173,7 +175,7 @@ export function recipientsStep(v: StepView): HTMLElement {
     h('div', { class: 'dms-actions' }, add),
     s.canAddRecipient ? null : note(t('recipients.max_reached', { max: s.maxRecipients }), 'soft', { 'data-max': 'reached' }),
     ...messenger,
-    actions(linkButton(t('action.back'), '#/write/letters', { kind: 'quiet' }), next));
+    actions(linkButton(t('action.back'), v.href('letters'), { kind: 'quiet' }), next));
 }
 
 // ---- rhythm --------------------------------------------------------------------------------------------------------
@@ -202,5 +204,5 @@ export function rhythmStep(v: StepView): HTMLElement {
   refresh();
   return sheet({ title: t('rhythm.title'), level: 1, class: 'dms-write__sheet' },
     group, consequence, h('p', { class: 'dms-soft' }, t('rhythm.grace_note')), h('p', { class: 'dms-soft' }, t('rhythm.long_warning')),
-    actions(linkButton(t('action.back'), '#/write/recipients', { kind: 'quiet' }), next));
+    actions(linkButton(t('action.back'), v.href('recipients'), { kind: 'quiet' }), next));
 }

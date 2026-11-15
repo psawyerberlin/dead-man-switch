@@ -1,6 +1,6 @@
 // The application shell: skip link, header, the routed screen in <main>, footer. Every route of the app is
 // listed here (`#/write`, `#/mine`, `#/checkin`, `#/open`, `#/open/demo`, `#/drill`, `#/drill/report`, `#/guide`,
-// `#/privacy`, `#/about`); Write (`#/write/<step>`) and the guides are real screens, the routes of phase 3 still placeholders.
+// `#/privacy`, `#/about`), with `#/write/<step>`, `#/drill/<step>` and `#/guide/<place>`.
 import { setLanguage, t, getLanguage, type Language } from '../core/i18n';
 import { h, mount } from './dom';
 import { header, rememberLanguage } from './header';
@@ -10,6 +10,14 @@ import { browserIO, type WriteIO } from './files';
 import { guideScreen } from './screens/guide';
 import { homeScreen } from './screens/home';
 import { notFoundScreen, placeholderScreen } from './screens/placeholder';
+import { drillIntro, drillReport, drillUnavailable } from './screens/drill';
+import { type OpenApp, openScreen, practiceScreen } from './screens/open';
+import { privacyScreen } from './screens/privacy';
+import { checkinScreen } from './mine/checkin';
+import { mineScreen } from './mine/screen';
+import { MineService, type OwnerDriver, type OwnerMessenger } from './mine/service';
+import type { MineApp } from './mine/view';
+import { drillBounds } from '../core/drill';
 import type { Wallet } from './wallet';
 import { writeScreen } from './write/flow';
 import { type MessengerLike, type SwitchDriver, WriteSession } from './write/session';
@@ -27,25 +35,69 @@ export interface ShellDeps {
   /** the vendored CRT files of the current network, once loaded */
   crt?: () => CrtFiles | null;
   io?: WriteIO;
+  /** chain side of My switches, the phone check-in and the status on `#/open` */
+  owner?: OwnerDriver | null;
+  /** the messenger as the owner uses it after Create (GET, PATCH, DELETE) */
+  ownerMessenger?: ((config: Config) => OwnerMessenger | null) | null;
+  /** the practice vaults by language (`virtual:dms-practice`) */
+  practice?: (() => Promise<Record<Language, string>>) | null;
+  storage?: Storage | null;
 }
 
 export interface AppServices {
   write: WriteApp;
+  /** the fire drill's own Write session */
+  drill: WriteApp;
+  mine: MineApp;
+  open: OpenApp;
 }
 
-/** The services of the screens: one Write session per page load (state in memory only, SPEC.md §3.1). */
-export function appServices(network: NetworkState, deps: Partial<Pick<ShellDeps, 'driver' | 'messenger' | 'crt' | 'io' | 'wallet'>> = {}): AppServices {
+/** A fire drill is offered on this network (testnet with a drill configuration; never mainnet). */
+export function drillAvailable(network: NetworkState): boolean {
+  const cfg = network.configs[network.current];
+  if (!cfg) return false;
+  try { drillBounds(cfg); return true; } catch { return false; }
+}
+
+/** The services of the screens: one Write session (and one drill session) per page load (state in memory only, SPEC.md §3.1). */
+export function appServices(network: NetworkState, deps: Partial<Omit<ShellDeps, 'root' | 'network' | 'win'>> = {}): AppServices {
   const config = (): Config | null => network.configs[network.current] ?? null;
-  const session = new WriteSession({ config, crt: deps.crt, driver: deps.driver ?? null, messenger: deps.messenger ?? null,
-    walletConnected: () => deps.wallet?.state.status === 'connected' });
+  const walletConnected = (): boolean => deps.wallet?.state.status === 'connected';
+  const connectWallet = deps.wallet ? () => deps.wallet!.connect() : undefined;
+  const io = deps.io ?? browserIO();
+  const storage = deps.storage === undefined ? safeStorage() : deps.storage;
+  const writeApp = (drill: boolean): WriteApp => ({
+    session: new WriteSession({ config, crt: deps.crt, driver: deps.driver ?? null, messenger: deps.messenger ?? null, walletConnected, drill,
+      ...(storage !== undefined ? { storage } : {}) }),
+    io, walletConnected, connectWallet,
+  });
+  const write = writeApp(false);
+  const drill = writeApp(true);
+  const blockSeconds = (): number | undefined => {
+    const b = (deps.crt?.()?.deployment as { block_seconds?: unknown } | undefined)?.block_seconds;
+    return typeof b === 'number' ? b : undefined;
+  };
+  const driver = deps.driver ?? null;
+  const service = new MineService({
+    config: (n) => network.configs[n] ?? null, driver: deps.owner ?? null, messenger: deps.ownerMessenger ?? null, storage, blockSeconds,
+    wrap: driver ? (c, K, d) => driver.wrap(c, K, d) : null,
+  });
+  deps.wallet?.subscribe(() => service.changed());
+  const owner = deps.owner ?? null;
   return {
-    write: {
-      session,
-      io: deps.io ?? browserIO(),
-      walletConnected: () => deps.wallet?.state.status === 'connected',
-      connectWallet: deps.wallet ? () => deps.wallet!.connect() : undefined,
+    write, drill,
+    mine: { service, network: () => network.current, io, walletConnected, connectWallet, sessions: () => [write.session, drill.session],
+      drillAvailable: () => drillAvailable(network) },
+    open: {
+      network: () => network.current,
+      status: owner ? (n, T) => { const c = network.configs[n]; return c ? owner.summary(c, T) : Promise.reject(new Error('no configuration')); } : null,
+      practice: deps.practice ?? null,
     },
   };
+}
+
+function safeStorage(): Storage | null {
+  try { return globalThis.localStorage ?? null; } catch { return null; }
 }
 
 /** The screen for a route (pure: builds DOM, no side effects). */
@@ -53,14 +105,17 @@ export function screenFor(route: Route, network: NetworkState, app: AppServices 
   switch (route.id) {
     case 'home': return homeScreen(network.current);
     case 'write': return writeScreen(route.param, app.write);
-    case 'mine': return placeholderScreen('mine.title');
-    case 'checkin': return placeholderScreen('checkin.title');
-    case 'open': return placeholderScreen('open.title');
-    case 'open-demo': return placeholderScreen('open.practice_link');
-    case 'drill': return placeholderScreen('drill.title', { drill: true });
-    case 'drill-report': return placeholderScreen('drill.report_title', { drill: true });
+    case 'mine': return mineScreen(app.mine);
+    case 'checkin': return checkinScreen(route.query, app.mine);
+    case 'open': return openScreen(route.query, app.open);
+    case 'open-demo': return practiceScreen(app.open);
+    case 'drill': {
+      if (!drillAvailable(network)) return drillUnavailable();
+      return route.param ? writeScreen(route.param, app.drill, { drill: true }) : drillIntro(true);
+    }
+    case 'drill-report': return drillReport(route.query, app.mine, drillAvailable(network));
     case 'guide': return guideScreen(route.param);
-    case 'privacy': return placeholderScreen('privacy.title');
+    case 'privacy': return privacyScreen(network.configs[network.current]?.operator_contact ?? null);
     case 'about': {
       const site = `/${getLanguage()}/`;
       return placeholderScreen('about.title', { extra: [h('p', {}, h('a', { href: site }, t('about.site')))] });

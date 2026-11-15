@@ -47,7 +47,7 @@ export function createStep(v: StepView): HTMLElement {
     parts.push(note(t('create.done'), 'ok'));
     primary = button(t('create.to_seal'), { kind: 'primary', onClick: () => v.go('seal') });
   }
-  const back = st.sent || s.created ? null : linkButton(t('action.back'), '#/write/price', { kind: 'quiet' });
+  const back = st.sent || s.created ? null : linkButton(t('action.back'), v.href('price'), { kind: 'quiet' });
   return sheet({ title: t('create.title'), level: 1, class: 'dms-write__sheet' }, ...parts, actions(back, primary));
 }
 

@@ -50,7 +50,7 @@ export function guardiansStep(v: StepView): HTMLElement {
   const phrase = t('guardians.ack_phrase');
   if (!s.runners && !s.runnersError) void s.loadRunners();
   const next = button(t('action.next'), { kind: 'primary', disabled: !s.guardiansValid(phrase), onClick: () => v.go('price') });
-  const back = linkButton(t('action.back'), '#/write/rhythm', { kind: 'quiet' });
+  const back = linkButton(t('action.back'), v.href('rhythm'), { kind: 'quiet' });
   const q = s.quote();
   const blockSeconds = q?.blockSeconds ?? 10.8;
   const body: (HTMLElement | null)[] = [];
@@ -110,8 +110,12 @@ export function guardiansStep(v: StepView): HTMLElement {
   // how closely they watch
   if (cfg) {
     const presets = cfg.heartbeat_presets_blocks;
-    const hb = radioGroup<string>(t('heartbeat.title'), 'heartbeat', presets.map((p) => ({ value: String(p), label: heartbeatLabel(p, blockSeconds) })), String(s.heartbeat),
-      (val) => s.setHeartbeat(Number(val)));
+    // a fire drill has a fixed check interval (`drill.heartbeat_blocks`)
+    const hb = s.drill
+      ? h('div', { class: 'dms-field', 'data-heartbeat': 'fixed' }, h('p', { class: 'dms-field__label' }, t('heartbeat.title')),
+        h('p', {}, t('drill.heartbeat_fixed', { interval: heartbeatLabel(s.heartbeat, blockSeconds) })))
+      : radioGroup<string>(t('heartbeat.title'), 'heartbeat', presets.map((p) => ({ value: String(p), label: heartbeatLabel(p, blockSeconds) })), String(s.heartbeat),
+        (val) => s.setHeartbeat(Number(val)));
     const tip = input({ type: 'number', min: 0.1, step: 0.1, 'data-k': 'tip', inputmode: 'decimal' });
     tip.value = String(s.tip);
     tip.addEventListener('change', () => { const x = Number(tip.value); if (Number.isFinite(x) && x >= 0.1) s.setTip(x); else tip.value = String(s.tip); });
@@ -158,7 +162,7 @@ export function priceStep(v: StepView): HTMLElement {
     parts.push(note(t('app.loading')));
   }
 
-  const back = linkButton(t('action.back'), '#/write/guardians', { kind: 'quiet' });
+  const back = linkButton(t('action.back'), v.href('guardians'), { kind: 'quiet' });
   const fee = s.feeError();
   const phrase = t('guardians.ack_phrase');
   let primary: HTMLElement | null = null;

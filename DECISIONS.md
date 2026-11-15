@@ -2,6 +2,57 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-ui, phase 3 (My switches, check-in, open, drill, privacy)
+
+- 2026-11-15 — Files: `app/src/core/{away,switches,practice}.ts` (+ `practice-descriptor.json`), `app/src/ui/mine/` (`service.ts` the
+  logic without DOM, `card.ts`, `dialogs.ts`, `screen.ts` = `#/mine`, `checkin.ts` = `#/checkin`, `view.ts`, `chain-owner.ts` the real
+  driver), `app/src/ui/screens/{open,drill,privacy}.ts`, `app/src/ui/write/steps-drill.ts`, `app/src/ui/mine.css`. Tests in
+  `app/test/mine.test.ts` (jsdom, fake `OwnerDriver` and fake messenger), with the fixed names `ui_cancel_two_clicks`,
+  `ui_checkin_deeplink`, `ui_away_until`, `ui_drill_bounds`, `ui_drill_hidden_on_mainnet`.
+- The chain side of the owner screens is behind `OwnerDriver` (summary = `switchSummary`, history = `checkinHistory`, wallet lock hash,
+  renew / cancel / reclaim through CRT's `txBuilders`). The real one (`chain-owner.ts`) is a lazily imported chunk; typechecked, not run
+  (no devnet here). The local list moved to `core/switches.ts` (`dms.switches`, unchanged format plus `heartbeat_blocks` /
+  `heartbeat_tip_ckb` for the check-in estimate); Write's `remember()` uses it.
+- Check in = chain median time + rhythm (`addRhythm`); allowed while armed/committed, including the grace; refused once released or
+  cancelled. The estimate shown before a check-in is CRT's cost estimator over the new term with organiser fee 0, plus the overlap sentence
+  (days of the current term still covered by the old heartbeat jobs).
+- Away until: `<input type=date>` with `min` = tomorrow and `max` = today + 5 years (local dates); the Renew deadline is the chosen day at
+  12:00 local time (`awayDeadline`). Earliest/latest are checked again in code, not only by the picker.
+- Cancel: one danger button with the same size class as Check in (`dms-card__action`, min 44 px × 10 em), one confirm dialog
+  (`cancel.consequence`, "no fee"), one signature (`buildCancel` with the Node Cells reclaimed), then `DELETE` at the messenger when this
+  browser holds the owner code. A messenger error after the cancel is shown but does not undo it.
+- Phone check-in `#/checkin?network=&T=&rhythm=`: invalid parameters show `checkin.bad_link`. Without a wallet the one button connects;
+  with one, the page compares the wallet's lock hash with the Node Cells' owner lock hash and shows `checkin.not_owner` (button disabled)
+  when they differ. A switch opened from a link is not added to this device's list (only listed switches are updated).
+- Restore from owner code: the code carries only the first 8 hex of T, so the full T is asked for too and must match; the code is stored
+  and the messenger's record (`GET`) fills sender, rhythm, recipients and descriptor.
+- Timeline = chain history (created, check-ins) + messenger events (mapped to `timeline.event.*`, unknown kinds shown generically) + the
+  next deadline. Recipient states from the messenger's confirmations: confirmed ✓ / waiting … / not asked – / stopped ×, with text.
+- Download the vaults again: from this page's Write (or drill) session when it built them; otherwise after opening the owner archive
+  (kept in memory for the page only) the vaults are rebuilt with the same letters and K and fresh envelopes (`wrapKeyAnchored`).
+- Change guardians: without K (no archive, no Write tab) the dialog explains and offers to open the archive; with K it shows the
+  "new vaults" warning and the steps. **The rewrap transaction sequence itself (buildRewrap → commits → new descriptor → Arm → new vaults)
+  is not implemented in this phase**: it needs live guardians to be meaningful and has no acceptance test here; left for the devnet phase.
+- Messenger settings dialog: owner email and reminders, each recipient's email, language and "tell them now" (`PATCH`, then `GET`);
+  without an owner code it asks for one. Links and letters are said to need the owner archive.
+- Fire drill: `#/drill` (intro) and `#/drill/<step>` = the Write flow with a separate `WriteSession({ drill: true })`; the rhythm step is
+  replaced by the drill term (presets of `presets_minutes`, custom minutes within `drillBounds`, both dates of `drillOpensAt`). The term is
+  a new rhythm kind `minutes` (ISO `PT<n>M`, accepted by the record's regex and by `parseRhythmIso`, which also reads `PT<n>H`). Check
+  interval fixed to `drill.heartbeat_blocks` (the presets are not shown), "tell them now" forced on and shown disabled, ribbon on every
+  drill screen; `create()` validates the term again. On mainnet (or without a drill config) every drill route shows `drill.unavailable`
+  and nothing else; My switches and home show no drill entry. `#/drill/report?T=`: timeline as in My switches + a five-item checklist;
+  without T it lists this device's drills.
+- `#/open`: a dropped/chosen file is checked with `parseVault` and then runs its own code (kit + opener) in an `<iframe srcdoc>` with
+  `sandbox="allow-scripts allow-downloads allow-modals allow-popups"` (no `allow-same-origin`: the vault cannot touch the app or its
+  storage). `?T=` reads only the status (summary). jsdom lacks `File.text`, hence `readText` with a FileReader fallback.
+- `#/open/demo`: `practiceVault(lang, opener)` builds a real vault (CRT's descriptor test vector, dummy envelopes, a public fixed key
+  `0x70…70`, deterministic nonce) with the prelude `DMS_PRACTICE=true; DMS_PRACTICE_KEY=…` before the opener. It is built **at build
+  time** by the Vite plugin `virtual:dms-practice` (an SSR build of `core/practice.ts`, run once in Node with the built opener), loaded
+  lazily as its own chunk; one vault per language, the one of the UI language is shown.
+- `main.ts` now calls `setOpenerScript` with `virtual:dms-opener`, so vaults made in Write carry the real opener (phase 2 left the stub).
+- `#/privacy`: SPEC.md §7 in six short sections + the operator contact link (only `https:` or `mailto:` are linked).
+- i18n keys added (en, fr, de; for the maintainer's review): `away.confirm`, `away.date_label`, `away.hint`, `away.too_early`, `away.too_late`, `away.invalid`, `cancel.no_fee`, `checkin.bad_link`, `checkin.checking_owner`, `checkin.connect`, `checkin.new_deadline`, `checkin.state.released`, `checkin.state.cancelled`, `checkin.state.other`, `drill.check_interval`, `drill.checklist_title`, `drill.check1`, `drill.check2`, `drill.check3`, `drill.check4`, `drill.check5`, `drill.custom`, `drill.custom_hint`, `drill.custom_minutes`, `drill.deadline_at`, `drill.heartbeat_fixed`, `drill.point_term`, `drill.point_marked`, `drill.point_confirm`, `drill.point_report`, `drill.report_needs_code`, `drill.report_none`, `drill.retention`, `drill.start`, `drill.tell_now_forced`, `drill.term_invalid`, `drill.term_label`, `drill.term_title`, `drill.unavailable`, `drill.state.absent`, `drill.state.pending`, `drill.state.committed`, `drill.state.armed`, `drill.state.released`, `drill.state.cancelled`, `drill.state.inconsistent`, `mine.archive_failed`, `mine.archive_file`, `mine.archive_missing`, `mine.archive_open`, `mine.archive_title`, `mine.card_title`, `mine.card_untitled`, `mine.chain_time`, `mine.local_time`, `mine.change_needs_archive`, `mine.change_steps`, `mine.checkin_cost`, `mine.descriptor_hash`, `mine.error`, `mine.forget`, `mine.id_invalid`, `mine.lead`, `mine.messenger_error`, `mine.more_title`, `mine.restore`, `mine.restore_failed`, `mine.restore_hint`, `mine.ring_caption`, `mine.ring_grace`, `mine.ring_unknown`, `mine.signing`, `mine.recipient.confirmed`, `mine.recipient.waiting`, `mine.recipient.not_asked`, `mine.recipient.stopped`, `mine.link_set`, `mine.link_unset`, `open.frame_title`, `open.local_only`, `open.practice_failed`, `open.practice_note`, `open.practice_title`, `open.running`, `open.status.absent`, `open.step1`, `open.step2`, `open.step3`, `privacy.intro`, `privacy.browser.title`, `privacy.browser.text`, `privacy.messenger.title`, `privacy.messenger.text`, `privacy.retention.title`, `privacy.retention.text`, `privacy.delete.title`, `privacy.delete.text`, `privacy.operator.title`, `privacy.operator.text`, `privacy.none.title`, `privacy.none.text`, `privacy.contact.title`, `privacy.contact.text`, `settings.links_need_archive`, `settings.needs_code`, `settings.not_loaded`, `settings.save`, `settings.saved`, `reclaim.done`, `timeline.empty`, `timeline.title`, `timeline.created`, `timeline.checkin`, `timeline.deadline`, `timeline.event.reminder`, `timeline.event.alarm`, `timeline.event.release`, `timeline.event.report`, `timeline.event.cancelled`, `timeline.event.asked`, `timeline.event.confirmed`, `timeline.event.stopped`, `timeline.event.skipped`, `timeline.event.mail_failed`, `timeline.event.changed`, `timeline.event.other`, `practice.recipient`, `practice.sender`, `practice.letter_title`, `practice.letter_body`, `practice.note`.
+
 ## dms-ui, phase 2 (Write)
 
 - 2026-11-15 — Files: `app/src/ui/write/` (`session.ts` state and logic without DOM, `flow.ts` the `#/write/<step>` screen,

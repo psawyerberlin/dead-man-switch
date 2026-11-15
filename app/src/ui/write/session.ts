@@ -18,6 +18,8 @@ import { type Quote, quote } from '../../core/price';
 import { type Rhythm, addRhythm, rhythmIso } from '../../core/rhythm';
 import { type TemplateId, templateText } from '../../core/templates';
 import { buildVault, vaultFileName, zipVaults } from '../../core/vault';
+import { DrillError, drillBounds, validateDrillTerm } from '../../core/drill';
+import { OWNER_CODE_KEY, SWITCHES_KEY, upsertSwitch } from '../../core/switches';
 
 // ---- the outside world ---------------------------------------------------------------------------------------------
 
@@ -60,7 +62,8 @@ export interface MessengerLike {
   put(record: MessengerRecord, A: Uint8Array): Promise<unknown>;
 }
 
-export interface StorageLike { getItem(k: string): string | null; setItem(k: string, v: string): void; removeItem(k: string): void }
+export type { StorageLike } from '../../core/switches';
+import type { StorageLike } from '../../core/switches';
 
 export interface WriteDeps {
   config: () => Config | null;
@@ -74,6 +77,8 @@ export interface WriteDeps {
   /** wall clock, unix seconds */
   now?: () => number;
   storage?: StorageLike | null;
+  /** a fire drill (SPEC.md §3.4): testnet only, term in minutes, fixed check interval, "tell them now" forced on */
+  drill?: boolean;
 }
 
 // ---- state -----------------------------------------------------------------------------------------------------------
@@ -128,8 +133,7 @@ export interface Created {
 
 export interface SealedVault { index: number; name: string; language: Language; fileName: string; html: string }
 
-export const OWNER_CODE_KEY = (network: Network, T: string): string => `dms.owner_code.${network}.${T.toLowerCase()}`;
-export const SWITCHES_KEY = 'dms.switches';
+export { OWNER_CODE_KEY, SWITCHES_KEY };
 
 const shannons = (ckb: number): bigint => BigInt(Math.round(ckb * 1e8));
 
@@ -163,6 +167,8 @@ export class WriteSession {
   mandatory: string[] = [];
   ack = '';
   drill = false;
+  /** the drill's term screen shows the custom field (a custom term may equal a preset) */
+  drillCustom = false;
 
   runners: Runner[] | null = null;
   runnersError: string | null = null;
@@ -188,6 +194,11 @@ export class WriteSession {
     this.rng = deps.rng ?? defaultRng;
     this.now = deps.now ?? (() => Math.floor(Date.now() / 1000));
     this.storage = deps.storage === undefined ? safeStorage() : deps.storage;
+    if (deps.drill) {
+      this.drill = true;
+      const presets = this.drillBounds()?.presets ?? [];
+      this.rhythm = { kind: 'minutes', minutes: Math.round((presets.includes(3600) ? 3600 : presets[0] ?? 3600) / 60) };
+    }
     this.recipients.push(this.blankRecipient(1));
   }
 
@@ -204,7 +215,7 @@ export class WriteSession {
 
   // ---- recipients ----
   private blankRecipient(index: number): RecipientDraft {
-    return { index, name: '', language: getLanguage(), email: '', tellNow: false, text: '', note: '', files: [], place: null, link: '' };
+    return { index, name: '', language: getLanguage(), email: '', tellNow: this.drill, text: '', note: '', files: [], place: null, link: '' };
   }
   get canAddRecipient(): boolean { return this.recipients.length < this.maxRecipients; }
   /** Adds a recipient; false (and nothing added) at `max_recipients`. */
@@ -258,8 +269,34 @@ export class WriteSession {
   deadlineFrom(now = this.now()): number { return addRhythm(now, this.rhythm); }
   termSeconds(now = this.now()): number { return this.deadlineFrom(now) - now; }
 
+  // ---- fire drill ----
+  /** The drill's bounds of this network, or null (mainnet, or no drill configured). */
+  drillBounds(): ReturnType<typeof drillBounds> | null {
+    const cfg = this.config;
+    if (!cfg) return null;
+    try { return drillBounds(cfg); } catch (e) { if (e instanceof DrillError) return null; throw e; }
+  }
+  /** The term (seconds) is a whole number of minutes within the drill's bounds (`drillBounds`). */
+  drillTermAllowed(seconds: number): boolean {
+    const b = this.drillBounds();
+    if (!b) return false;
+    try { validateDrillTerm(this.config!, seconds); } catch { return false; }
+    return seconds % 60 === 0;
+  }
+  /** Sets the drill term (seconds); false when it is outside the drill's bounds (nothing changes). */
+  setDrillTerm(seconds: number): boolean {
+    if (!this.drillTermAllowed(seconds)) return false;
+    this.rhythm = { kind: 'minutes', minutes: seconds / 60 };
+    this.changed();
+    return true;
+  }
+
   // ---- guardians ----
-  get heartbeat(): number { return this.heartbeatBlocks ?? this.config?.default_heartbeat_blocks ?? SWITCH_PARAM_RANGES.heartbeatBlocks.default; }
+  get heartbeat(): number {
+    const drill = this.drill ? this.drillBounds() : null;
+    if (drill) return drill.heartbeatBlocks;
+    return this.heartbeatBlocks ?? this.config?.default_heartbeat_blocks ?? SWITCH_PARAM_RANGES.heartbeatBlocks.default;
+  }
   get tip(): number { return this.tipCkb ?? this.config?.default_heartbeat_tip_ckb ?? 0.5; }
 
   loadRunners(): Promise<void> {
@@ -369,6 +406,7 @@ export class WriteSession {
     if (this.status.sent) return; // never a second switch from one flow
     try {
       if (!cfg || !driver) throw new Error('no chain connection');
+      if (this.drill) validateDrillTerm(cfg, this.termSeconds()); // never a drill on mainnet or outside 30 min – 48 h
       const fee = this.feeError();
       if (fee) throw new ConfigError(fee);
       if (!this.lettersValid() || !this.recipientsValid() || !this.guardiansValid(ackPhrase)) throw new Error('incomplete');
@@ -416,13 +454,9 @@ export class WriteSession {
   private remember(): void {
     const c = this.created;
     if (!c || !this.storage || !c.descriptor) return;
-    let list: unknown[] = [];
-    try { const v = JSON.parse(this.storage.getItem(SWITCHES_KEY) ?? '[]'); if (Array.isArray(v)) list = v; } catch { list = []; }
-    list = list.filter((x) => !(x && typeof x === 'object' && (x as { T?: string }).T === c.T && (x as { network?: string }).network === c.network));
-    list.push({ network: c.network, T: c.T, I: c.I, created_at: c.createdAt, deadline: c.deadline, sender_label: this.senderLabel.trim(),
+    upsertSwitch(this.storage, { network: c.network, T: c.T, I: c.I, created_at: c.createdAt, deadline: c.deadline, sender_label: this.senderLabel.trim(),
       rhythm: rhythmIso(this.rhythm), drill: this.drill, messenger: c.claimed, descriptor_hash: descriptorHash(c.descriptor),
-      descriptor: c.descriptor, recipients: this.recipients.map((r) => ({ index: r.index, name: r.name.trim(), language: r.language })) });
-    try { this.storage.setItem(SWITCHES_KEY, JSON.stringify(list)); } catch { /* full: My switches can add it by T */ }
+      heartbeat_blocks: this.heartbeat, heartbeat_tip_ckb: this.tip, descriptor: c.descriptor, recipients: this.recipients.map((r) => ({ index: r.index, name: r.name.trim(), language: r.language })) });
   }
 
   // ---- seal ----

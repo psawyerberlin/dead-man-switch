@@ -16,8 +16,8 @@ export const ROUTES: Readonly<Record<string, RouteId>> = {
   '#/about': 'about',
 };
 
-/** Routes whose last segment is a parameter. */
-const FAMILIES: readonly [prefix: string, id: RouteId][] = [['#/write/', 'write'], ['#/guide/', 'guide']];
+/** Routes whose last segment is a parameter (`#/drill/report` is an exact route and wins over `#/drill/<step>`). */
+const FAMILIES: readonly [prefix: string, id: RouteId][] = [['#/write/', 'write'], ['#/drill/', 'drill'], ['#/guide/', 'guide']];
 
 export interface Route {
   id: RouteId;

@@ -1,0 +1,63 @@
+/* My switches, the phone check-in, Open, the fire drill and privacy (SPEC.md §3.2–§3.4, §7, §8).
+   Colour pairs used here are those of COLOUR_PAIRS in a11y.ts (ink / ink-soft / ok / warn / danger on sheet). */
+.dms-mine__cards { display: grid; gap: var(--s-3); }
+
+/* the switch card: an envelope with the countdown ring as its stamp */
+.dms-card { position: relative; overflow: hidden; }
+.dms-card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 46px; pointer-events: none;
+  background: linear-gradient(170deg, transparent 49%, var(--line) 50%, transparent 51%), linear-gradient(10deg, transparent 49%, var(--line) 50%, transparent 51%);
+  opacity: .55; }
+.dms-card > * { position: relative; }
+.dms-card--drill { border-top: 4px solid var(--warn); }
+.dms-card__id { margin: 0 0 var(--s-2); color: var(--ink-soft); }
+.dms-card__head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-3); }
+.dms-card__stamp { flex: 0 0 auto; padding: var(--s-1); border: 2px dashed var(--line); border-radius: 12px; background: var(--sheet); }
+.dms-card__stamp .dms-ring { width: 136px; height: 136px; }
+.dms-card__facts { flex: 1 1 14em; }
+.dms-card__opens { font-family: var(--font-serif); font-size: var(--fs-h4); margin: 0 0 var(--s-1); }
+.dms-card__health p { margin: var(--s-1) 0; display: flex; align-items: center; gap: var(--s-0); }
+.dms-card__subtitle { font-family: var(--font-serif); font-size: var(--fs-body); margin: var(--s-3) 0 var(--s-1); }
+.dms-card__people { list-style: none; padding: 0; margin: 0; }
+.dms-card__people li { padding: var(--s-1) 0; border-bottom: 1px solid var(--line); }
+.dms-card__person { font-weight: 600; }
+.dms-card__state.is-confirmed { color: var(--ok); }
+.dms-card__state.is-waiting { color: var(--ink-soft); }
+.dms-card__state.is-stopped { color: var(--danger); }
+.dms-card__actions { margin-top: var(--s-3); }
+/* every action of a card has the same size: Cancel is never smaller than Check in */
+.dms-card__action { min-height: var(--touch); min-width: 10em; }
+.dms-card__details { display: grid; grid-template-columns: max-content 1fr; gap: var(--s-0) var(--s-2); }
+.dms-card__details dd { margin: 0; }
+.dms-tag--warn { border-color: var(--warn); color: var(--warn); }
+
+.dms-timeline { list-style: none; padding: 0 0 0 var(--s-2); margin: 0; border-left: 2px solid var(--line); }
+.dms-timeline__item { position: relative; padding: var(--s-0) 0 var(--s-0) var(--s-1); }
+.dms-timeline__item::before { content: ""; position: absolute; left: calc(-1 * var(--s-2) - 6px); top: .75em; width: 10px; height: 10px;
+  border-radius: 50%; background: var(--sheet); border: 2px solid var(--gold); }
+.dms-timeline__item.is-deadline::before { border-color: var(--seal); }
+.dms-timeline__when { color: var(--ink-soft); }
+
+/* the ring refills after a check-in (the transition of components.css; none under reduced motion) */
+@media (prefers-reduced-motion: reduce) { .dms-ring__arc { transition: none; } }
+
+/* the phone check-in: one hand, 360 px */
+.dms-checkin__sheet { max-width: 34rem; margin-inline: auto; text-align: center; }
+.dms-checkin__stamp { display: flex; justify-content: center; margin: var(--s-2) 0; }
+.dms-checkin__actions { justify-content: center; }
+.dms-checkin__button { width: 100%; min-height: calc(1.5 * var(--touch)); font-size: var(--fs-h4); }
+
+/* open */
+.dms-open__drop { min-height: calc(3 * var(--touch)); }
+.dms-open__steps { padding-left: 1.4em; }
+.dms-vault-frame { display: block; width: 100%; min-height: 80vh; margin-top: var(--s-2); border: 1px solid var(--line);
+  border-radius: var(--radius-sheet, 14px); background: var(--sheet); }
+.dms-banner-practice { padding: var(--s-1) var(--s-2); border: 2px dashed var(--gold); border-radius: 10px; color: var(--ink); }
+
+/* drill */
+.dms-drill__art { color: var(--ink-soft); max-width: 120px; }
+.dms-checklist { list-style: none; padding: 0; }
+.dms-checklist li { display: flex; align-items: center; gap: var(--s-1); min-height: var(--touch); }
+.dms-checklist input { width: 22px; height: 22px; accent-color: var(--seal); }
+
+.dms-settings__recipient { border: 1px solid var(--line); border-radius: 10px; margin: var(--s-2) 0; padding: var(--s-1) var(--s-2); }
+.dms-privacy p { max-width: var(--measure); }
