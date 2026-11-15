@@ -2,6 +2,10 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-core, phase 4 (documentation)
+
+- 2026-11-15 — `docs/formats.md` links SPEC §4 to code and tests instead of copying it; `app/README.md` and CHANGELOG added.
+
 ## dms-core, phase 3 (the opener)
 
 - 2026-11-15 — Files: `app/src/opener/index.ts` (IIFE entry), `opener.ts` (`installOpener(window)`: hook, UI, decrypt),
