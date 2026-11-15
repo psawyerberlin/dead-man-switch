@@ -2,6 +2,38 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-e2e, phase 1 (scripted scenario, written, not run)
+
+- 2026-11-15 — `test/e2e/scenario.mjs` written and checked with `node --check` only (no devnet, no Chromium here); the maintainer
+  runs it (`node test/e2e/scenario.mjs`, `--help` for options). Its own dev dependencies live in `test/e2e/package.json`
+  (`smtp-server`, `mailparser`, `playwright-core`, `tsx`) so neither `app/` nor `notifier/` gains test-only packages.
+- The script re-runs itself under `tsx` and imports `app/src/core/*.ts` and `.refs/crt/client/src/index.ts` as sources (the
+  same way CRT's `scripts/devnet-scenario.mjs` uses the client); devnet helpers (time travel with
+  `generate_block_with_template`, 86.4 s per block, heartbeat 1000 blocks, CCC devnet script table, genesis key) are taken
+  over from that script. The vault opener is `app/dist/opener.js` (built with `npm run build:opener` when missing).
+- The devnet is started with `.refs/crt/scripts/devnet-e2e.sh --runners 3 --state .devnet/crt` (`--no-devnet` when it is
+  already up, `--down` to stop it at the end).
+- The app (`Network`) and the notifier (`NETWORKS`) only know `testnet` and `mainnet`, and adding a third network to both
+  would be a product change outside this phase. The scenario therefore serves the devnet to them **under the name `testnet`**:
+  `NETWORKS=testnet`, `RPC_TESTNET=<devnet RPC>`, `CRT_DEPLOYMENTS_DIR=.devnet/notifier/deployments` holding CRT's
+  `deployments/devnet.json` copied as `testnet.json` (I is computed from the deployment's `network_id`, so it stays consistent).
+- SMTP sink: the notifier only accepts port 465 or 587, so the sink listens on 127.0.0.1:587 with STARTTLS and a throwaway
+  self-signed certificate in `.devnet/smtp-tls/`; only the notifier child gets `NODE_TLS_REJECT_UNAUTHORIZED=0`. Every
+  message is stored as `.devnet/mail/<n>.eml` and parsed with `mailparser`. `APP_URL` is the notifier's own origin, so the
+  confirm links in the emails can be followed by the script. The sink's STARTTLS/auth/parse path was smoke-tested here with
+  nodemailer.
+- Rhythm `P1D` (CRT's shortest term): the messenger treats it as a short term, so step 4's "next reminder" is the 50 % reminder
+  of the **new** deadline (its UTC date is in the subject/text); the script also asserts no reminder names the old deadline.
+  Both the owner and recipient 1 confirm through their links (reminders and alarms go to a confirmed owner only). Recipient 2
+  has an email but no "tell now", so the release email is the only one it may get.
+- The notifier's watcher ticks every 5 minutes of wall time (not configurable); email steps wait up to 7 minutes and do not
+  mine while waiting, so the chain time the watcher sees stays in the intended window (first alarm = "24 hours").
+- Opener in headless Chromium (`playwright-core`, `--chromium`/`CHROMIUM_PATH` or its own browser) over `file://`, vaults
+  built with `rpcUrls: [devnet RPC]`; the script drives `window.__dmsOpener.checkChain()` and `window.CRT_KIT.api.recover()`
+  and reads the files back from the opener's object URLs. This relies on the CKB node answering CORS for a `file://` page
+  (it sends `Access-Control-Allow-Origin: *`); if a run shows `offline`, that is the first thing to check.
+- Step 8 accepts 404/410/401 for the `GET` after deletion (the record and its owner hash are gone).
+
 ## dms-ui, maintainer review (2026-11-15)
 
 - Checked rendered in headless Chrome (home, Write, practice vault, drill, guides, My switches, check-in at 390 px,
