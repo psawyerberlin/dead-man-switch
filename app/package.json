@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build && OPENER=1 vite build && node scripts/copy-to-site.mjs",
+    "build": "bash ../scripts/vendor-crt.sh && bash ../scripts/sync-config.sh && tsc --noEmit && vite build && OPENER=1 vite build && node scripts/copy-to-site.mjs && bash ../scripts/vendor-crt.sh && bash ../scripts/sync-config.sh",
     "build:opener": "OPENER=1 vite build",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

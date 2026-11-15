@@ -289,6 +289,19 @@ test('ui_fee_below_capacity_refused', async () => {
   expect(el.querySelector('input[data-cost], [data-cost="organiser"] input')).toBeNull(); // not editable
 });
 
+test('ui_price_matches_quote', async () => {
+  const h = harness({ lock: { occupiedSize: 53 } });
+  await armedInputs(h);
+  await h.s.loadOrganiser();
+  const q = h.s.quote()!;
+  expect(q).not.toBeNull();
+  const el = show('price', h.app);
+  expect(el.querySelector('[data-cost="now"] dd')!.textContent).toBe(formatCkb(q.spentNow));
+  expect(el.querySelector('[data-cost="term"] dd')!.textContent).toBe(formatCkb(q.spentOverTerm));
+  expect(el.querySelector('[data-cost="parked"] dd')!.textContent).toBe(formatCkb(q.parked));
+  expect(el.querySelector('[data-cost="monthly"]')!.textContent).toContain(formatCkb(q.monthly, undefined, { unit: false }));
+});
+
 async function armedInputs(h: Harness): Promise<void> {
   h.s.senderLabel = 'Patrick';
   h.s.shared.text = 'Hello';

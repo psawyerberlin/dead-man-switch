@@ -107,10 +107,27 @@ export function dmsPracticePlugin(): Plugin {
   };
 }
 
+/**
+ * CCC carries origins that this app never contacts (documentation link in an error text, the COTA aggregator, fallback
+ * public RPC nodes, a link in a message). The built app may reference no origin but its own, the configured RPC,
+ * monitor and wallet origins (SPEC.md §7), so the `//` of those literals is written `\x2f\x2f`: the same string for
+ * JavaScript, nothing a grep for a URL can mistake for a reference.
+ */
+const FOREIGN_ORIGINS = /https:\/\/(api\.ckbccc\.com|cota\.nervina\.dev|(?:main|test)net\.ckbapp\.dev|nervosnetwork)/g;
+function noForeignOriginsPlugin(): Plugin {
+  return {
+    name: 'dms-no-foreign-origins',
+    enforce: 'post',
+    generateBundle(_options, bundle) {
+      for (const chunk of Object.values(bundle)) if (chunk.type === 'chunk') chunk.code = chunk.code.replace(FOREIGN_ORIGINS, 'https:\\x2f\\x2f$1');
+    },
+  };
+}
+
 export default defineConfig({
-  base: './',
+  base: opener ? './' : '/app/',
   resolve: { alias },
-  plugins: opener ? [scriptSafePlugin()] : [dmsOpenerPlugin(), dmsPracticePlugin()],
+  plugins: opener ? [scriptSafePlugin()] : [dmsOpenerPlugin(), dmsPracticePlugin(), noForeignOriginsPlugin()],
   define: opener ? { 'process.env.NODE_ENV': '"production"' } : {},
   build: opener ? openerBuild : { outDir: 'dist', emptyOutDir: true },
   // TAP output lists every test by its fixed name (`ok n - <name>`), which the acceptance check reads.

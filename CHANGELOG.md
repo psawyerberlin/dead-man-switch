@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- dms-ui: quality and build: tests for three languages, no hard-coded strings, price equals quote, mainnet disabled;
+  `npm run build` writes `site/app/` (base `/app/`) with vendored deployments and synced config; `docs/app.md`.
 - dms-ui: the Write flow (letters, recipients and messenger, rhythm, guardians with the live cost panel, price with
   the organiser fee check, create with claim before signature and hard-fail verification, seal with downloads, owner
   code, owner archive, paper backup and calendar file, hand over to the messenger) and the handover guides for ten places.

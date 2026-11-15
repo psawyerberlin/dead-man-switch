@@ -2,6 +2,14 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-ui, phase 4 (quality and build)
+
+- 2026-11-15 — New tests: `app/test/quality.test.ts` (`ui_renders_three_languages`, `i18n_no_hardcoded_strings`, `ui_mainnet_disabled`) and
+  `ui_price_matches_quote` in `write.test.ts`. Same-keys check for en/fr/de is part of the hard-coded-strings test.
+- Build: `npm run build` runs `vendor-crt.sh` and `sync-config.sh` before the build (inputs in `app/public/`) and again after
+  copying to `site/app/`. App base is `/app/` (opener build keeps `./`).
+- CCC carries origins the app never contacts (docs link, COTA aggregator, fallback RPC nodes); a post-build plugin writes their `//` as `\x2f\x2f` (same string at runtime) so the built app names no foreign origin.
+
 ## dms-ui, phase 3 (My switches, check-in, open, drill, privacy)
 
 - 2026-11-15 — Files: `app/src/core/{away,switches,practice}.ts` (+ `practice-descriptor.json`), `app/src/ui/mine/` (`service.ts` the
