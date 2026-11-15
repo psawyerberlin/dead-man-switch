@@ -8,7 +8,7 @@ The only place where a human has to do something. pswsl: `~/work/dead-man-switch
    `config/mainnet.json` (secp256k1 addresses, minimum 61 CKB), `organiser_fee_ckb` 70; `scripts/build-site.sh` run and
    `site/app/` committed. After a change to `app/` or `config/`, run `bash scripts/build-site.sh` again and commit
    `site/app/`. Merge `aiworker/dms-e2e` into `main` (pull request on GitHub); the VPS serves `main`.
-2. **Deploy on the VPS** (as `deploy`):
+2. **Deploy on the VPS** (as `deploy`). Done on 2026-11-15 (messenger healthy, site live):
    ```sh
    git clone https://github.com/psawyerberlin/dead-man-switch.git ~/src/dead-man-switch
    git clone --depth 1 https://github.com/psawyerberlin/ckb-revocable-timelock.git ~/src/dead-man-switch/.refs/crt
@@ -22,9 +22,11 @@ The only place where a human has to do something. pswsl: `~/work/dead-man-switch
    ```
    Then append `deploy/Caddyfile.snippet` to `~/vericell/packages/web/Caddyfile`, add the mount line
    `- ~/src/dead-man-switch/site:/sites/dead-man-switch:ro` to the caddy service in `~/vericell` after the
-   stats-export line, validate in a throwaway container and rebuild only Caddy (see `deploy/README.md`):
+   stats-export line, validate inside the running Caddy container (a throwaway one lacks `CADDY_DOMAIN`) and
+   rebuild only Caddy (see `deploy/README.md`):
    ```sh
-   docker run --rm -v ~/vericell/packages/web/Caddyfile:/etc/caddy/Caddyfile:ro caddy:2 caddy validate --config /etc/caddy/Caddyfile
+   docker cp ~/vericell/packages/web/Caddyfile vericell-caddy-1:/tmp/Caddyfile.new && \
+  docker exec vericell-caddy-1 caddy validate --config /tmp/Caddyfile.new --adapter caddyfile
    cd ~/vericell && docker compose up -d --build caddy
    ```
    The mail DNS of `chainsolution.psawyer.de` is already done (SPF Strato standard, DKIM by Strato, DMARC

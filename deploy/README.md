@@ -13,10 +13,14 @@
   Caddy block reaches it as `dms-notifier:8787`.
 - The Caddy block is `deploy/Caddyfile.snippet`; append it to the web server's Caddyfile.
 
-## Validate the Caddyfile (throwaway container)
+## Validate the Caddyfile
+
+Validate inside the running `vericell-caddy-1`: the Caddyfile's first site address is `{$CADDY_DOMAIN}`, which a
+throwaway container leaves empty (the block then reads as global options and fails with "unrecognized global option").
 
 ```sh
-docker run --rm -v ~/vericell/packages/web/Caddyfile:/etc/caddy/Caddyfile:ro caddy:2 caddy validate --config /etc/caddy/Caddyfile
+docker cp ~/vericell/packages/web/Caddyfile vericell-caddy-1:/tmp/Caddyfile.new && \
+  docker exec vericell-caddy-1 caddy validate --config /tmp/Caddyfile.new --adapter caddyfile
 cd ~/vericell && docker compose up -d --build caddy
 ```
 
