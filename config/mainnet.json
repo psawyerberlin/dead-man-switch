@@ -2,7 +2,7 @@
   "network": "mainnet",
   "enabled": false,
   "note": "Enabled when CRT's deployments/mainnet.json is enabled (CSR service runtime on mainnet).",
-  "organiser_address": "ckb1FILL_ME_WITH_THE_OPERATOR_MAINNET_ADDRESS",
+  "organiser_address": "ckb1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsqvgkl7qa2ggec5l459gc5kk6l3f6erhezqk0kw74",
   "default_t": 5,
   "default_n": 8,
   "n_min": 3,
@@ -11,7 +11,7 @@
   "drill": null,
   "crt_deployment_url": "/app/deployments/mainnet.json",
   "crt_runners_url": "/app/deployments/mainnet-runners.json",
-  "organiser_fee_ckb": 65,
+  "organiser_fee_ckb": 61,
   "rhythms_months": [
     1,
     3,

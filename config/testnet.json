@@ -1,7 +1,7 @@
 {
   "network": "testnet",
   "enabled": true,
-  "organiser_address": "ckt1FILL_ME_WITH_THE_OPERATOR_TESTNET_ADDRESS",
+  "organiser_address": "ckt1qzda0cr08m85hc8jlnfp3zer7xulejywt49kt2rr0vthywaa50xwsq04zh9h2sdzs80m7p46q5hzxwz5336ncncap8udf",
   "default_t": 1,
   "default_n": 1,
   "n_min": 1,
@@ -23,7 +23,7 @@
   "crt_deployment_url": "/app/deployments/testnet.json",
   "crt_runners_url": "/app/deployments/testnet-runners.json",
   "faucet_url": "https://faucet.nervos.org/",
-  "organiser_fee_ckb": 65,
+  "organiser_fee_ckb": 61,
   "rhythms_months": [
     1,
     3,
