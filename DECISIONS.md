@@ -2,6 +2,16 @@
 
 Newest spec first. One `##` section per spec, one bullet per decision (`AIWORKER.md` §5).
 
+## dms-e2e, phase 2 (packaging, deployment files, manual steps)
+
+- 2026-11-15 — `scripts/build-site.sh` checks the organiser address first (testnet always, mainnet only when enabled), then runs
+  `npm run build` (vendor, sync, build, copy), writes `site/app/BUILD` (commit, CRT commit, version, date), repeats the
+  acceptance test's external-reference check, and packs `dist/dead-man-switch-site-<version>.tar.gz`. Not run here (needs the CRT build).
+- `config/testnet.json` keeps its existing `organiser_address` (a syntactically valid address, tests rely on it); the manual step asks
+  the human to confirm or replace it. `config/mainnet.json` stays `enabled: false`.
+- Caddy snippet: CSP also allows the CRT coordinator (`crt.chainsolution.net`) because the practice vault names it; `style-src 'unsafe-inline'` kept as in `site/DEPLOY.md`. Not validated here (no Docker).
+- `docs/manual-steps.md` has six numbered items; the devnet output goes into a `DECISIONS.md` section (the file mentions devnet/PASS).
+
 ## dms-e2e, phase 1 (scripted scenario, written, not run)
 
 - 2026-11-15 — `test/e2e/scenario.mjs` written and checked with `node --check` only (no devnet, no Chromium here); the maintainer
