@@ -2,7 +2,8 @@
 
 ## Layout
 
-- Repository: `~/src/dead-man-switch` (`git clone git@github.com:psawyerberlin/dead-man-switch.git ~/src/dead-man-switch`).
+- Repository: `~/src/dead-man-switch` (`git clone https://github.com/psawyerberlin/dead-man-switch.git ~/src/dead-man-switch`, plus CRT in
+  `.refs/crt` for the notifier image: `git clone --depth 1 https://github.com/psawyerberlin/ckb-revocable-timelock.git ~/src/dead-man-switch/.refs/crt`).
   `site/` (including the built `site/app/`, committed) is served as it is: there is no build step on the server.
 - The web server's compose file mounts the site read-only:
   `- ~/src/dead-man-switch/site:/sites/dead-man-switch:ro`
@@ -15,17 +16,21 @@
 ## Validate the Caddyfile (throwaway container)
 
 ```sh
-docker run --rm -v ~/path-to-your/Caddyfile:/etc/caddy/Caddyfile:ro caddy:2 caddy validate --config /etc/caddy/Caddyfile
+docker run --rm -v ~/vericell/packages/web/Caddyfile:/etc/caddy/Caddyfile:ro caddy:2 caddy validate --config /etc/caddy/Caddyfile
+cd ~/vericell && docker compose up -d --build caddy
 ```
 
-Replace the left side of `-v` with the real Caddyfile of the web server. Then reload or rebuild that server.
+The Caddyfile is baked into the `vericell` web image, so a change needs the rebuild of the `caddy` service; the
+Vericell and csr-monitor site blocks stay untouched.
 
 ## Update
 
 ```sh
 git -C ~/src/dead-man-switch pull -q
 # only when notifier/ changed:
-docker compose -f ~/src/dead-man-switch/notifier/compose.yaml up -d --build dms-notifier
+git -C ~/src/dead-man-switch/.refs/crt pull -q
+cd ~/src/dead-man-switch && DMS_NOTIFIER_ENV=$HOME/dms-notifier.env DMS_NOTIFIER_DATA=$HOME/dms-notifier-data \
+  WEB_NETWORK=vericell_default docker compose -f notifier/compose.yaml up -d --build
 ```
 
 ## Mail

@@ -1,45 +1,44 @@
 # Manual steps
 
-The only place where a human has to do something. Paths are those of the repository root
-(`/srv/aiworker/projects/dms-e2e` here, `~/src/dead-man-switch` on the VPS).
+The only place where a human has to do something. pswsl: `~/work/dead-man-switch`. VPS (`deploy@ubuntu`,
+31.70.74.15): `~/src/dead-man-switch`, web server = Docker Compose project `~/vericell`, container
+`vericell-caddy-1`, Caddyfile baked into its image from `~/vericell/packages/web/Caddyfile`.
 
-1. **Organiser address.** In `config/testnet.json` set `organiser_address` to your testnet address (`ckt1…`); later
-   the same in `config/mainnet.json` (`ckb1…`, then `"enabled": true` once CRT's mainnet deployment is enabled).
-   Check `organiser_fee_ckb` (70): it must cover the occupied capacity of the address's lock plus 8 CKB (a
-   secp256k1 address needs 61 CKB, a JoyID or multisig lock more); the app refuses a smaller fee.
-2. **Build and commit the site.**
+1. **Organiser address and the site build.** Done on 2026-11-15: `organiser_address` set in `config/testnet.json` and
+   `config/mainnet.json` (secp256k1 addresses, minimum 61 CKB), `organiser_fee_ckb` 70; `scripts/build-site.sh` run and
+   `site/app/` committed. After a change to `app/` or `config/`, run `bash scripts/build-site.sh` again and commit
+   `site/app/`. Merge `aiworker/dms-e2e` into `main` (pull request on GitHub); the VPS serves `main`.
+2. **Deploy on the VPS** (as `deploy`):
    ```sh
-   cd /srv/aiworker/projects/dms-e2e
-   bash scripts/build-site.sh
-   git add site/app && git commit -m "site: build" && git push
+   git clone https://github.com/psawyerberlin/dead-man-switch.git ~/src/dead-man-switch
+   git clone --depth 1 https://github.com/psawyerberlin/ckb-revocable-timelock.git ~/src/dead-man-switch/.refs/crt
+   install -m 600 ~/src/dead-man-switch/notifier/.env.example ~/dms-notifier.env
+   mkdir -p ~/dms-notifier-data && sudo chown 1000:1000 ~/dms-notifier-data
+   sed -i "s/^NOTIFIER_DATA_KEY=.*/NOTIFIER_DATA_KEY=$(openssl rand -hex 32)/" ~/dms-notifier.env
+   nano ~/dms-notifier.env        # type the Strato password after SMTP_PASS=
+   docker network ls --format '{{.Name}}' | grep -i vericell     # the web server's network, normally vericell_default
+   cd ~/src/dead-man-switch && DMS_NOTIFIER_ENV=$HOME/dms-notifier.env DMS_NOTIFIER_DATA=$HOME/dms-notifier-data \
+     WEB_NETWORK=vericell_default docker compose -f notifier/compose.yaml up -d --build
    ```
-   The script refuses to finish while the address is a placeholder. The site is served from git, not uploaded.
-3. **Devnet scenario.**
+   Then append `deploy/Caddyfile.snippet` to `~/vericell/packages/web/Caddyfile`, add the mount line
+   `- ~/src/dead-man-switch/site:/sites/dead-man-switch:ro` to the caddy service in `~/vericell` after the
+   stats-export line, validate in a throwaway container and rebuild only Caddy (see `deploy/README.md`):
    ```sh
-   cd /srv/aiworker/projects/dms-e2e/test/e2e && npm ci && cd ../..
-   node test/e2e/scenario.mjs
+   docker run --rm -v ~/vericell/packages/web/Caddyfile:/etc/caddy/Caddyfile:ro caddy:2 caddy validate --config /etc/caddy/Caddyfile
+   cd ~/vericell && docker compose up -d --build caddy
+   ```
+   The mail DNS of `chainsolution.psawyer.de` is already done (SPF Strato standard, DKIM by Strato, DMARC
+   `p=quarantine`; verified 2026-11-15 with SPF, DKIM and DMARC pass at Gmail). Keep a copy of `NOTIFIER_DATA_KEY`
+   outside the VPS (password manager): the database is useless without it.
+3. **Devnet scenario** on pswsl (needs the CRT devnet prerequisites of CRT's `docs/testing.md` and a Chromium:
+   `npx playwright-core install chromium` in `test/e2e`):
+   ```sh
+   cd ~/work/dead-man-switch && (cd test/e2e && npm ci) && node test/e2e/scenario.mjs
    ```
    Paste the PASS/FAIL output into `DECISIONS.md` (section "dms-e2e, devnet run").
-4. **VPS.**
-   ```sh
-   git clone git@github.com:psawyerberlin/dead-man-switch.git ~/src/dead-man-switch
-   cp ~/src/dead-man-switch/notifier/.env.example ~/dms-notifier.env
-   chmod 600 ~/dms-notifier.env
-   openssl rand -hex 32        # paste as NOTIFIER_DATA_KEY in ~/dms-notifier.env
-   ```
-   Edit `~/dms-notifier.env`: `SMTP_USER` and `MAIL_FROM` are the Strato mailbox
-   `dead-man-switch_noreply@chainsolution.psawyer.de`; type its password as `SMTP_PASS` yourself. Then:
-   ```sh
-   docker compose -f ~/src/dead-man-switch/notifier/compose.yaml up -d --build
-   ```
-   Add the block of `~/src/dead-man-switch/deploy/Caddyfile.snippet` to the web server's Caddyfile and the line
-   `- ~/src/dead-man-switch/site:/sites/dead-man-switch:ro` to its compose file, validate
-   (`docker run --rm -v <your Caddyfile>:/etc/caddy/Caddyfile:ro caddy:2 caddy validate --config /etc/caddy/Caddyfile`,
-   see `deploy/README.md`) and rebuild the web server. The mail DNS of `chainsolution.psawyer.de` is already done
-   (SPF Strato standard, DKIM by Strato, DMARC `p=quarantine`; verified 2026-11-15 with SPF, DKIM and DMARC pass at Gmail).
-5. **Fire drill on testnet** with a JoyID wallet in the deployed app: one recipient who confirms, then a second
+4. **Fire drill on testnet** with a JoyID wallet in the deployed app: one recipient who confirms, then a second
    drill that is cancelled. Record T, dates and PASS/FAIL in `docs/testing.md`.
-6. **Updates.** `git -C ~/src/dead-man-switch pull -q`, and
-   `docker compose -f ~/src/dead-man-switch/notifier/compose.yaml up -d --build dms-notifier` when `notifier/` changed.
+5. **Updates.** `git -C ~/src/dead-man-switch pull -q`; when `notifier/` changed, also
+   `git -C ~/src/dead-man-switch/.refs/crt pull -q` and the `docker compose … up -d --build` line of step 2.
 
 Nothing else.
