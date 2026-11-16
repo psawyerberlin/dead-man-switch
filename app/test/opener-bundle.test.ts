@@ -76,3 +76,20 @@ test('opener_bundle_runs_in_vault', async () => {
   expect(w.document.querySelector('#dms-letter .dms-text h1')?.textContent).toBe('Pour Ben');
   expect(w.document.querySelector('#dms-letter .dms-files a')?.getAttribute('href')).toBe('blob:vault/1');
 });
+
+test('offline_box_opens_with_the_recovered_key', async () => {
+  const w = open(await vaultHtml(2, 'Ben'));
+  await settle();
+  const paste = w.document.getElementById('crt-paste') as HTMLTextAreaElement;
+  const click = () => (w.document.getElementById('crt-btn-offline') as HTMLButtonElement).click();
+  // a value that is neither a guardian's release value nor K: a clear message, nothing opens
+  paste.value = '0x' + '42'.repeat(32);
+  click(); await settle();
+  expect(w.document.getElementById('crt-status')!.textContent).toContain('neither the release value');
+  expect(w.document.querySelector('#dms-letter .dms-text h1')).toBeNull();
+  // the recovered key K kept from an earlier opening: opens without any chain read
+  paste.value = K;
+  click(); await settle();
+  expect(w.document.getElementById('crt-status')!.textContent).toContain('Opened with the recovered key');
+  expect(w.document.querySelector('#dms-letter .dms-text h1')?.textContent).toBe('Pour Ben');
+});
