@@ -33,7 +33,7 @@ testnet first, mainnet when CRT's mainnet deployment is enabled.
 | `config/` | per-network configuration (organiser fee and address, defaults, limits) | needs the operator address |
 | `site/` | the multilingual website — deploy root; `site/app/` receives the app build | done |
 | `test/e2e/` | devnet scenario against CRT and the messenger | spec 04 |
-| `docs/` | formats, app, notifier, manual steps | specs 01–04 |
+| `docs/` | formats, app, notifier, manual steps, roadmap | specs 01–04 |
 
 ## How it relates to CRT
 
