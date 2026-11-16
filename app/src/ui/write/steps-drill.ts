@@ -1,5 +1,5 @@
 // The fire drill's term (SPEC.md §3.4), in place of the rhythm step: presets 30 min … 48 h and a custom term in
-// minutes within `drillBounds`; both dates of `drillOpensAt` (deadline + 24 h grace, plus at most one guardian check).
+// minutes within `drillBounds`; both dates of `drillOpensAt` (deadline + the rehearsal deployment's grace, plus at most one guardian check).
 import { drillOpensAt } from '../../core/drill';
 import { formatDate, formatDuration, t } from '../../core/i18n';
 import { button, linkButton } from '../components/button';
@@ -25,7 +25,7 @@ export function drillTermStep(v: StepView): HTMLElement {
   const custom = field({ label: t('drill.custom_minutes'), hint: t('drill.custom_hint', { min: formatDuration(b.minSeconds), max: formatDuration(b.maxSeconds) }), control: minutes });
   const refresh = (): void => {
     const deadline = s.deadlineFrom();
-    const opens = drillOpensAt(deadline, b.heartbeatBlocks, s.quote()?.blockSeconds);
+    const opens = drillOpensAt(deadline, b.heartbeatBlocks, s.quote()?.blockSeconds, s.graceSeconds());
     dates.textContent = `${t('drill.deadline_at', { deadline: formatDate(deadline) })} ${t('drill.opens_between', { earliest: formatDate(opens.earliest), latest: formatDate(opens.latest) })}`;
   };
   minutes.addEventListener('input', () => {

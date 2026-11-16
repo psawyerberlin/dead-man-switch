@@ -12,14 +12,14 @@ import { note } from '../write/controls';
 import { switchRing } from './card';
 import { live, type MineApp } from './view';
 
-export interface CheckinLink { network: Network; T: string; rhythm: Rhythm }
+export interface CheckinLink { network: Network; T: string; rhythm: Rhythm; drill: boolean }
 
 /** Parses the three parameters of the phone link; null when one is missing or malformed. */
 export function parseCheckinLink(query: URLSearchParams): CheckinLink | null {
   const network = query.get('network');
   if (network !== 'testnet' && network !== 'mainnet') return null;
   try {
-    return { network, T: normaliseSwitchId(query.get('T') ?? ''), rhythm: parseRhythmIso(query.get('rhythm') ?? '') };
+    return { network, T: normaliseSwitchId(query.get('T') ?? ''), rhythm: parseRhythmIso(query.get('rhythm') ?? ''), drill: query.get('drill') === '1' };
   } catch { return null; }
 }
 
@@ -33,7 +33,7 @@ export function checkinScreen(query: URLSearchParams, app: MineApp): HTMLElement
   }
   const svc = app.service;
   const saved = svc.get(link.network, link.T);
-  const sw: SavedSwitch = { ...(saved ?? {}), network: link.network, T: link.T, rhythm: rhythmIso(link.rhythm) };
+  const sw: SavedSwitch = { ...(saved ?? {}), network: link.network, T: link.T, rhythm: rhythmIso(link.rhythm), drill: saved?.drill ?? link.drill };
   let owner: boolean | null | 'pending' = null;
   let ownerFor = '';
   const checkOwner = (): void => {

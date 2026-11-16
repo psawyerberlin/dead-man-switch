@@ -6,7 +6,7 @@ import './ui/components.css';
 import './ui/write.css';
 import './ui/mine.css';
 import { detectLanguage, setLanguage, t } from './core/i18n';
-import { type Config, type CrtFiles, type FetchFn, type Network, loadCrtFiles } from './core/config';
+import { type Config, type CrtFiles, type FetchFn, type Network, drillView, loadCrtFiles } from './core/config';
 import { MessengerClient } from './core/messenger';
 import { loadNetworks } from './ui/network';
 import { startShell } from './ui/shell';
@@ -58,12 +58,21 @@ async function boot(): Promise<void> {
   if (!root) return;
   const fetchFn: FetchFn = (url) => fetch(url, { credentials: 'same-origin' });
   const network = await loadNetworks(fetchFn);
-  const crtFiles: Partial<Record<Network, CrtFiles>> = {};
-  const crtOf = async (config: Config): Promise<CrtFiles> => (crtFiles[config.network] ??= await loadCrtFiles(config, fetchFn));
+  // keyed by deployment URL: a fire drill uses CRT's rehearsal deployment on the same network (drillView)
+  const crtFiles: Record<string, CrtFiles> = {};
+  const crtOf = async (config: Config): Promise<CrtFiles> => (crtFiles[config.crt_deployment_url] ??= await loadCrtFiles(config, fetchFn));
+  const crtNow = (config?: Config | null): CrtFiles | null => {
+    const c = config ?? network.configs[network.current];
+    return c ? crtFiles[c.crt_deployment_url] ?? null : null;
+  };
   const current = network.configs[network.current];
-  if (current) await crtOf(current).catch(() => undefined);
+  if (current) {
+    await crtOf(current).catch(() => undefined);
+    if (current.drill?.crt_deployment_url) await crtOf(drillView(current)).catch(() => undefined);
+  }
   const rpcUrl = (n: Network): string | undefined => {
-    const urls = (crtFiles[n]?.deployment as { rpc_urls?: unknown } | undefined)?.rpc_urls;
+    const c = network.configs[n];
+    const urls = ((c ? crtFiles[c.crt_deployment_url] : undefined)?.deployment as { rpc_urls?: unknown } | undefined)?.rpc_urls;
     return Array.isArray(urls) && typeof urls[0] === 'string' ? urls[0] : undefined;
   };
   const icon = new URL('favicon.svg', document.baseURI).href;
@@ -72,7 +81,7 @@ async function boot(): Promise<void> {
   const messenger = (config: Config): MessengerClient | null => (config.notifier_url ? new MessengerClient(config.notifier_url) : null);
   const owner = lazyOwner(async () => (await import('./ui/mine/chain-owner')).chainOwner({ signer: () => wallet.signer, crt: crtOf }));
   const practice = async () => (await import('virtual:dms-practice')).default;
-  startShell({ root, network, wallet, driver, messenger, ownerMessenger: messenger, owner, practice, crt: () => crtFiles[network.current] ?? null });
+  startShell({ root, network, wallet, driver, messenger, ownerMessenger: messenger, owner, practice, crt: crtNow });
   void wallet.restore();
 }
 

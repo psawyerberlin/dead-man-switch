@@ -78,3 +78,12 @@ test('vault_contains_only_own_letter', async () => {
     expect(html).not.toContain('Lettre secrète'); // no plaintext
   });
 });
+
+test('vault carries a non-default grace only', async () => {
+  const { vaultPayload } = await import('../src/core/vault');
+  const base = { recipient: { index: 1, name: 'Anna' }, sealed: { nonce: new Uint8Array(12), ciphertext: new Uint8Array(4) },
+    meta: { network: 'testnet' as const, language: 'en' as const, sender_label: 'P', drill: true, created_at: 1, app_url: 'https://x.example' } };
+  expect('grace_seconds' in vaultPayload(base)).toBe(false);
+  expect('grace_seconds' in vaultPayload({ ...base, meta: { ...base.meta, grace_seconds: 86_400 } })).toBe(false);
+  expect(vaultPayload({ ...base, meta: { ...base.meta, grace_seconds: 600 } }).grace_seconds).toBe(600);
+});

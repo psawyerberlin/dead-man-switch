@@ -18,7 +18,9 @@
       1440,
       2880
     ],
-    "heartbeat_blocks": 1000
+    "heartbeat_blocks": 50,
+    "crt_deployment_url": "/app/deployments/testnet-drill.json",
+    "crt_runners_url": "/app/deployments/testnet-drill-runners.json"
   },
   "crt_deployment_url": "/app/deployments/testnet.json",
   "crt_runners_url": "/app/deployments/testnet-runners.json",

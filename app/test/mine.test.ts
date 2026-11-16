@@ -171,7 +171,8 @@ test('ui_mine_add_by_T_and_restore_from_owner_code', async () => {
 test('ui_checkin_deeplink', async () => {
   const route = parseHash(`#/checkin?network=testnet&T=${T}&rhythm=P3M`);
   expect(route.id).toBe('checkin');
-  expect(parseCheckinLink(route.query)).toEqual({ network: 'testnet', T, rhythm: { kind: 'months', months: 3 } });
+  expect(parseCheckinLink(route.query)).toEqual({ network: 'testnet', T, rhythm: { kind: 'months', months: 3 }, drill: false });
+  expect(parseCheckinLink(parseHash(`#/checkin?network=testnet&T=${T}&rhythm=PT30M&drill=1`).query)?.drill).toBe(true);
   expect(parseCheckinLink(new URLSearchParams(`network=moon&T=${T}&rhythm=P3M`))).toBeNull();
   expect(parseCheckinLink(new URLSearchParams(`network=testnet&T=0x12&rhythm=P3M`))).toBeNull();
   expect(parseCheckinLink(new URLSearchParams(`network=testnet&T=${T}&rhythm=3`))).toBeNull();

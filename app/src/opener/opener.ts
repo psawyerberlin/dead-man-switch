@@ -14,8 +14,9 @@ import { OPENER_CSS } from './styles';
 
 // ---- what the CRT kit exposes (CRT client/kit/recovery.ts) -------------------------------------------------------
 
-/** CRT's protocol grace after the deadline (lock script constant, CRT SPEC §6). */
-const GRACE_SECONDS = 24 * 3600;
+/** CRT's grace after the deadline (lock script constant, CRT SPEC §6): 24 h, or the testnet rehearsal's value, which
+ *  the vault payload carries as `grace_seconds`. */
+const DEFAULT_GRACE_SECONDS = 24 * 3600;
 
 export interface KitSwitchStatus {
   alive: boolean;
@@ -102,6 +103,7 @@ export function installOpener(win: Window): OpenerHandle {
   const doc = w.document;
   const kit = (): CrtKit => w.CRT_KIT ?? {};
   const payload = (): VaultPayload | null => kit().application?.payload ?? null;
+  const graceSeconds = (): number => { const g = payload()?.grace_seconds; return typeof g === 'number' && g > 0 ? g : DEFAULT_GRACE_SECONDS; };
   const practice = (): boolean => w.DMS_PRACTICE === true;
 
   const initial = payload()?.language;
@@ -237,7 +239,7 @@ export function installOpener(win: Window): OpenerHandle {
         const dl = status.deadline != null ? Number(status.deadline) : certificateDeadline();
         // Device clock: the chain's median time trails it by minutes, which does not change these sentences.
         if (dl !== null && Date.now() / 1000 > dl) {
-          sheet.append(msg({ key: 'open.status.in_grace', params: { deadline: formatDate(dl, state.lang), opens: formatDate(dl + GRACE_SECONDS, state.lang) } }));
+          sheet.append(msg({ key: 'open.status.in_grace', params: { deadline: formatDate(dl, state.lang), opens: formatDate(dl + graceSeconds(), state.lang) } }));
         } else {
           sheet.append(msg({ key: 'open.status.not_yet', params: { deadline: dl === null ? '—' : formatDate(dl, state.lang) } }));
         }

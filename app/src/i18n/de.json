@@ -217,7 +217,7 @@
   "drill.ribbon": "Probealarm — Testnet",
   "drill.title": "Probealarm ausprobieren",
   "drill.intro": "Eine kurze Probe mit echten Wächtern im Testnet, für Sie und Ihre Empfänger. Es steht nichts Echtes auf dem Spiel.",
-  "drill.opens_between": "Die Briefe öffnen sich zwischen {earliest} und {latest}: 24 Stunden Kulanz nach der Frist, plus die nächste Prüfung der Wächter.",
+  "drill.opens_between": "Die Briefe öffnen sich zwischen {earliest} und {latest}: die kurze Kulanz nach der Frist, plus die nächste Prüfung der Wächter.",
   "drill.report_title": "Bericht zum Probealarm",
   "checkin.title": "Sich melden",
   "checkin.button": "Jetzt melden — neue Frist {deadline}",
@@ -236,7 +236,7 @@
   "unit.hours": "{count, plural, one {# Stunde} other {# Stunden}}",
   "unit.minutes": "{count, plural, one {# Minute} other {# Minuten}}",
   "ics.alarm_half": "Die Hälfte der Frist ist vorbei",
-  "ics.alarm_deadline": "Die Frist ist erreicht: 24 Stunden Kulanz bleiben",
+  "ics.alarm_deadline": "Die Frist ist erreicht: Die Kulanzzeit hat begonnen",
   "drill.subject_prefix": "[Probealarm]",
   "template.legacy_checklist.title": "Checkliste für den digitalen Nachlass",
   "template.legacy_checklist.body": "## Konten\n\n- E-Mail:\n- Bank und Zahlungsdienste:\n- Soziale Netzwerke (behalten, in Gedenkzustand versetzen oder löschen?):\n\n## Passwort-Manager\n\n- Welcher, und wo das Master-Passwort oder das Notfallblatt liegt:\n\n## Geräte\n\n- Telefon (der Entsperrcode liegt):\n- Computer:\n- Sicherungen und Speicher:\n\n## Abos, die gekündigt werden sollen\n\n- \n",
@@ -468,7 +468,7 @@
   "drill.custom_minutes": "Minuten bis zur Frist",
   "drill.deadline_at": "Frist: {deadline}.",
   "drill.heartbeat_fixed": "Ein Probealarm nutzt ein festes Prüfintervall: {interval}.",
-  "drill.point_term": "Die Frist liegt 30 Minuten bis 48 Stunden entfernt; danach folgen 24 Stunden Kulanz.",
+  "drill.point_term": "Die Frist liegt 30 Minuten bis 48 Stunden entfernt; danach folgen 10 Minuten Kulanz.",
   "drill.point_marked": "Alles ist als Probealarm gekennzeichnet: die Seiten, die Tresor-Dateien und die E-Mails.",
   "drill.point_confirm": "Empfänger werden zuerst um Bestätigung gebeten; unbestätigte Adressen erhalten keine Probealarm-E-Mail.",
   "drill.point_report": "Danach zeigt der Bericht des Probealarms, was geschehen ist.",
@@ -576,5 +576,5 @@
   "nav.menu": "Menü",
   "nav.menu_close": "Schließen",
   "error.network": "Das CKB-Netzwerk ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-  "open.status.in_grace": "Die Frist ist am {deadline} ohne Meldung verstrichen. Nach 24 Stunden Kulanz veröffentlichen die Wächter ihre Teile: Der Brief lässt sich ab etwa {opens} öffnen (bis zu einigen Stunden später, bei der nächsten Prüfung der Wächter). Kommen Sie dann wieder und klicken Sie auf „Auf der Chain prüfen“."
+  "open.status.in_grace": "Die Frist ist am {deadline} ohne Meldung verstrichen. Nach der Kulanzzeit veröffentlichen die Wächter ihre Teile: Der Brief lässt sich ab etwa {opens} öffnen (bis zu einigen Stunden später, bei der nächsten Prüfung der Wächter). Kommen Sie dann wieder und klicken Sie auf „Auf der Chain prüfen“."
 }

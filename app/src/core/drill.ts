@@ -29,8 +29,8 @@ export function validateDrillTerm(config: Pick<Config, 'network' | 'drill'>, sec
   return seconds;
 }
 
-/** Earliest: deadline + 24 h grace; latest: plus one guardian check interval. Unix seconds. */
-export function drillOpensAt(deadline: number | bigint, heartbeatBlocks: number, blockSeconds: number = DEFAULT_BLOCK_SECONDS): { earliest: number; latest: number } {
-  const earliest = Number(deadline) + GRACE_SECONDS;
+/** Earliest: deadline + grace (the drill deployment's, else 24 h); latest: plus one guardian check interval. Unix seconds. */
+export function drillOpensAt(deadline: number | bigint, heartbeatBlocks: number, blockSeconds: number = DEFAULT_BLOCK_SECONDS, graceSeconds: number = GRACE_SECONDS): { earliest: number; latest: number } {
+  const earliest = Number(deadline) + graceSeconds;
   return { earliest, latest: earliest + Math.round(heartbeatBlocks * blockSeconds) };
 }

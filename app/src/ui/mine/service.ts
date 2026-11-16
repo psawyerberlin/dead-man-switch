@@ -9,7 +9,7 @@ import { type Rng, defaultRng, hexToBytes } from '../../core/bytes';
 import { buildVault, vaultFileName } from '../../core/vault';
 import type { Language } from '../../core/bundle';
 import type { HistoryEntry, SwitchSummary } from '../../core/chain';
-import type { Config, Network } from '../../core/config';
+import { type Config, type CrtFiles, type Network, drillView } from '../../core/config';
 import { type RecordPatch, MessengerError, parseOwnerCode } from '../../core/messenger';
 import { type Quote, quote } from '../../core/price';
 import { type Rhythm, addRhythm, parseRhythmIso } from '../../core/rhythm';
@@ -55,6 +55,8 @@ export interface OwnerDeps {
   storage: StorageLike | null;
   /** the vendored CRT deployment (block seconds for the estimates) */
   blockSeconds?: (network: Network) => number | undefined;
+  /** CRT files for a config (the drill view gets the rehearsal deployment: its grace) */
+  crt?: (config: Config) => CrtFiles | null;
   /** wall clock, unix seconds */
   now?: () => number;
   /** `wrapKeyAnchored` (rebuilding the vaults from an owner archive needs fresh envelopes) */
@@ -116,6 +118,18 @@ export class MineService {
 
   constructor(readonly deps: OwnerDeps) {
     this.now = deps.now ?? (() => Math.floor(Date.now() / 1000));
+  }
+
+  /** The config a switch is read and changed with: a fire drill uses CRT's rehearsal deployment (drillView). */
+  private cfgOf(s: Pick<SavedSwitch, 'network' | 'drill'>): Config | null {
+    const c = this.deps.config(s.network);
+    return c && s.drill ? drillView(c) : c;
+  }
+
+  /** The grace of the deployment a config uses (24 h, or the rehearsal's 10 min). */
+  private graceOf(cfg: Config): number {
+    const g = (this.deps.crt?.(cfg)?.deployment as { grace_seconds?: unknown } | undefined)?.grace_seconds;
+    return typeof g === 'number' && g > 0 ? g : 86_400;
   }
 
   onChange(fn: () => void): () => void { this.listeners.add(fn); return () => this.listeners.delete(fn); }
@@ -193,7 +207,7 @@ export class MineService {
     try { return parseOwnerCode(code).A; } catch { return null; }
   }
   private messengerFor(s: SavedSwitch): OwnerMessenger | null {
-    const cfg = this.deps.config(s.network);
+    const cfg = this.cfgOf(s);
     return cfg && s.messenger !== false ? this.deps.messenger?.(cfg) ?? null : null;
   }
 
@@ -204,7 +218,7 @@ export class MineService {
   // ---- reading ----
   /** Reads the chain (summary, check-in history) and, with the owner code, the messenger's view. */
   async refresh(s: SavedSwitch): Promise<void> {
-    const cfg = this.deps.config(s.network);
+    const cfg = this.cfgOf(s);
     const driver = this.deps.driver;
     this.patchCard(s, { busy: this.card(s).busy ?? 'refresh' });
     const jobs: Promise<void>[] = [];
@@ -265,7 +279,7 @@ export class MineService {
 
   /** The estimate before a check-in to `deadline`: the guardians' checks over the new term (CRT §11.1). */
   checkinQuote(s: SavedSwitch, deadline: number): Quote | null {
-    const cfg = this.deps.config(s.network);
+    const cfg = this.cfgOf(s);
     if (!cfg) return null;
     const n = Math.max(1, s.descriptor?.nodes?.length ?? cfg.default_n);
     try {
@@ -289,7 +303,7 @@ export class MineService {
   /** Builds the vaults again from the open archive: same letters and K, fresh envelopes from the chain. */
   async rebuildVaults(s: SavedSwitch): Promise<RebuiltVault[]> {
     const a = this.archiveOf(s);
-    const cfg = this.deps.config(s.network);
+    const cfg = this.cfgOf(s);
     if (!a || !cfg) throw new Error('open the owner archive first');
     const descriptor = s.descriptor;
     if (!descriptor || !this.deps.wrap) throw new Error('the switch record is missing from this browser');
@@ -300,7 +314,7 @@ export class MineService {
     for (const letter of a.letters) {
       const sealed = await encryptBundle(K, a.I, letter.recipient.index, letter, this.deps.rng ?? defaultRng, { maxBytes: cfg.max_vault_bytes });
       const html = buildVault({ descriptor, envelopes, deadline, recipient: letter.recipient, sealed,
-        meta: { network: s.network, language: letter.language, sender_label: letter.sender_label, drill: letter.drill, created_at: letter.created_at, app_url: cfg.app_url } });
+        meta: { network: s.network, language: letter.language, sender_label: letter.sender_label, drill: letter.drill, created_at: letter.created_at, app_url: cfg.app_url, grace_seconds: this.graceOf(cfg) } });
       out.push({ index: letter.recipient.index, name: letter.recipient.name, fileName: vaultFileName(letter.sender_label, letter.recipient.name, s.T, letter.drill), html });
     }
     K.fill(0);
@@ -310,7 +324,7 @@ export class MineService {
   // ---- the owner's actions ----
   /** Whether the connected wallet is the owner of `s` (lock hash = the owner lock hash of the Node Cells). */
   async isOwner(s: SavedSwitch): Promise<boolean | null> {
-    const cfg = this.deps.config(s.network);
+    const cfg = this.cfgOf(s);
     const driver = this.deps.driver;
     if (!cfg || !driver) return null;
     const owner = this.card(s).summary?.ownerLockHash ?? (await driver.summary(cfg, s.T, s.descriptor as unknown as DescriptorLike | undefined)).ownerLockHash;
@@ -324,7 +338,7 @@ export class MineService {
    * Allowed during the grace, refused once a guardian has released or the switch is cancelled.
    */
   async checkin(s: SavedSwitch, deadline?: number): Promise<boolean> {
-    const cfg = this.deps.config(s.network);
+    const cfg = this.cfgOf(s);
     const driver = this.deps.driver;
     const c = this.card(s);
     if (c.busy && c.busy !== 'refresh') return false;
@@ -348,7 +362,7 @@ export class MineService {
 
   /** Cancel: one signature (CRT cancel), then the messenger deletes the switch's data (`DELETE`). */
   async cancel(s: SavedSwitch): Promise<boolean> {
-    const cfg = this.deps.config(s.network);
+    const cfg = this.cfgOf(s);
     const driver = this.deps.driver;
     if (this.card(s).busy && this.card(s).busy !== 'refresh') return false;
     try {
@@ -372,7 +386,7 @@ export class MineService {
 
   /** Reclaim: after release or cancel, the parked CKB back (one expired job per transaction). */
   async reclaim(s: SavedSwitch): Promise<boolean> {
-    const cfg = this.deps.config(s.network);
+    const cfg = this.cfgOf(s);
     const driver = this.deps.driver;
     try {
       if (!cfg || !driver) throw new Error('no chain connection');

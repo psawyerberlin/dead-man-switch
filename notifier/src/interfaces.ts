@@ -12,6 +12,8 @@ export interface SwitchState {
   I?: string;
   /** Descriptor hash committed in the Node Cells (CRT `verifyNodes`), `0x` hex. */
   descriptorHash?: string;
+  /** Grace of the CRT deployment the switch was found under, seconds (24 h; a testnet fire drill: 600). */
+  grace?: number;
 }
 
 /** Unix seconds. */

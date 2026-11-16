@@ -38,8 +38,8 @@ class FakeChain implements Chain {
     this.recovered.push(K);
     return K;
   }
-  set(T: string, state: SwitchStateName, deadline: number, releases = 0, t = 2): void {
-    this.states.set(`testnet/${T}`, { state, deadline, releases, t });
+  set(T: string, state: SwitchStateName, deadline: number, releases = 0, t = 2, grace?: number): void {
+    this.states.set(`testnet/${T}`, { state, deadline, releases, t, ...(grace !== undefined ? { grace } : {}) });
   }
 }
 
@@ -400,3 +400,26 @@ test('logs_redact_personal_data', () => {
   assert.ok(out.includes('[redacted]'));
   for (const s of SECRETS) assert.ok(!out.includes(s), `the log contains ${s}`);
 });
+
+test('watcher_drill_short_grace', async () => {
+  // A drill on CRT's rehearsal deployment (grace 600 s): the deadline email, no hour-based alarms, the drill flag in
+  // the phone check-in link.
+  const s = setup();
+  const D = BASE + 2 * HOUR;
+  const { T } = s.seed({ drill: true, rhythm: 'PT30M' });
+  s.chain.set(T, 'armed', D, 0, 1, 600);
+  await s.tick(D + 30);
+  await s.tick(D + 300);
+  await s.tick(D + 590);
+  const owner = s.mailer.to(`owner-${T.slice(2, 8)}`);
+  assert.equal(owner.filter((m) => /open in/.test(m.subject)).length, 0, 'no hour-based alarm for a 10-minute grace');
+  const deadlineMails = owner.filter((m) => m.text.includes('/app/#/checkin?network=testnet&T=' + T));
+  assert.ok(deadlineMails.length >= 1, 'the deadline email');
+  for (const m of deadlineMails) assert.ok(m.text.includes('&drill=1'), 'the check-in link opens the drill view');
+  // past the 10-minute grace: nothing more to the owner before the release
+  const n = s.mailer.sent.length;
+  await s.tick(D + 900);
+  assert.equal(s.mailer.sent.length, n);
+  s.close();
+});
+

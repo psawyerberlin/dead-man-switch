@@ -1,8 +1,9 @@
 // The real Chain over @crt/client: `readSwitch` for the state of a switch, `recoverOnline` for K after release.
-import { RpcClient, bytesToHex, identity, loadDeployment, readSwitch, recoverOnline, type Deployment } from '@crt/client';
+import { RpcClient, bytesToHex, graceSeconds, identity, loadDeployment, readSwitch, recoverOnline, type Deployment } from '@crt/client';
 import type { Chain, SwitchState, SwitchStateName } from './interfaces.ts';
 
-interface Net { rpc: RpcClient; urls: string[]; deployment: Deployment }
+/** `drill`: CRT's rehearsal deployment on the same network (`<network>-drill.json`, short grace), when present. */
+interface Net { rpc: RpcClient; urls: string[]; deployment: Deployment; drill?: Deployment }
 
 const hexNum = (h: string | undefined): number => (h ? Number(BigInt(h)) : 0);
 
@@ -15,7 +16,9 @@ export class CrtChain implements Chain {
     for (const [network, url] of Object.entries(rpc)) {
       if (!url) continue;
       const deployment = await loadDeployment(network, deploymentsDir);
-      nets.set(network, { rpc: new RpcClient(url), urls: [url], deployment });
+      let drill: Deployment | undefined;
+      try { drill = await loadDeployment(`${network}-drill`, deploymentsDir); } catch { drill = undefined; }
+      nets.set(network, { rpc: new RpcClient(url), urls: [url], deployment, ...(drill ? { drill } : {}) });
     }
     return new CrtChain(nets);
   }
@@ -28,10 +31,16 @@ export class CrtChain implements Chain {
 
   async switchState(network: string, T: string): Promise<SwitchState> {
     const n = this.net(network);
-    const [st, info] = await Promise.all([
+    const [first, info] = await Promise.all([
       readSwitch(T, { rpc: n.rpc, deployment: n.deployment }),
       n.rpc.call<{ median_time?: string }>('get_blockchain_info'),
     ]);
+    // A fire drill's Node Cells sit under the rehearsal deployment's lock: the normal read then finds none of them.
+    let st = first, dep = n.deployment;
+    if (first.nodeCells.length === 0 && n.drill) {
+      const second = await readSwitch(T, { rpc: n.rpc, deployment: n.drill });
+      if (second.nodeCells.length > 0) { st = second; dep = n.drill; }
+    }
     if (st.state === 'inconsistent') throw new Error('the Node Cells of this switch disagree');
     return {
       state: st.state as SwitchStateName,
@@ -42,6 +51,7 @@ export class CrtChain implements Chain {
       t: 0,
       I: bytesToHex(identity(n.deployment.network_id, T)).toLowerCase(),
       ...(st.descriptorHash !== null ? { descriptorHash: st.descriptorHash } : {}),
+      grace: graceSeconds(dep),
     };
   }
 

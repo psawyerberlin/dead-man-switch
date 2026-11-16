@@ -217,7 +217,7 @@
   "drill.ribbon": "Fire drill — testnet",
   "drill.title": "Try a fire drill",
   "drill.intro": "A short rehearsal with real guardians on testnet, for you and your recipients. Nothing real is at stake.",
-  "drill.opens_between": "The letters open between {earliest} and {latest}: 24 hours of grace after the deadline, plus the guardians' next check.",
+  "drill.opens_between": "The letters open between {earliest} and {latest}: the short grace after the deadline, plus the guardians' next check.",
   "drill.report_title": "Drill report",
   "checkin.title": "Check in",
   "checkin.button": "Check in — new deadline {deadline}",
@@ -236,7 +236,7 @@
   "unit.hours": "{count, plural, one {# hour} other {# hours}}",
   "unit.minutes": "{count, plural, one {# minute} other {# minutes}}",
   "ics.alarm_half": "Half of the term has passed",
-  "ics.alarm_deadline": "The deadline is now: 24 hours of grace remain",
+  "ics.alarm_deadline": "The deadline is now: the grace period has begun",
   "drill.subject_prefix": "[Drill]",
   "template.legacy_checklist.title": "Digital legacy checklist",
   "template.legacy_checklist.body": "## Accounts\n\n- Email:\n- Bank and payment:\n- Social networks (keep, memorialise or close?):\n\n## Password manager\n\n- Which one, and where the master password or emergency kit is:\n\n## Devices\n\n- Phone (unlock code is kept at):\n- Computer:\n- Backups and storage:\n\n## Subscriptions to cancel\n\n- \n",
@@ -468,7 +468,7 @@
   "drill.custom_minutes": "Minutes until the deadline",
   "drill.deadline_at": "Deadline: {deadline}.",
   "drill.heartbeat_fixed": "A fire drill uses a fixed check interval: {interval}.",
-  "drill.point_term": "The deadline is 30 minutes to 48 hours away; then come 24 hours of grace.",
+  "drill.point_term": "The deadline is 30 minutes to 48 hours away; then come 10 minutes of grace.",
   "drill.point_marked": "Everything is marked as a drill: the screens, the vault files and the emails.",
   "drill.point_confirm": "Recipients are asked to confirm first; unconfirmed addresses get no drill email.",
   "drill.point_report": "Afterwards, the drill report shows what happened.",
@@ -576,5 +576,5 @@
   "nav.menu": "Menu",
   "nav.menu_close": "Close",
   "error.network": "The CKB network could not be reached. Check your connection and try again.",
-  "open.status.in_grace": "The deadline passed on {deadline} without a check-in. After 24 hours of grace the guardians publish their pieces: the letter can be opened from about {opens} (up to a few hours later, at the guardians' next check). Come back then and press “Check the chain”."
+  "open.status.in_grace": "The deadline passed on {deadline} without a check-in. After the grace period the guardians publish their pieces: the letter can be opened from about {opens} (up to a few hours later, at the guardians' next check). Come back then and press “Check the chain”."
 }

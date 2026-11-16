@@ -33,7 +33,7 @@ export interface ShellDeps {
   driver?: SwitchDriver | null;
   messenger?: ((config: Config) => MessengerLike | null) | null;
   /** the vendored CRT files of the current network, once loaded */
-  crt?: () => CrtFiles | null;
+  crt?: (config?: Config | null) => CrtFiles | null;
   io?: WriteIO;
   /** chain side of My switches, the phone check-in and the status on `#/open` */
   owner?: OwnerDriver | null;
@@ -80,6 +80,7 @@ export function appServices(network: NetworkState, deps: Partial<Omit<ShellDeps,
   const driver = deps.driver ?? null;
   const service = new MineService({
     config: (n) => network.configs[n] ?? null, driver: deps.owner ?? null, messenger: deps.ownerMessenger ?? null, storage, blockSeconds,
+    ...(deps.crt ? { crt: deps.crt } : {}),
     wrap: driver ? (c, K, d) => driver.wrap(c, K, d) : null,
   });
   deps.wallet?.subscribe(() => service.changed());

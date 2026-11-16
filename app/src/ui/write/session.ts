@@ -8,7 +8,7 @@ import { ARCHIVE_MIN_STRENGTH, type ArchiveContents, passphraseStrength, sealArc
 import { type Language, type Letter, type LetterFile, BUNDLE_VERSION, encodeBundle, encryptBundle, sealedSize } from '../../core/bundle';
 import { type Rng, bytesToHex, defaultRng, toBase64, utf8 } from '../../core/bytes';
 import { icsForDeadline } from '../../core/calendar';
-import { type Config, type CrtFiles, type LockLike, type Network, ConfigError, organiserFeeCheck } from '../../core/config';
+import { type Config, type CrtFiles, type LockLike, type Network, ConfigError, organiserFeeCheck, drillView } from '../../core/config';
 import { type GuardianBounds, accessTree, candidatePool, chooseGuardians, clamp, guardianBounds, thresholdRange } from '../../core/guardians';
 import { getLanguage } from '../../core/i18n';
 import { checkLink, encryptLink } from '../../core/links';
@@ -68,7 +68,8 @@ import type { StorageLike } from '../../core/switches';
 export interface WriteDeps {
   config: () => Config | null;
   /** the vendored CRT deployment (block seconds for the quote) */
-  crt?: () => CrtFiles | null;
+  /** CRT files for a config (cached by main.ts): the drill view gets the rehearsal deployment */
+  crt?: (config: Config) => CrtFiles | null;
   driver: SwitchDriver | null;
   messenger: ((config: Config) => MessengerLike | null) | null;
   /** whether a wallet is connected */
@@ -206,7 +207,14 @@ export class WriteSession {
   onChange(fn: () => void): () => void { this.listeners.add(fn); return () => this.listeners.delete(fn); }
   changed(): void { for (const fn of [...this.listeners]) fn(); }
 
-  get config(): Config | null { return this.deps.config(); }
+  /** In a fire drill: the drill view (CRT's rehearsal deployment, short grace, the drill's check interval). */
+  get config(): Config | null { const c = this.deps.config(); return c && this.drill ? drillView(c) : c; }
+  /** The grace of the deployment this flow uses (24 h, or the rehearsal's 10 min). */
+  graceSeconds(): number {
+    const cfg = this.config;
+    const g = cfg ? (this.deps.crt?.(cfg)?.deployment as { grace_seconds?: unknown } | undefined)?.grace_seconds : undefined;
+    return typeof g === 'number' && g > 0 ? g : 86_400;
+  }
   get network(): Network { return this.config?.network ?? 'testnet'; }
   get maxRecipients(): number { return this.config?.max_recipients ?? 10; }
   get maxVaultBytes(): number { return this.config?.max_vault_bytes ?? 26_214_400; }
@@ -365,7 +373,7 @@ export class WriteSession {
     const n = this.n ?? Math.max(1, Math.min(cfg.default_n, cfg.n_max));
     const t = clamp(this.t ?? 1, 1, n);
     try {
-      return quote(cfg, (this.deps.crt?.()?.deployment ?? null) as { block_seconds?: number } | null,
+      return quote(cfg, (this.deps.crt?.(cfg)?.deployment ?? null) as { block_seconds?: number } | null,
         { n, t, termSeconds: this.termSeconds(), heartbeatBlocks: this.heartbeat, heartbeatTip: this.tip });
     } catch { return null; }
   }
@@ -472,7 +480,7 @@ export class WriteSession {
         const letter = this.letterFor(r);
         const sealed = await encryptBundle(c.K, c.I, r.index, letter, this.rng, { maxBytes: cfg.max_vault_bytes });
         const html = buildVault({ descriptor: c.descriptor, envelopes: c.envelopes, deadline: c.deadline, recipient: letter.recipient, sealed,
-          meta: { network: c.network, language: r.language, sender_label: letter.sender_label, drill: this.drill, created_at: c.createdAt, app_url: cfg.app_url } });
+          meta: { network: c.network, language: r.language, sender_label: letter.sender_label, drill: this.drill, created_at: c.createdAt, app_url: cfg.app_url, grace_seconds: this.graceSeconds() } });
         out.push({ index: r.index, name: letter.recipient.name, language: r.language, fileName: vaultFileName(letter.sender_label, letter.recipient.name, c.T, this.drill), html });
       }
       this.vaults = out;

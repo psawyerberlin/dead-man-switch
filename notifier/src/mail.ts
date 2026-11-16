@@ -52,8 +52,8 @@ export function renderConfirmation(kind: 'owner_confirm' | 'told_now', p: Confir
 // ---- the watcher's emails (phase 3)
 
 /** The phone check-in page of SPEC.md §3.2, carried by every reminder and alarm. */
-export const checkinUrl = (appUrl: string, network: string, T: string, rhythm: string): string =>
-  `${appUrl}/app/#/checkin?network=${encodeURIComponent(network)}&T=${encodeURIComponent(T)}&rhythm=${encodeURIComponent(rhythm)}`;
+export const checkinUrl = (appUrl: string, network: string, T: string, rhythm: string, drill = false): string =>
+  `${appUrl}/app/#/checkin?network=${encodeURIComponent(network)}&T=${encodeURIComponent(T)}&rhythm=${encodeURIComponent(rhythm)}${drill ? '&drill=1' : ''}`;
 export const openPageUrl = (appUrl: string): string => `${appUrl}/app/#/open`;
 
 /** A chain time (unix seconds) in the address's language, in UTC. */
@@ -70,14 +70,14 @@ export function renderReminder(p: SwitchMailParams & { deadline: number; days: n
   const subject = p.short ? subjectFor(p.lang, 'reminder_drill_subject', p.drill, vars)
     : subjectFor(p.lang, p.days <= 1 ? 'reminder_subject_one' : 'reminder_subject', p.drill, vars);
   const body = t(p.lang, p.short ? 'reminder_drill_text' : 'reminder_text', vars);
-  return compose(p.lang, subject, [body, t(p.lang, 'checkin_link', { url: checkinUrl(p.appUrl, p.network, p.T, p.rhythm) })], p.stopUrl);
+  return compose(p.lang, subject, [body, t(p.lang, 'checkin_link', { url: checkinUrl(p.appUrl, p.network, p.T, p.rhythm, p.drill === true) })], p.stopUrl);
 }
 
 /** Grace alarm: "Your letters open in N hours. Check in now:" with the phone check-in link. */
 export function renderAlarm(p: SwitchMailParams & { hours: number }): Omit<MailMessage, 'to'> {
   const vars = { switch: switchLabel(p.T), hours: p.hours };
   const subject = subjectFor(p.lang, p.hours <= 1 ? 'alarm_subject_one' : 'alarm_subject', p.drill, vars);
-  return compose(p.lang, subject, [t(p.lang, 'alarm_text', vars), t(p.lang, 'checkin_link', { url: checkinUrl(p.appUrl, p.network, p.T, p.rhythm) })], p.stopUrl);
+  return compose(p.lang, subject, [t(p.lang, 'alarm_text', vars), t(p.lang, 'checkin_link', { url: checkinUrl(p.appUrl, p.network, p.T, p.rhythm, p.drill === true) })], p.stopUrl);
 }
 
 /** The release email of §3.3.3: the decrypted link (or "open the vault <sender> gave you"), the open page, three steps. */

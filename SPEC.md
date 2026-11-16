@@ -185,9 +185,11 @@ A rehearsal of the whole flow with the real guardians on testnet, for the owner 
 "Try a fire drill" on the home screen and in My switches; hidden on mainnet.
 
 * Deadline in **30 minutes to 48 hours** (presets 30 min, 1 h, 3 h, 12 h, 24 h, 48 h; custom within the range;
-  CRT allows terms ≥ 30 min on testnet and devnet). The letters open at the deadline + 24 h grace (a CRT protocol
-  constant), plus at most one guardian check (3 h at the drill's check interval of 1000 blocks). The screen says
-  so with the two dates.
+  CRT allows terms ≥ 30 min on testnet and devnet). A drill runs on CRT's **testnet rehearsal deployment**
+  (`deployments/testnet-drill.json`, contracts built with a 10-minute grace; its own node lock and CRT service, which a
+  runner enables next to the normal one). So the letters open at the deadline + 10 minutes, plus at most one guardian
+  check (50 blocks ≈ 9 min, the drill's check interval; CRT allows 50 on test networks). The screen shows both dates.
+  The vault carries the grace (`grace_seconds`), the messenger finds the switch under either deployment.
 * Guardians: as §3.1.5 on testnet (1-of-1 allowed without acknowledgement on a drill).
 * Everything is marked: a diagonal amber "Fire drill — testnet" ribbon on every screen, `drill-` in vault file
   names, "[Drill]" / "[Exercice]" / "[Probealarm]" in email subjects, a banner inside the vault.

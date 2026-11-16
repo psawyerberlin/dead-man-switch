@@ -35,6 +35,8 @@ export interface VaultPayload {
   ciphertext_b64: string;
   size: number;
   app_url: string;
+  /** grace of the switch's CRT deployment in seconds; absent in older vaults = 86 400 (a fire drill: 600) */
+  grace_seconds?: number;
 }
 
 export interface VaultMeta {
@@ -44,6 +46,8 @@ export interface VaultMeta {
   drill: boolean;
   created_at: number;
   app_url: string;
+  /** grace of the deployment (default 86 400) */
+  grace_seconds?: number;
 }
 
 export interface BuildVaultInput {
@@ -73,6 +77,8 @@ export function vaultPayload(input: Pick<BuildVaultInput, 'recipient' | 'sealed'
     recipient: { index: recipient.index, name: recipient.name }, drill: meta.drill, created_at: meta.created_at,
     cipher: VAULT_CIPHER, nonce: bytesToHex(sealed.nonce), ciphertext_b64: toBase64(sealed.ciphertext),
     size: sealed.ciphertext.length, app_url: meta.app_url,
+    // only a non-default grace is written, so normal vaults stay byte-identical to earlier builds
+    ...(meta.grace_seconds !== undefined && meta.grace_seconds !== 86_400 ? { grace_seconds: meta.grace_seconds } : {}),
   };
 }
 

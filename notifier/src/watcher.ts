@@ -149,12 +149,16 @@ export function createWatcher(deps: WatcherDeps): Watcher {
       return;
     }
     // In the grace: nothing once a guardian has released.
-    if (chainNow >= deadline + GRACE_S || s.releases > 0) return;
+    const grace = s.grace ?? GRACE_S;
+    if (chainNow >= deadline + grace || s.releases > 0) return;
     if (short) await deliver(network, rec.T, 'reminder', owner, `deadline@${deadline}`, () => renderReminder({ ...base, deadline, days: 0, short }));
+    // Hour-based alarms only make sense for a grace of an hour or more; a rehearsal's 10 minutes are covered by the
+    // deadline email above.
+    if (grace < HOUR) return;
     let off: number | undefined;
-    for (const h of rec.drill ? DRILL_ALARM_HOURS : ALARM_HOURS) if (chainNow >= deadline + h * HOUR) off = h;
+    for (const h of rec.drill ? DRILL_ALARM_HOURS : ALARM_HOURS) if (h * HOUR < grace && chainNow >= deadline + h * HOUR) off = h;
     if (off === undefined) return;
-    const hours = Math.max(1, Math.ceil((deadline + GRACE_S - chainNow) / HOUR));
+    const hours = Math.max(1, Math.ceil((deadline + grace - chainNow) / HOUR));
     await deliver(network, rec.T, 'alarm', owner, `${off}h@${deadline}`, () => renderAlarm({ ...base, hours }));
   }
 

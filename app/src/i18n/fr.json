@@ -217,7 +217,7 @@
   "drill.ribbon": "Exercice — testnet",
   "drill.title": "Faire un exercice",
   "drill.intro": "Une courte répétition avec de vrais gardiens sur testnet, pour vous et vos destinataires. Rien de réel n'est en jeu.",
-  "drill.opens_between": "Les lettres s'ouvrent entre le {earliest} et le {latest} : 24 heures de grâce après l'échéance, plus la prochaine vérification des gardiens.",
+  "drill.opens_between": "Les lettres s'ouvrent entre le {earliest} et le {latest} : la courte grâce après l'échéance, plus la prochaine vérification des gardiens.",
   "drill.report_title": "Bilan de l'exercice",
   "checkin.title": "Signaler votre présence",
   "checkin.button": "Signaler ma présence — nouvelle échéance {deadline}",
@@ -236,7 +236,7 @@
   "unit.hours": "{count, plural, one {# heure} other {# heures}}",
   "unit.minutes": "{count, plural, one {# minute} other {# minutes}}",
   "ics.alarm_half": "La moitié du délai est écoulée",
-  "ics.alarm_deadline": "C'est l'échéance : il reste 24 heures de grâce",
+  "ics.alarm_deadline": "L'échéance est arrivée : la période de grâce a commencé",
   "drill.subject_prefix": "[Exercice]",
   "template.legacy_checklist.title": "Liste pour mon héritage numérique",
   "template.legacy_checklist.body": "## Comptes\n\n- E-mail :\n- Banque et paiement :\n- Réseaux sociaux (garder, transformer en compte commémoratif ou fermer ?) :\n\n## Gestionnaire de mots de passe\n\n- Lequel, et où se trouve le mot de passe principal ou le kit d'urgence :\n\n## Appareils\n\n- Téléphone (le code de déverrouillage se trouve) :\n- Ordinateur :\n- Sauvegardes et stockage :\n\n## Abonnements à résilier\n\n- \n",
@@ -468,7 +468,7 @@
   "drill.custom_minutes": "Minutes jusqu'à l'échéance",
   "drill.deadline_at": "Échéance : {deadline}.",
   "drill.heartbeat_fixed": "Un exercice utilise un intervalle de vérification fixe : {interval}.",
-  "drill.point_term": "L'échéance est dans 30 minutes à 48 heures ; viennent ensuite 24 heures de grâce.",
+  "drill.point_term": "L'échéance est dans 30 minutes à 48 heures ; viennent ensuite 10 minutes de grâce.",
   "drill.point_marked": "Tout est marqué comme exercice : les écrans, les fichiers des coffres et les e-mails.",
   "drill.point_confirm": "Les destinataires doivent d'abord confirmer ; les adresses non confirmées ne reçoivent aucun e-mail d'exercice.",
   "drill.point_report": "Ensuite, le rapport d'exercice montre ce qui s'est passé.",
@@ -576,5 +576,5 @@
   "nav.menu": "Menu",
   "nav.menu_close": "Fermer",
   "error.network": "Le réseau CKB est injoignable. Vérifiez votre connexion et réessayez.",
-  "open.status.in_grace": "L'échéance du {deadline} est passée sans signe de présence. Après 24 heures de grâce, les gardiens publient leurs fragments : la lettre pourra être ouverte à partir du {opens} environ (jusqu'à quelques heures plus tard, à la prochaine vérification des gardiens). Revenez alors et cliquez sur « Vérifier sur la chaîne »."
+  "open.status.in_grace": "L'échéance du {deadline} est passée sans signe de présence. Après la période de grâce, les gardiens publient leurs fragments : la lettre pourra être ouverte à partir du {opens} environ (jusqu'à quelques heures plus tard, à la prochaine vérification des gardiens). Revenez alors et cliquez sur « Vérifier sur la chaîne »."
 }

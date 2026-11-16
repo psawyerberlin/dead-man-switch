@@ -8,6 +8,9 @@ export interface DrillConfig {
   max_hours: number;
   presets_minutes: number[];
   heartbeat_blocks: number;
+  /** CRT's testnet rehearsal deployment (GRACE 600 s) and its runner list; absent = the normal deployment */
+  crt_deployment_url?: string;
+  crt_runners_url?: string;
 }
 
 export interface Config {
@@ -98,6 +101,8 @@ export function validateConfig(raw: unknown, network: Network): Config {
     const presets_minutes = intList(d, 'presets_minutes', min_minutes, max_hours * 60);
     const heartbeat_blocks = num(d, 'heartbeat_blocks', 1, 1_000_000);
     drill = { min_minutes, max_hours, presets_minutes, heartbeat_blocks };
+    if (d.crt_deployment_url !== undefined) drill.crt_deployment_url = urlOrPath(d, 'crt_deployment_url');
+    if (d.crt_runners_url !== undefined) drill.crt_runners_url = urlOrPath(d, 'crt_runners_url');
   } else if (raw.drill === undefined) {
     fail('drill', 'is required (null disables the fire drill)');
   }
@@ -211,4 +216,13 @@ export async function loadCrtFiles(config: Config, fetchFn: FetchFn): Promise<Cr
   if (!list) throw new ConfigError('crt runners: neither an array nor {runners: [...]}');
   for (const r of list) if (!isObj(r) || typeof r.runner_lock_hash !== 'string') throw new ConfigError('crt runners: entry without runner_lock_hash');
   return { deployment, runners: list as RunnerEntry[] };
+}
+
+/** The config a fire drill runs with: CRT's rehearsal deployment and runner list (short grace) and the drill's check
+ *  interval, when the drill section names them; otherwise the config unchanged. */
+export function drillView(c: Config): Config {
+  const d = c.drill;
+  if (!d || !d.crt_deployment_url) return c;
+  return { ...c, crt_deployment_url: d.crt_deployment_url, crt_runners_url: d.crt_runners_url ?? c.crt_runners_url,
+    default_heartbeat_blocks: d.heartbeat_blocks };
 }
