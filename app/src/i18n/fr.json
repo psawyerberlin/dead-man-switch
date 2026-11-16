@@ -576,5 +576,9 @@
   "nav.menu": "Menu",
   "nav.menu_close": "Fermer",
   "error.network": "Le réseau CKB est injoignable. Vérifiez votre connexion et réessayez.",
-  "open.status.in_grace": "L'échéance du {deadline} est passée sans signe de présence. Après la période de grâce, les gardiens publient leurs fragments : la lettre pourra être ouverte à partir du {opens} environ (jusqu'à quelques heures plus tard, à la prochaine vérification des gardiens). Revenez alors et cliquez sur « Vérifier sur la chaîne »."
+  "open.status.in_grace": "L'échéance du {deadline} est passée sans signe de présence. Après la période de grâce, les gardiens publient leurs fragments : la lettre pourra être ouverte à partir du {opens} environ (jusqu'à quelques heures plus tard, à la prochaine vérification des gardiens). Revenez alors et cliquez sur « Vérifier sur la chaîne ».",
+  "mine.wake": "Réveiller les gardiens",
+  "mine.ring_due": "échu : s’ouvre au prochain battement d’un gardien",
+  "wake.done": "Envoyé. Chaque gardien libère sa clé à son prochain battement, une fois la période de grâce passée.",
+  "wake.running": "Tous les gardiens veillent encore : la libération vient à leur prochain battement après la période de grâce."
 }

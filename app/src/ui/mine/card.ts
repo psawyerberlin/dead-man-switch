@@ -1,7 +1,7 @@
 // One switch in My switches (SPEC.md §3.2, §8): an envelope with the countdown ring as its stamp, the health in plain
 // words, the timeline, the recipients and the owner's buttons. Cancel is one button and one dialog.
 import { formatCkb, formatDate, formatDuration, t } from '../../core/i18n';
-import { GRACE_SECONDS, rhythmSeconds } from '../../core/rhythm';
+import { rhythmSeconds } from '../../core/rhythm';
 import type { SavedSwitch } from '../../core/switches';
 import { button, linkButton } from '../components/button';
 import { confirmDialog } from '../components/dialog';
@@ -30,7 +30,9 @@ export function switchRing(svc: MineService, sw: SavedSwitch): HTMLElement | SVG
     return ring({ fraction: 0, value: t(`mine.state.${state}`), caption: formatDate(deadline, undefined, { time: false }), state: 'done' }).el;
   }
   if (left <= 0) {
-    return ring({ fraction: Math.max(0, (left + GRACE_SECONDS) / GRACE_SECONDS), value: formatDuration(left + GRACE_SECONDS), caption: t('mine.ring_grace'), state: 'grace' }).el;
+    const grace = svc.graceSecondsOf(sw);
+    if (left + grace <= 0) return ring({ fraction: 0, value: '0', caption: t('mine.ring_due'), state: 'grace' }).el;
+    return ring({ fraction: Math.max(0, (left + grace) / grace), value: formatDuration(left + grace), caption: t('mine.ring_grace'), state: 'grace' }).el;
   }
   const lastStart = card.history?.length ? card.history[card.history.length - 1]!.timestamp : sw.created_at;
   const r = svc.rhythmOf(sw);
@@ -114,6 +116,11 @@ export function switchCard(app: MineApp, sw: SavedSwitch): HTMLElement {
   const reclaim = state === 'released' || state === 'cancelled'
     ? button(t('mine.reclaim'), { kind: 'secondary', class: 'dms-card__action', disabled: busy, onClick: () => { void svc.reclaim(sw); } }) : null;
   reclaim?.setAttribute('data-action', 'reclaim');
+  const deadlineNow = svc.deadline(sw);
+  const overdue = live && deadlineNow !== null && svc.chainNow(sw) >= deadlineNow;
+  const wake = overdue
+    ? button(t('mine.wake'), { kind: 'secondary', class: 'dms-card__action', disabled: busy, onClick: () => { void svc.wake(sw); } }) : null;
+  wake?.setAttribute('data-action', 'wake');
 
   // Download the vaults again: from this page's Write session, or rebuilt from the owner archive.
   const session = app.sessions?.().find((x) => x.created?.T === sw.T.toLowerCase() && x.created.network === sw.network && x.vaults);
@@ -150,14 +157,14 @@ export function switchCard(app: MineApp, sw: SavedSwitch): HTMLElement {
     c.busy === 'refresh' && !c.summary ? note(t('open.reading')) : null,
     c.error ? note(t('mine.error', { message: c.error }), 'error') : null,
     c.done ? note(t(c.done.key, { ...c.done.params, deadline: c.done.params?.deadline ? formatDate(Number(c.done.params.deadline)) : '' }), 'ok', { role: 'status' }) : null,
-    c.busy === 'checkin' || c.busy === 'cancel' || c.busy === 'reclaim' ? note(t('mine.signing'), 'soft', { role: 'status' }) : null,
+    c.busy === 'checkin' || c.busy === 'cancel' || c.busy === 'reclaim' || c.busy === 'wake' ? note(t('mine.signing'), 'soft', { role: 'status' }) : null,
     timeline(svc, sw),
     recipients(svc, sw),
     c.messengerError ? note(t('mine.messenger_error', { message: c.messengerError }), 'warn') : null,
     live && next !== null ? h('p', { class: 'dms-soft dms-card__checkin-note' }, t('mine.checkin_note', { deadline: formatDate(next) }),
       est ? ` ${t('mine.checkin_cost', { amount: formatCkb(est.spentOverTerm) })}` : '') : null,
     live && overlap > 0 ? h('p', { class: 'dms-soft', 'data-overlap': overlap }, t('mine.checkin_overlap', { days: overlap })) : null,
-    h('div', { class: 'dms-actions dms-card__actions' }, checkin, away, settings, change, cancel, reclaim, download),
+    h('div', { class: 'dms-actions dms-card__actions' }, checkin, wake, away, settings, change, cancel, reclaim, download),
     sw.drill ? h('p', {}, linkButton(t('drill.report_title'), `#/drill/report?T=${sw.T}`, { kind: 'quiet' })) : null,
     h('details', { class: 'dms-advanced' }, h('summary', {}, t('mine.details')),
       h('dl', { class: 'dms-card__details' },

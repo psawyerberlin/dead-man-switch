@@ -576,5 +576,9 @@
   "nav.menu": "Menu",
   "nav.menu_close": "Close",
   "error.network": "The CKB network could not be reached. Check your connection and try again.",
-  "open.status.in_grace": "The deadline passed on {deadline} without a check-in. After the grace period the guardians publish their pieces: the letter can be opened from about {opens} (up to a few hours later, at the guardians' next check). Come back then and press “Check the chain”."
+  "open.status.in_grace": "The deadline passed on {deadline} without a check-in. After the grace period the guardians publish their pieces: the letter can be opened from about {opens} (up to a few hours later, at the guardians' next check). Come back then and press “Check the chain”.",
+  "mine.wake": "Wake the guardians",
+  "mine.ring_due": "due: opens at the next guardian heartbeat",
+  "wake.done": "Sent. Each guardian releases its key at its next heartbeat, once the grace is over.",
+  "wake.running": "Every guardian is still on watch: the release comes at its next heartbeat after the grace."
 }

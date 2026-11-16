@@ -30,6 +30,8 @@ export interface OwnerDriver {
   cancel(config: Config, T: string): Promise<string>;
   /** CRT `buildReclaim` (Node Cells and one expired job per call), signed and sent */
   reclaim(config: Config, T: string, runners: string[]): Promise<string>;
+  /** CRT `buildTopUp`: a new heartbeat job for every guardian whose job no longer runs, signed and sent */
+  wake?(config: Config, T: string): Promise<string>;
 }
 
 /** What the messenger answers to `GET /switch/:network/:T` (notifier `summary`). */
@@ -66,7 +68,7 @@ export interface OwnerDeps {
 
 export interface RebuiltVault { index: number; name: string; fileName: string; html: string }
 
-export type Busy = 'refresh' | 'checkin' | 'cancel' | 'reclaim' | 'settings' | null;
+export type Busy = 'refresh' | 'checkin' | 'cancel' | 'reclaim' | 'wake' | 'settings' | null;
 
 export interface CardState {
   summary: SwitchSummary | null;
@@ -127,7 +129,7 @@ export class MineService {
   }
 
   /** The grace of the deployment a config uses (24 h, or the rehearsal's 10 min). */
-  private graceOf(cfg: Config): number {
+  graceOf(cfg: Config): number {
     const g = (this.deps.crt?.(cfg)?.deployment as { grace_seconds?: unknown } | undefined)?.grace_seconds;
     return typeof g === 'number' && g > 0 ? g : 86_400;
   }
@@ -396,6 +398,31 @@ export class MineService {
       return true;
     } catch (e) {
       this.patchCard(s, { busy: null, error: message(e) });
+      return false;
+    }
+  }
+
+  /** The grace of the switch's deployment (24 h, or the rehearsal's 10 min). */
+  graceSecondsOf(s: SavedSwitch): number {
+    const cfg = this.cfgOf(s);
+    return cfg ? this.graceOf(cfg) : 86_400;
+  }
+
+  /** Wake the guardians: after the deadline, when nothing was released. A guardian only releases at a heartbeat of
+   *  its job; a job that ran out (blocks faster than planned) gets a new one. One signature, a few CKB, refunded. */
+  async wake(s: SavedSwitch): Promise<boolean> {
+    const cfg = this.cfgOf(s);
+    const driver = this.deps.driver;
+    try {
+      if (!cfg || !driver?.wake) throw new Error('no chain connection');
+      this.patchCard(s, { busy: 'wake', error: null, done: null });
+      await driver.wake(cfg, s.T);
+      this.patchCard(s, { busy: null, done: { key: 'wake.done' } });
+      return true;
+    } catch (e) {
+      const m = message(e);
+      if (/still has a running heartbeat job/.test(m)) { this.patchCard(s, { busy: null, done: { key: 'wake.running' } }); return true; }
+      this.patchCard(s, { busy: null, error: m });
       return false;
     }
   }

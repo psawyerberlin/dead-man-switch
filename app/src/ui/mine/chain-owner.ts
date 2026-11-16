@@ -62,5 +62,9 @@ export function chainOwner(deps: ChainOwnerDeps): OwnerDriver {
       const { signer, b } = await builders(config);
       return send(signer, await b.buildReclaim(T, runners));
     },
+    async wake(config: Config, T: string) {
+      const { signer, b } = await builders(config);
+      return send(signer, await b.buildTopUp(T));
+    },
   };
 }

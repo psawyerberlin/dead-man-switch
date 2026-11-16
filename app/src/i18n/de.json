@@ -576,5 +576,9 @@
   "nav.menu": "Menü",
   "nav.menu_close": "Schließen",
   "error.network": "Das CKB-Netzwerk ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-  "open.status.in_grace": "Die Frist ist am {deadline} ohne Meldung verstrichen. Nach der Kulanzzeit veröffentlichen die Wächter ihre Teile: Der Brief lässt sich ab etwa {opens} öffnen (bis zu einigen Stunden später, bei der nächsten Prüfung der Wächter). Kommen Sie dann wieder und klicken Sie auf „Auf der Chain prüfen“."
+  "open.status.in_grace": "Die Frist ist am {deadline} ohne Meldung verstrichen. Nach der Kulanzzeit veröffentlichen die Wächter ihre Teile: Der Brief lässt sich ab etwa {opens} öffnen (bis zu einigen Stunden später, bei der nächsten Prüfung der Wächter). Kommen Sie dann wieder und klicken Sie auf „Auf der Chain prüfen“.",
+  "mine.wake": "Wächter wecken",
+  "mine.ring_due": "fällig: öffnet beim nächsten Herzschlag eines Wächters",
+  "wake.done": "Gesendet. Jeder Wächter gibt seinen Schlüssel beim nächsten Herzschlag frei, sobald die Nachfrist vorbei ist.",
+  "wake.running": "Alle Wächter halten noch Wache: die Freigabe kommt beim nächsten Herzschlag nach der Nachfrist."
 }
