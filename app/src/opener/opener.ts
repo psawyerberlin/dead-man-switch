@@ -14,6 +14,9 @@ import { OPENER_CSS } from './styles';
 
 // ---- what the CRT kit exposes (CRT client/kit/recovery.ts) -------------------------------------------------------
 
+/** CRT's protocol grace after the deadline (lock script constant, CRT SPEC §6). */
+const GRACE_SECONDS = 24 * 3600;
+
 export interface KitSwitchStatus {
   alive: boolean;
   nodes: { R: string; state: number; deadline: bigint; descriptorHash: string }[];
@@ -232,7 +235,12 @@ export function installOpener(win: Window): OpenerHandle {
         sheet.append(msg({ key: 'open.short', params: { have: status.released, need, missing: need - status.released } }));
       } else {
         const dl = status.deadline != null ? Number(status.deadline) : certificateDeadline();
-        sheet.append(msg({ key: 'open.status.not_yet', params: { deadline: dl === null ? '—' : formatDate(dl, state.lang) } }));
+        // Device clock: the chain's median time trails it by minutes, which does not change these sentences.
+        if (dl !== null && Date.now() / 1000 > dl) {
+          sheet.append(msg({ key: 'open.status.in_grace', params: { deadline: formatDate(dl, state.lang), opens: formatDate(dl + GRACE_SECONDS, state.lang) } }));
+        } else {
+          sheet.append(msg({ key: 'open.status.not_yet', params: { deadline: dl === null ? '—' : formatDate(dl, state.lang) } }));
+        }
       }
     }
     if (kit().api) actions.prepend(button('open.check', () => { void checkChain(); }, false, busy));

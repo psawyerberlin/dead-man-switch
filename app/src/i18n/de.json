@@ -132,7 +132,7 @@
   "open.integrity.mismatch": "Dieser Tresor passt nicht zu seinem Eintrag. Vertrauen Sie seinem Inhalt nicht.",
   "open.sealed_by": "Versiegelt von {sender} für {recipient} am {date}.",
   "open.opens_if": "Öffnet sich, wenn {sender} sich bis {deadline} nicht gemeldet hat.",
-  "open.status.not_yet": "Noch nicht. Der Eigentümer hat sich gemeldet; die aktuelle Frist ist {deadline}.",
+  "open.status.not_yet": "Noch nicht. Der Brief öffnet sich nur, wenn sich der Eigentümer bis {deadline} nicht gemeldet hat.",
   "open.status.released": "Freigegeben. {count} von {n} Wächtern haben ihr Stück veröffentlicht.",
   "open.status.cancelled": "Der Eigentümer hat diesen Schalter am {date} widerrufen. Der Brief kann nicht geöffnet werden.",
   "open.status.offline": "Keine Verbindung zur Kette. Sie können die veröffentlichten Stücke der Wächter von Hand einfügen.",
@@ -575,5 +575,6 @@
   "practice.note": "Hier stünde eine persönliche Notiz.",
   "nav.menu": "Menü",
   "nav.menu_close": "Schließen",
-  "error.network": "Das CKB-Netzwerk ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut."
+  "error.network": "Das CKB-Netzwerk ist nicht erreichbar. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+  "open.status.in_grace": "Die Frist ist am {deadline} ohne Meldung verstrichen. Nach 24 Stunden Kulanz veröffentlichen die Wächter ihre Teile: Der Brief lässt sich ab etwa {opens} öffnen (bis zu einigen Stunden später, bei der nächsten Prüfung der Wächter). Kommen Sie dann wieder und klicken Sie auf „Auf der Chain prüfen“."
 }

@@ -132,7 +132,7 @@
   "open.integrity.mismatch": "This vault does not match its record. Do not trust its contents.",
   "open.sealed_by": "Sealed by {sender} for {recipient} on {date}.",
   "open.opens_if": "Opens if {sender} has not checked in by {deadline}.",
-  "open.status.not_yet": "Not yet. The owner checked in; the current deadline is {deadline}.",
+  "open.status.not_yet": "Not yet. The letter opens only if the owner has not checked in by {deadline}.",
   "open.status.released": "Released. {count} of {n} guardians have published their piece.",
   "open.status.cancelled": "The owner cancelled this switch on {date}. The letter cannot be opened.",
   "open.status.offline": "No connection to the chain. You can paste the guardians' released pieces by hand.",
@@ -575,5 +575,6 @@
   "practice.note": "A personal note would appear here.",
   "nav.menu": "Menu",
   "nav.menu_close": "Close",
-  "error.network": "The CKB network could not be reached. Check your connection and try again."
+  "error.network": "The CKB network could not be reached. Check your connection and try again.",
+  "open.status.in_grace": "The deadline passed on {deadline} without a check-in. After 24 hours of grace the guardians publish their pieces: the letter can be opened from about {opens} (up to a few hours later, at the guardians' next check). Come back then and press “Check the chain”."
 }

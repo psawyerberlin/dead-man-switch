@@ -132,7 +132,7 @@
   "open.integrity.mismatch": "Ce coffre ne correspond pas à son enregistrement. Ne faites pas confiance à son contenu.",
   "open.sealed_by": "Scellé par {sender} pour {recipient} le {date}.",
   "open.opens_if": "S'ouvre si {sender} n'a pas signalé sa présence avant le {deadline}.",
-  "open.status.not_yet": "Pas encore. Le propriétaire a signalé sa présence ; l'échéance actuelle est le {deadline}.",
+  "open.status.not_yet": "Pas encore. La lettre ne s'ouvre que si le propriétaire n'a pas signalé sa présence avant le {deadline}.",
   "open.status.released": "Libéré. {count} gardiens sur {n} ont publié leur fragment.",
   "open.status.cancelled": "Le propriétaire a annulé ce dispositif le {date}. La lettre ne peut pas être ouverte.",
   "open.status.offline": "Pas de connexion à la chaîne. Vous pouvez coller à la main les fragments publiés par les gardiens.",
@@ -575,5 +575,6 @@
   "practice.note": "Une note personnelle apparaîtrait ici.",
   "nav.menu": "Menu",
   "nav.menu_close": "Fermer",
-  "error.network": "Le réseau CKB est injoignable. Vérifiez votre connexion et réessayez."
+  "error.network": "Le réseau CKB est injoignable. Vérifiez votre connexion et réessayez.",
+  "open.status.in_grace": "L'échéance du {deadline} est passée sans signe de présence. Après 24 heures de grâce, les gardiens publient leurs fragments : la lettre pourra être ouverte à partir du {opens} environ (jusqu'à quelques heures plus tard, à la prochaine vérification des gardiens). Revenez alors et cliquez sur « Vérifier sur la chaîne »."
 }
