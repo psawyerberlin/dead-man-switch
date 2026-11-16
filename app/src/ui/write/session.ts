@@ -438,6 +438,8 @@ export class WriteSession {
         createdAt: now, chosen, ownerCode, claimed: ownerCode !== null };
       this.setStatus({ phase: 'sign' });
       await prepared.send();
+      // saved now, so that a switch whose Arm fails can still be found and cancelled in My switches
+      this.remember();
       this.setStatus({ phase: 'wait', sent: true });
       await driver.waitForCommits(cfg, prepared.T, n, (done) => this.setStatus({ done }));
       this.setStatus({ phase: 'verify', done: n });
@@ -461,10 +463,11 @@ export class WriteSession {
   /** The local list of switches (My switches): network, T and what is public. */
   private remember(): void {
     const c = this.created;
-    if (!c || !this.storage || !c.descriptor) return;
+    if (!c || !this.storage) return;
     upsertSwitch(this.storage, { network: c.network, T: c.T, I: c.I, created_at: c.createdAt, deadline: c.deadline, sender_label: this.senderLabel.trim(),
-      rhythm: rhythmIso(this.rhythm), drill: this.drill, messenger: c.claimed, descriptor_hash: descriptorHash(c.descriptor),
-      heartbeat_blocks: this.heartbeat, heartbeat_tip_ckb: this.tip, descriptor: c.descriptor, recipients: this.recipients.map((r) => ({ index: r.index, name: r.name.trim(), language: r.language })) });
+      rhythm: rhythmIso(this.rhythm), drill: this.drill, messenger: c.claimed,
+      ...(c.descriptor ? { descriptor_hash: descriptorHash(c.descriptor), descriptor: c.descriptor } : {}),
+      heartbeat_blocks: this.heartbeat, heartbeat_tip_ckb: this.tip, recipients: this.recipients.map((r) => ({ index: r.index, name: r.name.trim(), language: r.language })) });
   }
 
   // ---- seal ----
